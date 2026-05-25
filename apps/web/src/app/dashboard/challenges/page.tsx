@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -35,30 +35,105 @@ interface Challenge {
 
 const PAGE_SIZE = 15;
 
+type DifficultyFilter = "ALL" | "EASY" | "MEDIUM" | "HARD";
+
+interface ChallengesState {
+  challenges: Challenge[] | undefined;
+  loadingMore: boolean;
+  hasMore: boolean;
+  userElo: number;
+  filterDifficulty: DifficultyFilter;
+  searchQuery: string;
+}
+
+type ChallengesAction =
+  | {
+      type: "initialLoaded";
+      payload: { challenges: Challenge[]; hasMore: boolean; userElo: number };
+    }
+  | { type: "initialFailed" }
+  | { type: "loadingMore"; payload: boolean }
+  | { type: "appendLoaded"; payload: { challenges: Challenge[]; hasMore: boolean } }
+  | { type: "setFilter"; payload: DifficultyFilter }
+  | { type: "setSearch"; payload: string };
+
+const initialState: ChallengesState = {
+  challenges: undefined,
+  loadingMore: false,
+  hasMore: false,
+  userElo: 1200,
+  filterDifficulty: "ALL",
+  searchQuery: "",
+};
+
+function challengesReducer(
+  state: ChallengesState,
+  action: ChallengesAction
+): ChallengesState {
+  switch (action.type) {
+    case "initialLoaded":
+      return {
+        ...state,
+        challenges: action.payload.challenges,
+        hasMore: action.payload.hasMore,
+        userElo: action.payload.userElo,
+      };
+    case "initialFailed":
+      return {
+        ...state,
+        challenges: [],
+      };
+    case "loadingMore":
+      return {
+        ...state,
+        loadingMore: action.payload,
+      };
+    case "appendLoaded":
+      return {
+        ...state,
+        challenges: [...(state.challenges ?? []), ...action.payload.challenges],
+        hasMore: action.payload.hasMore,
+      };
+    case "setFilter":
+      return {
+        ...state,
+        filterDifficulty: action.payload,
+      };
+    case "setSearch":
+      return {
+        ...state,
+        searchQuery: action.payload,
+      };
+    default:
+      return state;
+  }
+}
+
 export default function ChallengesPage() {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const [userElo, setUserElo] = useState(1200);
-  const [filterDifficulty, setFilterDifficulty] = useState<string>("ALL");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [state, dispatch] = useReducer(challengesReducer, initialState);
+  const loading = state.challenges === undefined;
+  const challenges = state.challenges ?? [];
 
   useEffect(() => {
     const fetchInitialChallenges = async () => {
       try {
         const res = await getChallenges({ limit: PAGE_SIZE, offset: 0 });
         if (res.success && res.data) {
-          setChallenges(res.data.items as Challenge[]);
-          setHasMore(res.data.hasMore);
-          setUserElo(res.data.userElo);
+          dispatch({
+            type: "initialLoaded",
+            payload: {
+              challenges: res.data.items as Challenge[],
+              hasMore: res.data.hasMore,
+              userElo: res.data.userElo,
+            },
+          });
         } else {
+          dispatch({ type: "initialFailed" });
           toast.error(res.error || "Erro ao carregar desafios");
         }
       } catch {
+        dispatch({ type: "initialFailed" });
         toast.error("Erro ao conectar ao servidor");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -66,23 +141,28 @@ export default function ChallengesPage() {
   }, []);
 
   const loadMoreChallenges = async () => {
-    if (loadingMore || !hasMore) {
+    if (state.loadingMore || !state.hasMore) {
       return;
     }
 
-    setLoadingMore(true);
+    dispatch({ type: "loadingMore", payload: true });
     try {
       const res = await getChallenges({ limit: PAGE_SIZE, offset: challenges.length });
       if (res.success && res.data) {
-        setChallenges(prev => [...prev, ...(res.data.items as Challenge[])]);
-        setHasMore(res.data.hasMore);
+        dispatch({
+          type: "appendLoaded",
+          payload: {
+            challenges: res.data.items as Challenge[],
+            hasMore: res.data.hasMore,
+          },
+        });
       } else {
         toast.error(res.error || "Erro ao carregar mais desafios");
       }
     } catch {
       toast.error("Erro ao conectar ao servidor");
     } finally {
-      setLoadingMore(false);
+      dispatch({ type: "loadingMore", payload: false });
     }
   };
 
@@ -145,7 +225,7 @@ export default function ChallengesPage() {
   };
 
   const getLevelCompatibility = (recommendedElo: number) => {
-    const delta = recommendedElo - userElo;
+    const delta = recommendedElo - state.userElo;
     if (delta <= 150) {
       return {
         label: "Nível Compatível",
@@ -167,11 +247,11 @@ export default function ChallengesPage() {
 
   const filtered = challenges.filter(ch => {
     const matchesSearch =
-      ch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ch.tags.toLowerCase().includes(searchQuery.toLowerCase());
+      ch.title.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+      ch.tags.toLowerCase().includes(state.searchQuery.toLowerCase());
 
     const matchesDifficulty =
-      filterDifficulty === "ALL" || ch.difficulty === filterDifficulty;
+      state.filterDifficulty === "ALL" || ch.difficulty === state.filterDifficulty;
 
     return matchesSearch && matchesDifficulty;
   });
@@ -179,23 +259,23 @@ export default function ChallengesPage() {
   return (
     <div className="flex-1 w-full bg-background/50 px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="border-b border-border pb-6">
-        <h1 className="text-xl font-bold tracking-tight">Diretório de Desafios</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Diretório de Desafios</h1>
         <p className="text-xs text-muted-foreground mt-1">
           Explore o repositório de exercícios de leitura e diagnóstico React.
         </p>
-        <p className="text-[10px] font-mono text-muted-foreground mt-2">Seu Rating Atual: {userElo} ELO</p>
+        <p className="text-[10px] font-mono text-muted-foreground mt-2">Seu Rating Atual: {state.userElo} ELO</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:flex-1">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar desafios por título ou tag (ex: useEffect)..."
-            className="pl-9 h-9"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
-        </div>
+            <Input
+              placeholder="Buscar desafios por título ou tag (ex: useEffect)…"
+              className="pl-9 h-9"
+              value={state.searchQuery}
+              onChange={e => dispatch({ type: "setSearch", payload: e.target.value })}
+            />
+          </div>
 
         <div className="flex flex-wrap gap-1.5 items-center w-full md:w-auto">
           <span className="text-xs text-muted-foreground mr-1.5 flex items-center gap-1 font-medium">
@@ -204,9 +284,9 @@ export default function ChallengesPage() {
           {(["ALL", "EASY", "MEDIUM", "HARD"] as const).map(diff => (
             <Button
               key={diff}
-              variant={filterDifficulty === diff ? "default" : "outline"}
+              variant={state.filterDifficulty === diff ? "default" : "outline"}
               size="xs"
-              onClick={() => setFilterDifficulty(diff)}
+              onClick={() => dispatch({ type: "setFilter", payload: diff })}
               className="h-7 text-3xs font-mono uppercase"
             >
               {diff === "ALL" ? "Todos" : getDifficultyLabel(diff)}
@@ -219,7 +299,7 @@ export default function ChallengesPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            <p className="text-xs text-muted-foreground">Buscando repositório de desafios...</p>
+            <p className="text-xs text-muted-foreground">Buscando repositório de desafios…</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">
@@ -298,18 +378,18 @@ export default function ChallengesPage() {
         )}
       </div>
 
-      {!loading && hasMore ? (
+      {!loading && state.hasMore ? (
         <div className="flex justify-center">
           <Button
             variant="outline"
             onClick={loadMoreChallenges}
-            disabled={loadingMore}
+            disabled={state.loadingMore}
             className="h-8 rounded-none font-mono uppercase text-xs"
           >
-            {loadingMore ? (
+            {state.loadingMore ? (
               <>
                 <Loader2 className="size-3.5 animate-spin mr-1.5" />
-                Carregando...
+                Carregando…
               </>
             ) : (
               "Carregar Mais"
