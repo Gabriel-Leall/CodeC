@@ -20,7 +20,7 @@ import {
 
 import { Button } from "@CC/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@CC/ui/components/card";
-import { getChallenge, submitAttempt } from "../../actions";
+import { getChallenge, getLocalUser, submitAttempt } from "../../actions";
 
 interface Challenge {
   id: string;
@@ -45,31 +45,41 @@ interface AttemptResult {
   score: number;
   eloChange: number;
   newElo: number;
+  isFirstAttempt: boolean;
   feedback: Feedback;
 }
+
+const MIN_ANSWER_LENGTH = 30;
 
 export default function TrainArenaPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
 
   const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [userElo, setUserElo] = useState(1200);
   const [loadingChallenge, setLoadingChallenge] = useState(true);
   
   // Submit state
   const [userAnswer, setUserAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [answerLocked, setAnswerLocked] = useState(false);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [showComparison, setShowComparison] = useState(false);
 
   useEffect(() => {
     const fetchChallengeData = async () => {
       try {
-        const res = await getChallenge(id);
-        if (res.success && res.data) {
-          setChallenge(res.data);
+        const [challengeRes, userRes] = await Promise.all([getChallenge(id), getLocalUser()]);
+
+        if (challengeRes.success && challengeRes.data) {
+          setChallenge(challengeRes.data);
         } else {
-          toast.error(res.error || "Desafio não encontrado");
+          toast.error(challengeRes.error || "Desafio não encontrado");
           router.push("/dashboard/challenges");
+        }
+
+        if (userRes.success && userRes.data) {
+          setUserElo(userRes.data.elo);
         }
       } catch (err) {
         toast.error("Erro ao conectar ao servidor");
@@ -83,11 +93,17 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
   // Form submission
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!userAnswer.trim()) {
-      toast.error("Por favor, digite seu diagnóstico técnico.");
+    if (submitting || answerLocked) {
       return;
     }
 
+    const answerLength = userAnswer.trim().length;
+    if (answerLength < MIN_ANSWER_LENGTH) {
+      toast.error(`Escreva pelo menos ${MIN_ANSWER_LENGTH} caracteres para enviar.`);
+      return;
+    }
+
+    setAnswerLocked(true);
     setSubmitting(true);
     try {
       const res = await submitAttempt(id, userAnswer);
@@ -95,9 +111,11 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
         setResult(res.data as any);
         toast.success("Diagnóstico avaliado com sucesso!");
       } else {
+        setAnswerLocked(false);
         toast.error(res.error || "Erro ao avaliar resposta");
       }
     } catch (err) {
+      setAnswerLocked(false);
       toast.error("Erro ao enviar resposta para correção");
     } finally {
       setSubmitting(false);
@@ -124,6 +142,8 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
   if (!challenge) return null;
 
   const lines = challenge.code.split("\n");
+  const answerLength = userAnswer.trim().length;
+  const canSubmit = !submitting && !answerLocked && answerLength >= MIN_ANSWER_LENGTH;
 
   const getDifficultyLabel = (diff: string) => {
     switch (diff) {
@@ -137,6 +157,29 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
         return diff;
     }
   };
+
+  const getLevelCompatibility = (recommendedElo: number) => {
+    const delta = recommendedElo - userElo;
+    if (delta <= 150) {
+      return {
+        label: "Nível Compatível",
+        className:
+          "inline-flex items-center border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      };
+    }
+
+    if (delta > 200) {
+      return {
+        label: "Desafio Avançado para o seu Rating",
+        className:
+          "inline-flex items-center gap-1 border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+      };
+    }
+
+    return null;
+  };
+
+  const compatibility = getLevelCompatibility(challenge.recommendedElo);
 
   return (
     <div className="flex-1 w-full bg-background/50 flex flex-col max-w-7xl mx-auto p-4 md:p-6 space-y-4 animate-in fade-in duration-300">
@@ -194,6 +237,14 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
                 <HelpCircle className="size-3.5" />
                 Pergunta de Diagnóstico
               </CardTitle>
+              {compatibility ? (
+                <CardDescription>
+                  <span className={compatibility.className}>
+                    {compatibility.label.includes("Avançado") ? <AlertCircle className="size-3" /> : null}
+                    {compatibility.label}
+                  </span>
+                </CardDescription>
+              ) : null}
             </CardHeader>
             <CardContent>
               <p className="text-xs font-semibold text-foreground leading-relaxed">
@@ -207,7 +258,17 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
         {/* Right Column (40% width) - Dynamic State Panel */}
         <div className="lg:col-span-4 flex flex-col">
           
-          {!result ? (
+          {submitting && !result ? (
+            <div className="flex-1 flex flex-col border border-border bg-card p-5 items-center justify-center text-center gap-3">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+              <p className="text-xs font-medium text-foreground">
+                Analisando sua resposta com base na rubrica sênior...
+              </p>
+              <p className="text-3xs text-muted-foreground">
+                Evite recarregar a página durante o processamento.
+              </p>
+            </div>
+          ) : !result ? (
             /* STATE 1: ANSWER FORM INPUT */
             <form onSubmit={handleSubmit} className="flex-1 flex flex-col border border-border bg-card p-5 space-y-4 justify-between h-full">
               
@@ -226,13 +287,14 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
                     value={userAnswer}
                     onChange={e => setUserAnswer(e.target.value)}
                     onKeyDown={handleKeyDown}
+                    readOnly={answerLocked}
                     disabled={submitting}
                   />
                 </div>
               </div>
 
               <div className="pt-4 border-t border-border flex flex-col gap-2">
-                <Button type="submit" disabled={submitting || !userAnswer.trim()} className="w-full h-9 rounded-none font-mono uppercase text-xs">
+                <Button type="submit" disabled={!canSubmit} className="w-full h-9 rounded-none font-mono uppercase text-xs">
                   {submitting ? (
                     <>
                       <Loader2 className="size-3.5 animate-spin mr-1.5" />
@@ -245,6 +307,9 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
                     </>
                   )}
                 </Button>
+                <span className="text-[10px] text-center text-muted-foreground font-mono">
+                  {answerLength}/{MIN_ANSWER_LENGTH} caracteres mínimos
+                </span>
                 <span className="text-[10px] text-center text-muted-foreground font-mono">
                   Ctrl + Enter para enviar imediatamente
                 </span>
@@ -267,15 +332,20 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
                   <div className="text-right">
                     <span className="text-4xs font-mono uppercase text-muted-foreground">Variação Rating</span>
                     <div className="mt-0.5">
-                      {result.eloChange >= 0 ? (
+                      {result.eloChange > 0 ? (
                         <span className="text-emerald-500 font-bold font-mono text-sm inline-flex items-center gap-0.5">
                           <ArrowUpRight className="size-4" />
                           +{result.eloChange} ELO
                         </span>
-                      ) : (
+                      ) : result.eloChange < 0 ? (
                         <span className="text-rose-500 font-bold font-mono text-sm inline-flex items-center gap-0.5">
                           <ArrowDownRight className="size-4" />
                           {result.eloChange} ELO
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground font-bold font-mono text-xs inline-flex items-center gap-1">
+                          <AlertCircle className="size-3.5" />
+                          Sem alteração (re-tentativa)
                         </span>
                       )}
                     </div>
@@ -365,6 +435,7 @@ export default function TrainArenaPage({ params }: { params: Promise<{ id: strin
                   onClick={() => {
                     setResult(null);
                     setUserAnswer("");
+                    setAnswerLocked(false);
                     setShowComparison(false);
                   }}
                   className="flex-1 h-9 rounded-none font-mono uppercase text-xs"
