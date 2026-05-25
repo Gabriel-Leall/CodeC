@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@CC/auth": "workspace:*",
+    "@CC/db": "workspace:*",
     "@CC/env": "workspace:*",
     "@CC/ui": "workspace:*",
     "@prisma/client": "catalog:",

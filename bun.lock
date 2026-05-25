@@ -20,6 +20,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@CC/auth": "workspace:*",
+        "@CC/db": "workspace:*",
         "@CC/env": "workspace:*",
         "@CC/ui": "workspace:*",
         "@prisma/client": "catalog:",

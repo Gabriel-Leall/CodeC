@@ -1,0 +1,32 @@
+model Challenge {
+  id             String    @id @default(uuid())
+  title          String
+  difficulty     String    // EASY, MEDIUM, HARD
+  recommendedElo Int       @default(1200)
+  code           String    // React code snippet
+  question       String    // Question to diagnose
+  solution       String    // Senior solution template
+  tags           String    // Comma-separated tags, e.g. "useEffect,stale-closure"
+  attempts       Attempt[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("challenge")
+}
+
+model Attempt {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId  String
+  challenge    Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userAnswer   String    // Answer typed by the user
+  feedbackJson String    // JSON containing score, summary, strengths, blindspots, seniorSolution
+  score        Float     // 0-10 score
+  eloChange    Int       // ELO variation (+/-)
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([challengeId])
+  @@map("attempt")
+}

@@ -8,6 +8,8 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  elo           Int       @default(1200)
+  attempts      Attempt[]
 
   @@unique([email])
   @@map("user")
