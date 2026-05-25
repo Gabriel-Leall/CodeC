@@ -1,0 +1,10 @@
+{
+  "id": "react-rendering-object-dependency-infinite-loop",
+  "title": "Loop Infinito por Dependência de Objeto",
+  "difficulty": "EASY",
+  "recommendedElo": 1200,
+  "code": "import React, { useState, useEffect } from 'react';\n\nexport function DataFetcher() {\n  const [data, setData] = useState([]);\n  const config = { api: \"https://api.example.com/items\" };\n\n  useEffect(() => {\n    fetch(config.api)\n      .then(res => res.json())\n      .then(data => setData(data));\n  }, [config]); // Objeto config como dependência\n\n  return (\n    <ul>\n      {data.map(item => <li key={item.id}>{item.name}</li>)}\n    </ul>\n  );\n}",
+  "question": "Por que este componente entra em um loop infinito de requisições de rede? Mapeie a causa base e forneça a solução.",
+  "solution": "### Causa Raiz\nNo JavaScript, objetos são comparados por referência na memória, não por valor estrutural. O objeto `config` é recriado a cada renderização do componente, obtendo uma nova referência. Como `config` está no array de dependências do `useEffect`, o React detecta uma mudança de dependência e executa o efeito novamente. O efeito então chama `setData`, o que aciona um re-render, recriando `config` com outra referência e iniciando um loop infinito.\n\n### Soluções Possíveis\n\n1. **Extrair para fora do componente** (se for estático):\n   ```tsx\n   const config = { api: \"https://api.example.com/items\" };\n   export function DataFetcher() { ... }\n   ```\n\n2. **Usar dependência primitiva** (String) no array:\n   ```tsx\n   useEffect(() => {\n     fetch(config.api) ...\n   }, [config.api]);\n   ```",
+  "tags": ["useEffect", "infinite-loop", "object-dependency"]
+}

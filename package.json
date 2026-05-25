@@ -32,7 +32,8 @@
     "db:studio": "bun run --filter @CC/db db:studio",
     "db:generate": "bun run --filter @CC/db db:generate",
     "db:migrate": "bun run --filter @CC/db db:migrate",
-    "db:local": "bun run --filter @CC/db db:local"
+    "db:local": "bun run --filter @CC/db db:local",
+    "db:seed:challenges": "bun run --filter @CC/db db:seed:challenges"
   },
   "dependencies": {
     "@CC/env": "workspace:*",
