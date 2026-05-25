@@ -6,18 +6,14 @@ import { toast } from "sonner";
 import {
   TrendingUp,
   Brain,
-  GraduationCap,
-  Sparkles,
   ArrowUpRight,
   ArrowDownRight,
-  Plus,
   Loader2,
   Trophy,
   History,
   Code
 } from "lucide-react";
 
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@CC/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@CC/ui/components/card";
 
@@ -34,7 +30,7 @@ interface Attempt {
   };
 }
 
-export default function Dashboard({ session }: { session: typeof authClient.$Infer.Session }) {
+export default function Dashboard() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [userElo, setUserElo] = useState(1200);
@@ -94,7 +90,7 @@ export default function Dashboard({ session }: { session: typeof authClient.$Inf
   };
 
   const chartPoints = getChartPoints();
-  const showChart = chartPoints.length >= 2;
+  const showChart = attempts.length >= 2 && chartPoints.length >= 3;
 
   // Render SVG Chart coordinates
   const renderSvgChart = () => {

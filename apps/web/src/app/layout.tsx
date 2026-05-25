@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../index.css";
 import Header from "@/components/header";
 import Providers from "@/components/providers";
+import { ensureDefaultLocalUser } from "@/lib/local-user";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +21,17 @@ export const metadata: Metadata = {
   description: "CC",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  try {
+    await ensureDefaultLocalUser();
+  } catch {
+    // Em build/prerender sem schema aplicado, não bloqueia renderização inicial.
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
