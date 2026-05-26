@@ -1,9 +1,10 @@
 "use server";
 
+import { auth } from "@CC/auth";
 import prisma from "@CC/db";
-import { upsertChallengesFromContent } from "@CC/db/challenge-content";
 import { env } from "@CC/env/server";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
 import { ensureDefaultLocalUser } from "@/lib/local-user";
 
@@ -140,6 +141,14 @@ ${userAnswer}`,
 
 export async function getLocalUser() {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session) {
+      // Local MVP mode: allow default local user without a remote auth session.
+      await ensureDefaultLocalUser();
+    }
+
     const user = await ensureDefaultLocalUser();
     return { success: true, data: user };
   } catch (error: unknown) {
@@ -150,9 +159,14 @@ export async function getLocalUser() {
 
 export async function getChallenges(params?: { limit?: number; offset?: number }) {
   try {
-    const user = await ensureDefaultLocalUser();
-    await upsertChallengesFromContent(prisma);
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session) {
+      await ensureDefaultLocalUser();
+    }
 
+    const user = await ensureDefaultLocalUser();
     const limit = Math.min(50, Math.max(1, params?.limit ?? 15));
     const offset = Math.max(0, params?.offset ?? 0);
     const total = await prisma.challenge.count();
@@ -196,6 +210,13 @@ export async function getChallenges(params?: { limit?: number; offset?: number }
 
 export async function getChallenge(id: string) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session) {
+      await ensureDefaultLocalUser();
+    }
+
     await ensureDefaultLocalUser();
 
     const challenge = await prisma.challenge.findUnique({
@@ -215,6 +236,13 @@ export async function getChallenge(id: string) {
 
 export async function submitAttempt(challengeId: string, userAnswer: string) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session) {
+      await ensureDefaultLocalUser();
+    }
+
     const user = await ensureDefaultLocalUser();
     const challenge = await prisma.challenge.findUnique({
       where: { id: challengeId },
@@ -299,6 +327,13 @@ export async function submitAttempt(challengeId: string, userAnswer: string) {
 
 export async function getAttemptsHistory() {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session) {
+      await ensureDefaultLocalUser();
+    }
+
     const user = await ensureDefaultLocalUser();
 
     const attempts = await prisma.attempt.findMany({
