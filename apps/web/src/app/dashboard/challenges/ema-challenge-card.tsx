@@ -3,74 +3,13 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import { Button } from "@CC/ui/components/button";
 import { eloToDanRank } from "@/lib/rating";
-
-export interface Attempt {
-  id: string;
-  score: number;
-}
-
-export interface Challenge {
-  id: string;
-  title: string;
-  difficulty: string;
-  recommendedElo: number;
-  tags: string;
-  attempts: Attempt[];
-}
-
-export const getDifficultyColor = (diff: string) => {
-  switch (diff) {
-    case "EASY":
-      return "border-emerald-800/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-400";
-    case "MEDIUM":
-      return "border-amber-800/30 bg-amber-500/10 text-amber-800 dark:text-amber-400";
-    case "HARD":
-      return "border-rose-800/30 bg-rose-500/10 text-rose-800 dark:text-rose-400";
-    default:
-      return "border-muted/30 bg-muted/10 text-muted-foreground";
-  }
-};
-
-export const getDifficultyLabel = (diff: string) => {
-  switch (diff) {
-    case "EASY":
-      return "Fácil";
-    case "MEDIUM":
-      return "Médio";
-    case "HARD":
-      return "Difícil";
-    default:
-      return diff;
-  }
-};
-
-export const getStatusLabel = (attempts: Attempt[]) => {
-  if (attempts.length === 0) return "Não iniciado";
-  const lastAttempt = attempts[0];
-  if (lastAttempt.score >= 5) return "Resolvido";
-  return "Falhou";
-};
-
-export const getLevelCompatibility = (recommendedElo: number, userElo: number) => {
-  const delta = recommendedElo - userElo;
-  if (delta <= 150) {
-    return {
-      label: "Compatível",
-      className:
-        "inline-flex items-center border px-1.5 py-0.5 text-[8px] font-mono uppercase font-bold border-emerald-800/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-400",
-    };
-  }
-
-  if (delta > 200) {
-    return {
-      label: "Avançado",
-      className:
-        "inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[8px] font-mono uppercase font-bold border-amber-800/30 bg-amber-500/10 text-amber-800 dark:text-amber-400",
-    };
-  }
-
-  return null;
-};
+import {
+  type Challenge,
+  getDifficultyColor,
+  getDifficultyLabel,
+  getLevelCompatibility,
+  getStatusLabel,
+} from "./ema-challenge-card-helpers";
 
 interface EmaChallengeCardProps {
   challenge: Challenge;
@@ -99,6 +38,8 @@ export function EmaChallengeCard({
           ? "opacity-100 filter-none"
           : "opacity-20 blur-[1.5px] pointer-events-none select-none"
       }`}
+      role="button"
+      tabIndex={0}
       onMouseEnter={() => setHoveredId(challenge.id)}
       onMouseLeave={() => setHoveredId(null)}
       onClick={(e) => {
@@ -107,6 +48,12 @@ export function EmaChallengeCard({
           return;
         }
         setHoveredId(isHovered ? null : challenge.id);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setHoveredId(isHovered ? null : challenge.id);
+        }
       }}
     >
       {/* Visual Hanging String and Hole for Ema plaque effect */}

@@ -16,9 +16,8 @@ import { getChallenges } from "../actions";
 import { eloToDanRank } from "@/lib/rating";
 import {
   EmaChallengeCard,
-  getDifficultyLabel,
-  type Challenge,
 } from "./ema-challenge-card";
+import { getDifficultyLabel, type Challenge } from "./ema-challenge-card-helpers";
 
 const PAGE_SIZE = 15;
 
