@@ -31,13 +31,13 @@ export default function Home() {
 
       {/* Call to Actions */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-        <Link href="/dashboard" className="w-full sm:w-auto">
+        <Link href="/challenges" className="w-full sm:w-auto">
           <Button size="lg" className="w-full sm:w-auto h-10 px-6 font-semibold">
             Entrar na Arena
             <ChevronRight className="size-4 ml-1.5" />
           </Button>
         </Link>
-        <Link href="/dashboard/challenges" className="w-full sm:w-auto">
+        <Link href="/challenges" className="w-full sm:w-auto">
           <Button variant="outline" size="lg" className="w-full sm:w-auto h-10 px-6">
             Ver Desafios
           </Button>

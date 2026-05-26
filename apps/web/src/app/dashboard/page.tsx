@@ -1,9 +1,5 @@
-import Dashboard from "./dashboard";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
-  return (
-    <div className="min-h-full bg-background/20 flex flex-col">
-      <Dashboard />
-    </div>
-  );
+  redirect("/profile");
 }

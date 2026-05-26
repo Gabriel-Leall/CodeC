@@ -1,20 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
 import {
   TrendingUp,
-  Brain,
   ArrowUpRight,
   ArrowDownRight,
   Loader2,
   Trophy,
   History,
-  Code,
+  Layers3,
 } from "lucide-react";
 
-import { Button } from "@CC/ui/components/button";
 import {
   Card,
   CardContent,
@@ -33,6 +30,7 @@ interface Attempt {
   challenge: {
     title: string;
     difficulty: string;
+    tags: string;
   };
 }
 
@@ -43,9 +41,17 @@ interface ChartPoint {
   change: number;
 }
 
-const INITIAL_ELO = 1200;
+interface TechRating {
+  technology: string;
+  elo: number;
+  level: string;
+  attempts: number;
+}
 
-export default function Dashboard() {
+const INITIAL_ELO = 1200;
+const INITIAL_TECH_ELO = 1000;
+
+export default function Profile() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [userElo, setUserElo] = useState(INITIAL_ELO);
@@ -84,6 +90,7 @@ export default function Dashboard() {
   }, []);
 
   const chartPoints = useMemo(() => buildChartPoints(attempts), [attempts]);
+  const techRatings = useMemo(() => buildTechRatings(attempts), [attempts]);
   const showChart = attempts.length >= 2 && chartPoints.length >= 3;
   const todayLabel = useMemo(
     () => new Date().toLocaleDateString("pt-BR"),
@@ -104,7 +111,7 @@ export default function Dashboard() {
           showChart={showChart}
           chartPoints={chartPoints}
         />
-        <TrainingCtaCard />
+        <TechStackRatingsCard loading={loading} ratings={techRatings} />
       </div>
 
       <RecentActivitiesCard loading={loading} attempts={attempts} />
@@ -128,6 +135,9 @@ function DashboardHeader({
           {userName.slice(0, 2).toUpperCase()}
         </div>
         <div>
+          <div className="text-2xs uppercase tracking-wider text-muted-foreground font-semibold">
+            Perfil
+          </div>
           <h1 className="text-xl font-semibold tracking-tight">{userName}</h1>
           <p className="text-2xs text-muted-foreground mt-0.5 font-mono">
             Usuário Local Padrão • Cadastro: {todayLabel}
@@ -310,41 +320,57 @@ function EloTrendSvg({ chartPoints }: { chartPoints: ChartPoint[] }) {
   );
 }
 
-function TrainingCtaCard() {
+function TechStackRatingsCard({
+  loading,
+  ratings,
+}: {
+  loading: boolean;
+  ratings: TechRating[];
+}) {
   return (
-    <Card className="border-border rounded-none flex flex-col justify-between">
+    <Card className="border-border rounded-none">
       <CardHeader>
         <CardTitle className="text-xs uppercase tracking-wider flex items-center gap-1.5">
-          <Brain className="size-4 text-primary" />
-          Comece a Treinar
+          <Layers3 className="size-4 text-primary" />
+          Tech Stack Ratings
         </CardTitle>
         <CardDescription className="text-3xs">
-          Pratique interpretação técnica e suba de nível na leitura de código
-          React.
+          Rating específico por tecnologia com base no histórico de tentativas.
         </CardDescription>
       </CardHeader>
-      <CardContent className="gap-4 flex-1 flex flex-col justify-end">
-        <div className="text-2xs flex flex-col gap-2.5">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="size-1.5 bg-emerald-500 rounded-full" />
-            <span>Excelente (&gt;=8): ganha +10 a +20 de ELO</span>
+      <CardContent>
+        {loading ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="size-1.5 bg-blue-500 rounded-full" />
-            <span>Parcial (5 a 7): ganha +2 a +5 de ELO</span>
+        ) : (
+          <div className="divide-y divide-border/70 border border-border/70">
+            {ratings.map(rating => (
+              <div
+                key={rating.technology}
+                className="flex items-center justify-between gap-3 px-3 py-3"
+              >
+                <div className="min-w-0">
+                  <div className="text-2xs font-semibold text-foreground">
+                    {rating.technology}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-mono">
+                    {rating.attempts} tentativa{rating.attempts === 1 ? "" : "s"} registrada
+                    {rating.attempts === 1 ? "" : "s"}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-2xs font-mono font-bold text-foreground">
+                    {rating.elo} ELO
+                  </div>
+                  <div className="text-[10px] font-mono text-primary">
+                    {rating.level}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="size-1.5 bg-rose-500 rounded-full" />
-            <span>Crítico (&lt;5): perde -5 a -15 de ELO</span>
-          </div>
-        </div>
-
-        <Link href="/dashboard/challenges" className="w-full pt-4 block">
-          <Button className="w-full h-9 rounded-none font-mono uppercase text-xs">
-            <Code className="size-3.5 mr-2" />
-            Explorar Desafios
-          </Button>
-        </Link>
+        )}
       </CardContent>
     </Card>
   );
@@ -457,6 +483,84 @@ function buildChartPoints(attempts: Attempt[]): ChartPoint[] {
     { elo: INITIAL_ELO, title: "Cadastro", date: "Início", change: 0 },
     ...eloPoints,
   ];
+}
+
+function buildTechRatings(attempts: Attempt[]): TechRating[] {
+  const ratings = new Map<string, { elo: number; attempts: number }>();
+
+  for (const technology of ["React", "TypeScript"]) {
+    ratings.set(technology, { elo: INITIAL_TECH_ELO, attempts: 0 });
+  }
+
+  for (const attempt of attempts) {
+    for (const technology of inferTechnologies(attempt.challenge.tags)) {
+      const current = ratings.get(technology) ?? {
+        elo: INITIAL_TECH_ELO,
+        attempts: 0,
+      };
+      ratings.set(technology, {
+        elo: Math.max(100, current.elo + attempt.eloChange),
+        attempts: current.attempts + 1,
+      });
+    }
+  }
+
+  return [...ratings.entries()]
+    .map(([technology, rating]) => ({
+      technology,
+      elo: rating.elo,
+      level: getTechLevel(rating.elo),
+      attempts: rating.attempts,
+    }))
+    .sort((a, b) => b.elo - a.elo || a.technology.localeCompare(b.technology));
+}
+
+function inferTechnologies(tags: string): string[] {
+  const normalizedTags = tags
+    .split(",")
+    .map(tag => tag.trim().toLowerCase())
+    .filter(Boolean);
+
+  const technologies = new Set<string>(["React"]);
+
+  if (
+    normalizedTags.some(tag =>
+      ["typescript", "ts", "tsx", "types", "generic"].includes(tag)
+    )
+  ) {
+    technologies.add("TypeScript");
+  }
+
+  if (
+    normalizedTags.some(tag =>
+      ["async", "race-condition", "promise", "fetch"].includes(tag)
+    )
+  ) {
+    technologies.add("Async State");
+  }
+
+  if (
+    normalizedTags.some(tag =>
+      ["useeffect", "react-hooks", "hooks", "stale-closure"].includes(tag)
+    )
+  ) {
+    technologies.add("React Hooks");
+  }
+
+  return [...technologies];
+}
+
+function getTechLevel(elo: number) {
+  if (elo >= 1400) {
+    return "L4 Senior";
+  }
+  if (elo >= 1150) {
+    return "L3 Mid";
+  }
+  if (elo >= 950) {
+    return "L2 Junior";
+  }
+  return "L1 Trainee";
 }
 
 function getDifficultyLabel(diff: string) {
