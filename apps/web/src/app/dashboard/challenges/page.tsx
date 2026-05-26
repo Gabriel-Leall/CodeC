@@ -1,37 +1,24 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
-import Link from "next/link";
+import { useEffect, useReducer, useState } from "react";
 import { toast } from "sonner";
 import {
   Search,
   Filter,
-  CheckCircle2,
-  XCircle,
-  Circle,
-  Play,
   Loader2,
   GraduationCap,
-  AlertTriangle,
 } from "lucide-react";
 
 import { Button } from "@CC/ui/components/button";
 import { Input } from "@CC/ui/components/input";
+import { HankoStamp } from "@CC/ui/components/hanko-stamp";
 import { getChallenges } from "../actions";
-
-interface Attempt {
-  id: string;
-  score: number;
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  difficulty: string;
-  recommendedElo: number;
-  tags: string;
-  attempts: Attempt[];
-}
+import { eloToDanRank } from "@/lib/rating";
+import {
+  EmaChallengeCard,
+  getDifficultyLabel,
+  type Challenge,
+} from "./ema-challenge-card";
 
 const PAGE_SIZE = 15;
 
@@ -109,8 +96,309 @@ function challengesReducer(
   }
 }
 
+function ChallengesHeader() {
+  return (
+    <div className="text-center space-y-3 pb-4">
+      <h1 className="text-4xl font-serif font-bold tracking-tight text-foreground">
+        Jardim dos Desafios
+      </h1>
+      <p className="text-xs font-mono text-muted-foreground max-w-xl mx-auto">
+        Explore o repositório de exercícios de diagnóstico e leitura de código. Siga a trilha e
+        aprimore sua visão.
+      </p>
+    </div>
+  );
+}
+
+function ChallengesFilters({
+  filterDifficulty,
+  searchQuery,
+  onFilterChange,
+  onSearchChange,
+}: {
+  filterDifficulty: DifficultyFilter;
+  searchQuery: string;
+  onFilterChange: (difficulty: DifficultyFilter) => void;
+  onSearchChange: (query: string) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-6 items-center border-y border-border/60 py-5 max-w-2xl mx-auto w-full">
+      <div className="relative w-full max-w-md">
+        <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground/60" />
+        <Input
+          placeholder="Buscar por título ou tag (ex: useEffect, closures)…"
+          className="pl-10 h-9 rounded-none border border-border/80 bg-card/45 focus:bg-card focus:ring-0 focus:border-primary/50 text-xs font-mono text-center"
+          value={searchQuery}
+          onChange={e => onSearchChange(e.target.value)}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-4 items-center justify-center w-full">
+        <span className="text-[10px] text-muted-foreground/60 flex items-center gap-1 font-mono uppercase tracking-widest mr-2">
+          <Filter className="size-3" /> Trilha:
+        </span>
+        {(["ALL", "EASY", "MEDIUM", "HARD"] as const).map(diff => (
+          <button
+            key={diff}
+            type="button"
+            onClick={() => onFilterChange(diff)}
+            className={`relative h-10 px-4 text-xs font-serif font-bold uppercase tracking-widest transition-all duration-300 focus:outline-none flex items-center justify-center ${
+              filterDifficulty === diff
+                ? "text-rose-800 dark:text-rose-400 scale-105"
+                : "text-muted-foreground/80 hover:text-foreground"
+            }`}
+          >
+            {filterDifficulty === diff && <HankoStamp />}
+            <span className="relative z-10">
+              {diff === "ALL" ? "Todos" : getDifficultyLabel(diff)}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RankBadge({ userElo }: { userElo: number }) {
+  const danRank = eloToDanRank(userElo);
+
+  return (
+    <div className="flex flex-col items-center pt-2">
+      <div className="relative font-serif border border-border bg-card/85 p-4 text-center flex flex-col justify-center items-center rounded-none shadow-[3px_3px_0px_rgba(0,0,0,0.06)] w-64 z-10">
+        <span className="text-[9px] uppercase tracking-widest text-muted-foreground font-mono">
+          Rank de Diagnóstico
+        </span>
+        <div className="text-2xl font-bold text-foreground mt-1 font-serif leading-none">
+          {danRank.kanji} <span className="text-sm font-normal">({danRank.kyuDan})</span>
+        </div>
+        <div className="mt-2.5">
+          <span className="text-[11px] font-sans italic text-primary font-medium block">
+            {danRank.description}
+          </span>
+          <span className="text-[10px] font-mono text-muted-foreground block mt-0.5">
+            {userElo} ELO
+          </span>
+        </div>
+
+        <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 rounded-full border border-border/80 bg-background flex items-center justify-center">
+          <div className="size-1 rounded-full bg-primary" />
+        </div>
+      </div>
+
+      <div className="w-0.5 h-8 bg-border/80" />
+    </div>
+  );
+}
+
+function ChallengesStatePanel({
+  title,
+  description,
+  animated = false,
+}: {
+  title: string;
+  description: string;
+  animated?: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center py-24 text-center px-4 border border-border/60 bg-card/20 ${
+        animated ? "animate-in fade-in duration-300" : ""
+      }`}
+    >
+      <GraduationCap className="size-10 text-muted-foreground mb-3 opacity-60" />
+      <h3 className="text-sm font-serif font-bold text-foreground/80">{title}</h3>
+      <p className="text-xs text-muted-foreground mt-1 max-w-sm font-mono">{description}</p>
+    </div>
+  );
+}
+
+function ChallengesLoadingState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 gap-3">
+      <Loader2 className="size-6 animate-spin text-primary" />
+      <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+        Invocando a Trilha…
+      </p>
+    </div>
+  );
+}
+
+function PairChallengeRow({
+  leftChallenge,
+  rightChallenge,
+  leftMatched,
+  rightMatched,
+  leftIsHovered,
+  rightIsHovered,
+  setHoveredId,
+  userElo,
+}: {
+  leftChallenge: Challenge;
+  rightChallenge: Challenge;
+  leftMatched: boolean;
+  rightMatched: boolean;
+  leftIsHovered: boolean;
+  rightIsHovered: boolean;
+  setHoveredId: (id: string | null) => void;
+  userElo: number;
+}) {
+  return (
+    <div className="relative w-full min-h-[160px] md:h-[160px] flex flex-col md:block items-center justify-center py-4 md:py-0">
+      <svg
+        className="absolute inset-0 size-full hidden md:block pointer-events-none overflow-visible z-0"
+        viewBox="0 0 768 160"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <path
+          d="M 384 0 C 300 10, 214 20, 214 50 C 214 100, 300 140, 384 160"
+          className={`stroke-2 fill-none transition-all duration-500 ${
+            leftMatched ? "stroke-primary/45" : "stroke-border/20"
+          }`}
+        />
+        <line
+          x1="214"
+          y1="50"
+          x2="214"
+          y2="60"
+          className={`stroke-2 transition-all duration-500 ${
+            leftMatched ? "stroke-border/75" : "stroke-border/20"
+          }`}
+        />
+        <path
+          d="M 384 0 C 468 10, 554 20, 554 50 C 554 100, 468 140, 384 160"
+          className={`stroke-2 fill-none transition-all duration-500 ${
+            rightMatched ? "stroke-primary/45" : "stroke-border/20"
+          }`}
+        />
+        <line
+          x1="554"
+          y1="50"
+          x2="554"
+          y2="60"
+          className={`stroke-2 transition-all duration-500 ${
+            rightMatched ? "stroke-border/75" : "stroke-border/20"
+          }`}
+        />
+      </svg>
+
+      <MobileVine />
+
+      <div className="relative w-full max-w-3xl h-full flex flex-col md:block items-start md:items-center gap-6 md:gap-0 z-10 px-4 md:px-0">
+        <CardPosition left>
+          <EmaChallengeCard
+            challenge={leftChallenge}
+            matched={leftMatched}
+            isHovered={leftIsHovered}
+            setHoveredId={setHoveredId}
+            userElo={userElo}
+          />
+        </CardPosition>
+
+        <CardPosition left={false}>
+          <EmaChallengeCard
+            challenge={rightChallenge}
+            matched={rightMatched}
+            isHovered={rightIsHovered}
+            setHoveredId={setHoveredId}
+            userElo={userElo}
+          />
+        </CardPosition>
+      </div>
+    </div>
+  );
+}
+
+function SingleChallengeRow({
+  challenge,
+  matched,
+  isHovered,
+  isLeft,
+  setHoveredId,
+  userElo,
+}: {
+  challenge: Challenge;
+  matched: boolean;
+  isHovered: boolean;
+  isLeft: boolean;
+  setHoveredId: (id: string | null) => void;
+  userElo: number;
+}) {
+  return (
+    <div className="relative w-full min-h-[160px] md:h-[160px] flex flex-col md:block items-center justify-center py-4 md:py-0">
+      <svg
+        className="absolute inset-0 size-full hidden md:block pointer-events-none overflow-visible z-0"
+        viewBox="0 0 768 160"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <path d="M 384 0 C 390 40, 378 120, 384 160" className="stroke-border/80 fill-none stroke-2" />
+        <path
+          d={isLeft ? "M 384 40 C 300 40, 214 42, 214 50" : "M 384 40 C 468 40, 554 42, 554 50"}
+          className={`stroke-2 fill-none transition-all duration-500 ${
+            matched ? "stroke-primary/45" : "stroke-border/20"
+          }`}
+        />
+        <line
+          x1={isLeft ? "214" : "554"}
+          y1="50"
+          x2={isLeft ? "214" : "554"}
+          y2="60"
+          className={`stroke-2 transition-all duration-500 ${
+            matched ? "stroke-border/75" : "stroke-border/20"
+          }`}
+        />
+      </svg>
+
+      <MobileVine />
+
+      <div className="relative w-full max-w-3xl h-full flex flex-col md:block items-start md:items-center z-10 px-4 md:px-0">
+        <CardPosition left={isLeft}>
+          <EmaChallengeCard
+            challenge={challenge}
+            matched={matched}
+            isHovered={isHovered}
+            setHoveredId={setHoveredId}
+            userElo={userElo}
+          />
+        </CardPosition>
+      </div>
+    </div>
+  );
+}
+
+function MobileVine() {
+  return (
+    <div className="absolute left-6 top-0 bottom-0 w-8 -translate-x-1/2 pointer-events-none md:hidden z-0">
+      <svg className="size-full overflow-visible" viewBox="0 0 32 100" preserveAspectRatio="none" fill="none">
+        <line x1="16" y1="0" x2="16" y2="100" className="stroke-border/80 stroke-2" />
+      </svg>
+    </div>
+  );
+}
+
+function CardPosition({
+  children,
+  left,
+}: {
+  children: React.ReactNode;
+  left: boolean;
+}) {
+  return (
+    <div
+      className={`ml-12 md:ml-0 md:absolute md:top-1/2 md:-translate-y-1/2 ${
+        left ? "md:left-[84px]" : "md:left-[424px]"
+      }`}
+    >
+      <div className="absolute left-[-24px] top-1/2 -translate-y-1/2 w-6 h-0.5 bg-border/40 md:hidden" />
+      {children}
+    </div>
+  );
+}
+
 export default function ChallengesPage() {
   const [state, dispatch] = useReducer(challengesReducer, initialState);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const loading = state.challenges === undefined;
   const challenges = state.challenges ?? [];
 
@@ -140,6 +428,17 @@ export default function ChallengesPage() {
     fetchInitialChallenges();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".challenge-card")) {
+        setHoveredId(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   const loadMoreChallenges = async () => {
     if (state.loadingMore || !state.hasMore) {
       return;
@@ -166,225 +465,121 @@ export default function ChallengesPage() {
     }
   };
 
-  const getDifficultyColor = (diff: string) => {
-    switch (diff) {
-      case "EASY":
-        return "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
-      case "MEDIUM":
-        return "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400";
-      case "HARD":
-        return "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400";
-      default:
-        return "border-muted/30 bg-muted/10 text-muted-foreground";
-    }
-  };
 
-  const getDifficultyLabel = (diff: string) => {
-    switch (diff) {
-      case "EASY":
-        return "Fácil";
-      case "MEDIUM":
-        return "Médio";
-      case "HARD":
-        return "Difícil";
-      default:
-        return diff;
-    }
-  };
-
-  const getStatusIcon = (attempts: Attempt[]) => {
-    if (attempts.length === 0) {
-      return (
-        <span title="Não iniciado">
-          <Circle className="size-4 text-muted-foreground/60" />
-        </span>
-      );
-    }
-
-    const lastAttempt = attempts[0];
-    if (lastAttempt.score >= 5) {
-      return (
-        <span title="Resolvido">
-          <CheckCircle2 className="size-4 text-emerald-500" />
-        </span>
-      );
-    }
-
-    return (
-      <span title="Falhou (Nota < 5)">
-        <XCircle className="size-4 text-rose-500" />
-      </span>
-    );
-  };
-
-  const getStatusLabel = (attempts: Attempt[]) => {
-    if (attempts.length === 0) return "Não iniciado";
-    const lastAttempt = attempts[0];
-    if (lastAttempt.score >= 5) return "Resolvido";
-    return "Falhou";
-  };
-
-  const getLevelCompatibility = (recommendedElo: number) => {
-    const delta = recommendedElo - state.userElo;
-    if (delta <= 150) {
-      return {
-        label: "Nível Compatível",
-        className:
-          "inline-flex items-center border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-      };
-    }
-
-    if (delta > 200) {
-      return {
-        label: "Desafio Avançado para o seu Rating",
-        className:
-          "inline-flex items-center gap-1 border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      };
-    }
-
-    return null;
-  };
-
-  const filtered = challenges.filter(ch => {
+  const isMatched = (challenge: Challenge) => {
     const matchesSearch =
-      ch.title.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-      ch.tags.toLowerCase().includes(state.searchQuery.toLowerCase());
+      challenge.title.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+      challenge.tags.toLowerCase().includes(state.searchQuery.toLowerCase());
 
     const matchesDifficulty =
-      state.filterDifficulty === "ALL" || ch.difficulty === state.filterDifficulty;
+      state.filterDifficulty === "ALL" || challenge.difficulty === state.filterDifficulty;
 
     return matchesSearch && matchesDifficulty;
-  });
+  };
+
+  const hasMatches = challenges.some(isMatched);
+
+  const sortedChallenges = challenges.toSorted((a, b) => a.recommendedElo - b.recommendedElo);
+  const rows: { type: "single" | "pair"; items: Challenge[] }[] = [];
+  let groupIndex = 0;
+  while (groupIndex < sortedChallenges.length) {
+    const current = sortedChallenges[groupIndex];
+    const next = sortedChallenges[groupIndex + 1];
+    // Group sibling challenges: same difficulty and close ELO
+    if (
+      next &&
+      current.difficulty === next.difficulty &&
+      Math.abs(current.recommendedElo - next.recommendedElo) <= 100
+    ) {
+      rows.push({ type: "pair", items: [current, next] });
+      groupIndex += 2;
+    } else {
+      rows.push({ type: "single", items: [current] });
+      groupIndex += 1;
+    }
+  }
 
   return (
-    <div className="flex-1 w-full bg-background/50 px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="border-b border-border pb-6">
-        <h1 className="text-xl font-semibold tracking-tight">Diretório de Desafios</h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          Explore o repositório de exercícios de leitura e diagnóstico React.
-        </p>
-        <p className="text-[10px] font-mono text-muted-foreground mt-2">Seu Rating Atual: {state.userElo} ELO</p>
-      </div>
+    <div className="flex-1 w-full bg-background/30 px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+      <ChallengesHeader />
+      <ChallengesFilters
+        filterDifficulty={state.filterDifficulty}
+        searchQuery={state.searchQuery}
+        onFilterChange={diff => dispatch({ type: "setFilter", payload: diff })}
+        onSearchChange={query => dispatch({ type: "setSearch", payload: query })}
+      />
+      <RankBadge userElo={state.userElo} />
 
-      <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full md:flex-1">
-          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar desafios por título ou tag (ex: useEffect)…"
-              className="pl-9 h-9"
-              value={state.searchQuery}
-              onChange={e => dispatch({ type: "setSearch", payload: e.target.value })}
-            />
-          </div>
-
-        <div className="flex flex-wrap gap-1.5 items-center w-full md:w-auto">
-          <span className="text-xs text-muted-foreground mr-1.5 flex items-center gap-1 font-medium">
-            <Filter className="size-3" /> Dificuldade:
-          </span>
-          {(["ALL", "EASY", "MEDIUM", "HARD"] as const).map(diff => (
-            <Button
-              key={diff}
-              variant={state.filterDifficulty === diff ? "default" : "outline"}
-              size="xs"
-              onClick={() => dispatch({ type: "setFilter", payload: diff })}
-              className="h-7 text-3xs font-mono uppercase"
-            >
-              {diff === "ALL" ? "Todos" : getDifficultyLabel(diff)}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <div className="border border-border bg-card">
+      <div className="relative w-full py-2">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            <p className="text-xs text-muted-foreground">Buscando repositório de desafios…</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-            <GraduationCap className="size-8 text-muted-foreground mb-3 opacity-60" />
-            <h3 className="text-sm font-semibold">Nenhum desafio correspondente</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-              Não há exercícios com os critérios de filtragem selecionados.
-            </p>
-          </div>
+          <ChallengesLoadingState />
+        ) : challenges.length === 0 ? (
+          <ChallengesStatePanel
+            title="Jardim Deserto"
+            description="Nenhum desafio registrado no templo do código."
+          />
+        ) : !hasMatches ? (
+          <ChallengesStatePanel
+            title="Trilha Oculta sob a Névoa"
+            description="A névoa cobre todos os nós. Nenhum desafio corresponde aos seus critérios."
+            animated
+          />
         ) : (
-          <div className="divide-y divide-border/60">
-            {filtered.map(challenge => {
-              const compatibility = getLevelCompatibility(challenge.recommendedElo);
+          <div className="relative flex flex-col w-full max-w-3xl mx-auto">
+            {rows.map((row, rowIndex) => {
+              const rowId = `row-${rowIndex}`;
 
-              return (
-                <div
-                  key={challenge.id}
-                  className="flex items-center justify-between p-4 hover:bg-muted/10 transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0 pr-4">
-                    <div className="shrink-0">
-                      {getStatusIcon(challenge.attempts)}
-                    </div>
+              if (row.type === "pair") {
+                const [leftChallenge, rightChallenge] = row.items;
+                const leftMatched = isMatched(leftChallenge);
+                const rightMatched = isMatched(rightChallenge);
+                const leftIsHovered = hoveredId === leftChallenge.id;
+                const rightIsHovered = hoveredId === rightChallenge.id;
 
-                    <div className="min-w-0 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Link
-                          href={`/dashboard/train/${challenge.id}`}
-                          className="text-xs font-semibold hover:text-primary hover:underline truncate"
-                        >
-                          {challenge.title}
-                        </Link>
+                return (
+                  <PairChallengeRow
+                    key={rowId}
+                    leftChallenge={leftChallenge}
+                    rightChallenge={rightChallenge}
+                    leftMatched={leftMatched}
+                    rightMatched={rightMatched}
+                    leftIsHovered={leftIsHovered}
+                    rightIsHovered={rightIsHovered}
+                    setHoveredId={setHoveredId}
+                    userElo={state.userElo}
+                  />
+                );
+              } else {
+                const challenge = row.items[0];
+                const matched = isMatched(challenge);
+                const isHovered = hoveredId === challenge.id;
+                const isLeft = rowIndex % 2 === 0;
 
-                        <span className={`inline-flex items-center border px-2 py-0.5 text-4xs font-mono uppercase font-bold rounded-none ${getDifficultyColor(challenge.difficulty)}`}>
-                          {getDifficultyLabel(challenge.difficulty)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-wrap text-3xs text-muted-foreground font-mono">
-                        <span>Recomendado: ELO {challenge.recommendedElo}</span>
-                        <span>•</span>
-                        <span>Status: {getStatusLabel(challenge.attempts)}</span>
-                        {compatibility ? (
-                          <>
-                            <span>•</span>
-                            <span className={compatibility.className}>
-                              {compatibility.label.includes("Avançado") ? <AlertTriangle className="size-3" /> : null}
-                              {compatibility.label}
-                            </span>
-                          </>
-                        ) : null}
-                        <span>•</span>
-                        <div className="flex gap-1.5">
-                          {challenge.tags.split(",").map(tag => (
-                            <span key={tag} className="bg-muted/40 px-1 border border-border/40 text-[10px]">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0">
-                    <Link href={`/dashboard/train/${challenge.id}`}>
-                      <Button size="sm" className="h-8 gap-1 rounded-none text-2xs font-mono uppercase">
-                        <Play className="size-3 fill-current" />
-                        Treinar
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              );
+                return (
+                  <SingleChallengeRow
+                    key={rowId}
+                    challenge={challenge}
+                    matched={matched}
+                    isHovered={isHovered}
+                    isLeft={isLeft}
+                    setHoveredId={setHoveredId}
+                    userElo={state.userElo}
+                  />
+                );
+              }
             })}
           </div>
         )}
       </div>
 
+      {/* Botão Carregar Mais */}
       {!loading && state.hasMore ? (
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-4">
           <Button
             variant="outline"
             onClick={loadMoreChallenges}
             disabled={state.loadingMore}
-            className="h-8 rounded-none font-mono uppercase text-xs"
+            className="h-9 rounded-none font-mono uppercase text-xs px-6 border-border/80 bg-card hover:bg-secondary/50 text-foreground"
           >
             {state.loadingMore ? (
               <>
@@ -392,7 +587,7 @@ export default function ChallengesPage() {
                 Carregando…
               </>
             ) : (
-              "Carregar Mais"
+              "Revelar Mais"
             )}
           </Button>
         </div>

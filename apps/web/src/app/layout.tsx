@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono, Courier_Prime } from "next/font/google";
 
 import "../index.css";
-import Header from "@/components/header";
-import Providers from "@/components/providers";
-import { ensureDefaultLocalUser } from "@/lib/local-user";
+import Header from "../components/header";
+import Providers from "../components/providers";
+import { ensureDefaultLocalUser } from "../lib/local-user";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const courierPrime = Courier_Prime({
+  variable: "--font-serif",
+  weight: ["400", "700"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "CC",
-  description: "CC",
+  title: "CC - Code Comprehension Trainer",
+  description: "Treine sua mente para ler, interpretar e diagnosticar problemas complexos em código React.",
 };
 
 export default async function RootLayout({
@@ -34,7 +35,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${jetbrainsMono.variable} ${courierPrime.variable} antialiased`}>
         <Providers>
           <div className="grid grid-rows-[auto_1fr] h-svh">
             <Header />
