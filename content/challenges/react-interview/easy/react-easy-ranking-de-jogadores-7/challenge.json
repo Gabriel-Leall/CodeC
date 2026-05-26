@@ -1,0 +1,14 @@
+{
+  "id": "react-easy-ranking-de-jogadores-7",
+  "title": "Entrevista: Diagnóstico rápido em ranking de jogadores",
+  "difficulty": "EASY",
+  "recommendedElo": 1140,
+  "question": "Você está em uma entrevista técnica e recebeu este componente de ranking de jogadores.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useCallback;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",
+  "tags": [
+    "interview",
+    "react",
+    "debugging",
+    "hooks",
+    "state"
+  ]
+}

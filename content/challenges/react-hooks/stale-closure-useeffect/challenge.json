@@ -1,0 +1,12 @@
+{
+  "id": "react-hooks-stale-closure-useeffect",
+  "title": "O Fechamento Obsoleto (Stale Closure) no useEffect",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1400,
+  "question": "Por que o contador acima trava no número 1 e o console.log sempre imprime 'Count value: 0'? Explique a causa raiz e sugira duas formas de resolver.",
+  "tags": [
+    "useEffect",
+    "stale-closure",
+    "react-hooks"
+  ]
+}

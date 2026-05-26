@@ -1,7 +1,10 @@
 import prisma from "./index";
-import { upsertChallengesFromContent } from "./challenge-content";
+import { syncChallengesIndexFromContent, upsertChallengesFromContent } from "./challenge-content";
 
 async function run() {
+  const syncResult = await syncChallengesIndexFromContent();
+  console.log(`[seed:challenges] indexSynced total=${syncResult.total}`);
+
   const result = await upsertChallengesFromContent(prisma);
   console.log(
     `[seed:challenges] total=${result.total} inserted=${result.inserted} updated=${result.updated}`,

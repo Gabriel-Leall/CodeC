@@ -1,0 +1,14 @@
+{
+  "id": "react-easy-grade-de-tickets-5",
+  "title": "Entrevista: Diagnóstico rápido em grade de tickets",
+  "difficulty": "EASY",
+  "recommendedElo": 1260,
+  "question": "Você está em uma entrevista técnica e recebeu este componente de grade de tickets.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useEffect;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",
+  "tags": [
+    "interview",
+    "react",
+    "debugging",
+    "hooks",
+    "state"
+  ]
+}

@@ -31,19 +31,21 @@
     "db:push": "bun run --filter @CC/db db:push",
     "db:studio": "bun run --filter @CC/db db:studio",
     "db:generate": "bun run --filter @CC/db db:generate",
+    "db:generate:challenges": "bun run --filter @CC/db db:generate:challenges",
+    "db:sync:challenges:index": "bun run --filter @CC/db db:sync:challenges:index",
     "db:migrate": "bun run --filter @CC/db db:migrate",
     "db:local": "bun run --filter @CC/db db:local",
-    "db:seed:challenges": "bun run --filter @CC/db db:seed:challenges"
+    "db:seed:challenges": "bun run --filter @CC/db db:seed:challenges",
+    "doctor": "react-doctor"
   },
   "dependencies": {
-    "@CC/env": "workspace:*",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
+    "@CC/env": "workspace:*"
   },
   "devDependencies": {
     "@CC/config": "workspace:*",
     "@types/node": "^22.13.14",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "react-doctor": "^0.2.6"
   },
   "packageManager": "bun@1.3.4"
 }

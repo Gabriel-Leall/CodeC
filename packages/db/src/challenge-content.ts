@@ -1,8 +1,16 @@
-import { access, readdir, readFile } from "node:fs/promises";
+import { access, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { PrismaClient } from "../prisma/generated/client";
+import {
+  challengeIndexSchema,
+  challengeLegacySchema,
+  challengeSplitMetaSchema,
+  type ChallengeIndexEntry,
+  type ChallengeLegacy,
+  type ChallengeSplitMeta,
+} from "./challenge-schemas";
 
 export type ChallengeContentEntry = {
   id: string;
@@ -14,6 +22,21 @@ export type ChallengeContentEntry = {
   solution: string;
   tags: string[];
 };
+
+type ChallengeLoadResult = {
+  challenge: ChallengeContentEntry;
+  indexEntry: ChallengeIndexEntry;
+};
+
+type ChallengeSource =
+  | {
+      kind: "split";
+      filePath: string;
+    }
+  | {
+      kind: "legacy";
+      filePath: string;
+    };
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -38,62 +61,187 @@ async function resolveContentRoot() {
   throw new Error("Pasta de conteúdo não encontrada em /content/challenges");
 }
 
-async function collectJsonFiles(root: string): Promise<string[]> {
-  const entries = await readdir(root, { withFileTypes: true });
-  const files: string[] = [];
+async function readJsonUnknown(filePath: string): Promise<unknown> {
+  const raw = await readFile(filePath, "utf-8");
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    throw new Error(`JSON inválido em ${filePath}`);
+  }
+}
 
+function inferLanguage(tags: string[]): string {
+  const normalized = tags.map(tag => tag.toLowerCase());
+  if (normalized.includes("react")) {
+    return "react";
+  }
+  if (normalized.includes("typescript")) {
+    return "typescript";
+  }
+  if (normalized.includes("javascript")) {
+    return "javascript";
+  }
+  return "react";
+}
+
+function buildIndexEntryFromMeta(meta: {
+  id: string;
+  title: string;
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  recommendedElo: number;
+  tags: string[];
+  language?: string;
+  type?: string;
+  estimatedTime?: number;
+  status?: string;
+}): ChallengeIndexEntry {
+  return {
+    id: meta.id,
+    title: meta.title,
+    language: meta.language ?? inferLanguage(meta.tags),
+    difficulty: meta.difficulty,
+    type: meta.type ?? "debugging",
+    tags: meta.tags,
+    estimatedTime: meta.estimatedTime ?? (meta.difficulty === "HARD" ? 18 : meta.difficulty === "MEDIUM" ? 12 : 8),
+    recommendedElo: meta.recommendedElo,
+    status: meta.status ?? "ACTIVE",
+  };
+}
+
+async function collectChallengeSources(root: string): Promise<ChallengeSource[]> {
+  const entries = await readdir(root, { withFileTypes: true });
+  const challengeJson = entries.find(entry => entry.isFile() && entry.name.toLowerCase() === "challenge.json");
+  if (challengeJson) {
+    return [
+      {
+        kind: "split",
+        filePath: path.join(root, challengeJson.name),
+      },
+    ];
+  }
+
+  const files: ChallengeSource[] = [];
   for (const entry of entries) {
     const fullPath = path.join(root, entry.name);
     if (entry.isDirectory()) {
-      const nested = await collectJsonFiles(fullPath);
+      const nested = await collectChallengeSources(fullPath);
       files.push(...nested);
       continue;
     }
 
-    if (entry.isFile() && entry.name.toLowerCase().endsWith(".json")) {
-      files.push(fullPath);
+    if (!entry.isFile() || !entry.name.toLowerCase().endsWith(".json")) {
+      continue;
     }
+
+    const name = entry.name.toLowerCase();
+    if (name === "index.json") {
+      continue;
+    }
+
+    files.push({
+      kind: "legacy",
+      filePath: fullPath,
+    });
   }
 
   return files;
 }
 
-function assertChallengeShape(input: unknown, filePath: string): asserts input is ChallengeContentEntry {
-  if (!input || typeof input !== "object") {
-    throw new Error(`Desafio inválido em ${filePath}: payload não é objeto`);
+async function loadLegacyChallenge(filePath: string): Promise<ChallengeLoadResult> {
+  const parsed = challengeLegacySchema.parse(await readJsonUnknown(filePath)) as ChallengeLegacy;
+  const solution = parsed.solution ?? parsed.expectedAnswer ?? "";
+
+  const challenge: ChallengeContentEntry = {
+    id: parsed.id,
+    title: parsed.title,
+    difficulty: parsed.difficulty,
+    recommendedElo: parsed.recommendedElo,
+    code: parsed.code,
+    question: parsed.question,
+    solution,
+    tags: parsed.tags,
+  };
+
+  return {
+    challenge,
+    indexEntry: buildIndexEntryFromMeta(parsed),
+  };
+}
+
+async function loadSplitChallenge(filePath: string): Promise<ChallengeLoadResult> {
+  const parsed = challengeSplitMetaSchema.parse(await readJsonUnknown(filePath)) as ChallengeSplitMeta;
+
+  const codeFileName = parsed.codeFile ?? "code.tsx";
+  const solutionFileName = parsed.solutionFile ?? parsed.expectedAnswerFile ?? "solution.md";
+  const codePath = path.resolve(path.dirname(filePath), codeFileName);
+  const solutionPath = path.resolve(path.dirname(filePath), solutionFileName);
+
+  const [code, solution] = await Promise.all([
+    readFile(codePath, "utf-8"),
+    readFile(solutionPath, "utf-8"),
+  ]);
+
+  if (code.trim().length === 0) {
+    throw new Error(`Desafio inválido em ${filePath}: arquivo "${codeFileName}" vazio`);
   }
 
-  const candidate = input as Record<string, unknown>;
-  const requiredStringFields = ["id", "title", "difficulty", "code", "question", "solution"];
+  if (solution.trim().length === 0) {
+    throw new Error(`Desafio inválido em ${filePath}: arquivo "${solutionFileName}" vazio`);
+  }
 
-  for (const field of requiredStringFields) {
-    if (typeof candidate[field] !== "string" || candidate[field]!.toString().trim().length === 0) {
-      throw new Error(`Desafio inválido em ${filePath}: campo "${field}" ausente ou vazio`);
+  const challenge: ChallengeContentEntry = {
+    id: parsed.id,
+    title: parsed.title,
+    difficulty: parsed.difficulty,
+    recommendedElo: parsed.recommendedElo,
+    question: parsed.question,
+    tags: parsed.tags,
+    code,
+    solution,
+  };
+
+  return {
+    challenge,
+    indexEntry: buildIndexEntryFromMeta(parsed),
+  };
+}
+
+async function loadChallengesAndIndex(root: string) {
+  const sources = (await collectChallengeSources(root)).sort((a, b) => a.filePath.localeCompare(b.filePath));
+  const ids = new Set<string>();
+  const challenges: ChallengeContentEntry[] = [];
+  const index: ChallengeIndexEntry[] = [];
+
+  for (const source of sources) {
+    const loaded =
+      source.kind === "split"
+        ? await loadSplitChallenge(source.filePath)
+        : await loadLegacyChallenge(source.filePath);
+
+    if (ids.has(loaded.challenge.id)) {
+      throw new Error(`ID duplicado encontrado em ${source.filePath}: "${loaded.challenge.id}"`);
     }
+
+    ids.add(loaded.challenge.id);
+    challenges.push(loaded.challenge);
+    index.push(loaded.indexEntry);
   }
 
-  if (typeof candidate.recommendedElo !== "number" || !Number.isFinite(candidate.recommendedElo)) {
-    throw new Error(`Desafio inválido em ${filePath}: "recommendedElo" deve ser número`);
-  }
-
-  if (!Array.isArray(candidate.tags) || candidate.tags.some(tag => typeof tag !== "string")) {
-    throw new Error(`Desafio inválido em ${filePath}: "tags" deve ser string[]`);
-  }
+  const validatedIndex = challengeIndexSchema.parse(index);
+  return { challenges, index: validatedIndex };
 }
 
 export async function readChallengesFromContent() {
   const root = await resolveContentRoot();
-  const jsonFiles = await collectJsonFiles(root);
-  const challenges: ChallengeContentEntry[] = [];
+  return (await loadChallengesAndIndex(root)).challenges;
+}
 
-  for (const filePath of jsonFiles) {
-    const raw = await readFile(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as unknown;
-    assertChallengeShape(parsed, filePath);
-    challenges.push(parsed);
-  }
-
-  return challenges;
+export async function syncChallengesIndexFromContent() {
+  const root = await resolveContentRoot();
+  const { index } = await loadChallengesAndIndex(root);
+  const indexPath = path.join(root, "index.json");
+  await writeFile(indexPath, `${JSON.stringify(index, null, 2)}\n`, "utf-8");
+  return { total: index.length, indexPath };
 }
 
 export async function upsertChallengesFromContent(prisma: PrismaClient) {

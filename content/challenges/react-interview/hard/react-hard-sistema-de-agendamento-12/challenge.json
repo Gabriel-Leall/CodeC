@@ -1,0 +1,14 @@
+{
+  "id": "react-hard-sistema-de-agendamento-12",
+  "title": "Entrevista sênior: incidente em sistema de agendamento",
+  "difficulty": "HARD",
+  "recommendedElo": 1950,
+  "question": "Você está em uma entrevista para vaga sênior. O avaliador diz que este componente de sistema de agendamento está causando incidentes em produção.\nIdentifique pelo menos 4 problemas independentes (não apenas sintomas) e conecte cada um ao impacto real.\nObrigatório cobrir: timezone drift, race em refetch e invalidação incompleta.\nFeche com uma estratégia de correção em fases (hotfix, estabilização e refactor).",
+  "tags": [
+    "interview",
+    "react",
+    "senior",
+    "multi-bug",
+    "architecture"
+  ]
+}

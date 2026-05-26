@@ -1,0 +1,14 @@
+{
+  "id": "react-medium-wizard-de-checkout-3",
+  "title": "Entrevista: análise de causa raiz em wizard de checkout",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1450,
+  "question": "Cenário de entrevista: o time reporta comportamento intermitente em wizard de checkout.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo estado derivado redundante + inconsistência entre steps.\nDepois proponha um plano de correção incremental com justificativa técnica.",
+  "tags": [
+    "interview",
+    "react",
+    "diagnosis",
+    "race-condition",
+    "state-management"
+  ]
+}

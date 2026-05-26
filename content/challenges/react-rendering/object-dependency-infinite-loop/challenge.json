@@ -1,0 +1,12 @@
+{
+  "id": "react-rendering-object-dependency-infinite-loop",
+  "title": "Loop Infinito por Dependência de Objeto",
+  "difficulty": "EASY",
+  "recommendedElo": 1200,
+  "question": "Por que este componente entra em um loop infinito de requisições de rede? Mapeie a causa base e forneça a solução.",
+  "tags": [
+    "useEffect",
+    "infinite-loop",
+    "object-dependency"
+  ]
+}

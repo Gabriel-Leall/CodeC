@@ -1,0 +1,12 @@
+{
+  "id": "react-state-race-condition-user-profile",
+  "title": "Race Condition não Tratada em Requisições",
+  "difficulty": "HARD",
+  "recommendedElo": 1600,
+  "question": "Explique qual o bug de concorrência (Race Condition) que pode ocorrer nesse componente ao mudar o 'userId' rapidamente, e como consertá-lo.",
+  "tags": [
+    "useEffect",
+    "race-condition",
+    "data-fetching"
+  ]
+}

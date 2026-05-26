@@ -1,0 +1,846 @@
+[
+  {
+    "id": "react-hooks-stale-closure-useeffect",
+    "title": "O Fechamento Obsoleto (Stale Closure) no useEffect",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "useEffect",
+      "stale-closure",
+      "react-hooks"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1400,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-agenda-de-entrevistas-10",
+    "title": "Entrevista: Diagnóstico rápido em agenda de entrevistas",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1260,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-carrinho-de-compras-9",
+    "title": "Entrevista: Diagnóstico rápido em carrinho de compras",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1220,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-catalogo-de-cursos-13",
+    "title": "Entrevista: Diagnóstico rápido em catálogo de cursos",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1180,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-contador-de-notificacoes-3",
+    "title": "Entrevista: Diagnóstico rápido em contador de notificações",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1180,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-dashboard-financeiro-12",
+    "title": "Entrevista: Diagnóstico rápido em dashboard financeiro",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1140,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-feed-de-artigos-8",
+    "title": "Entrevista: Diagnóstico rápido em feed de artigos",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1180,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-filtro-de-produtos-1",
+    "title": "Entrevista: Diagnóstico rápido em filtro de produtos",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1100,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-grade-de-tickets-5",
+    "title": "Entrevista: Diagnóstico rápido em grade de tickets",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1260,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-lista-de-alunos-2",
+    "title": "Entrevista: Diagnóstico rápido em lista de alunos",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1140,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-lista-de-tarefas-11",
+    "title": "Entrevista: Diagnóstico rápido em lista de tarefas",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1100,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-monitor-de-deploy-14",
+    "title": "Entrevista: Diagnóstico rápido em monitor de deploy",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1220,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-painel-de-pedidos-4",
+    "title": "Entrevista: Diagnóstico rápido em painel de pedidos",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1220,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-ranking-de-jogadores-7",
+    "title": "Entrevista: Diagnóstico rápido em ranking de jogadores",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1140,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-tabela-de-usuarios-15",
+    "title": "Entrevista: Diagnóstico rápido em tabela de usuários",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1260,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-easy-timeline-de-eventos-6",
+    "title": "Entrevista: Diagnóstico rápido em timeline de eventos",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "debugging",
+      "hooks",
+      "state"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1100,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-backoffice-de-pagamentos-5",
+    "title": "Entrevista sênior: incidente em backoffice de pagamentos",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1890,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-central-de-incidentes-criticos-15",
+    "title": "Entrevista sênior: incidente em central de incidentes críticos",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1770,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-console-de-feature-flags-7",
+    "title": "Entrevista sênior: incidente em console de feature flags",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1650,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-controle-de-comissoes-13",
+    "title": "Entrevista sênior: incidente em controle de comissões",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1650,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-dashboard-operacional-1",
+    "title": "Entrevista sênior: incidente em dashboard operacional",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1650,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-gestao-de-inventario-8",
+    "title": "Entrevista sênior: incidente em gestão de inventário",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1710,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-hub-de-integracoes-11",
+    "title": "Entrevista sênior: incidente em hub de integrações",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1890,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-mesa-de-operacoes-financeiras-14",
+    "title": "Entrevista sênior: incidente em mesa de operações financeiras",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1710,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-monitor-de-fraude-6",
+    "title": "Entrevista sênior: incidente em monitor de fraude",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1950,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-motor-de-busca-interno-3",
+    "title": "Entrevista sênior: incidente em motor de busca interno",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1770,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-orquestrador-de-deploy-4",
+    "title": "Entrevista sênior: incidente em orquestrador de deploy",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1830,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-painel-de-atendimento-em-tempo-real-2",
+    "title": "Entrevista sênior: incidente em painel de atendimento em tempo real",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1710,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-painel-de-observabilidade-10",
+    "title": "Entrevista sênior: incidente em painel de observabilidade",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1830,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-pipeline-de-aprovacao-9",
+    "title": "Entrevista sênior: incidente em pipeline de aprovação",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1770,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-hard-sistema-de-agendamento-12",
+    "title": "Entrevista sênior: incidente em sistema de agendamento",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "senior",
+      "multi-bug",
+      "architecture"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1950,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-busca-incremental-de-clientes-1",
+    "title": "Entrevista: análise de causa raiz em busca incremental de clientes",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1350,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-chat-de-suporte-5",
+    "title": "Entrevista: análise de causa raiz em chat de suporte",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1550,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-editor-colaborativo-12",
+    "title": "Entrevista: análise de causa raiz em editor colaborativo",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1600,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-feed-de-recomendacoes-16",
+    "title": "Entrevista: análise de causa raiz em feed de recomendações",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1500,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-filtro-avancado-de-logs-4",
+    "title": "Entrevista: análise de causa raiz em filtro avançado de logs",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1500,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-grade-de-permissoes-7",
+    "title": "Entrevista: análise de causa raiz em grade de permissões",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1350,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-lista-paginada-de-vendas-9",
+    "title": "Entrevista: análise de causa raiz em lista paginada de vendas",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-monitor-de-filas-11",
+    "title": "Entrevista: análise de causa raiz em monitor de filas",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1550,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-painel-de-metricas-6",
+    "title": "Entrevista: análise de causa raiz em painel de métricas",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1600,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-painel-de-sla-13",
+    "title": "Entrevista: análise de causa raiz em painel de SLA",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1350,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-resumo-de-assinaturas-10",
+    "title": "Entrevista: análise de causa raiz em resumo de assinaturas",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1500,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-resumo-de-faturamento-15",
+    "title": "Entrevista: análise de causa raiz em resumo de faturamento",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-sincronizacao-de-perfil-2",
+    "title": "Entrevista: análise de causa raiz em sincronização de perfil",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1400,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-timeline-de-auditoria-14",
+    "title": "Entrevista: análise de causa raiz em timeline de auditoria",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1400,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-triagem-de-incidentes-17",
+    "title": "Entrevista: análise de causa raiz em triagem de incidentes",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1550,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-upload-de-arquivos-8",
+    "title": "Entrevista: análise de causa raiz em upload de arquivos",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1400,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-medium-wizard-de-checkout-3",
+    "title": "Entrevista: análise de causa raiz em wizard de checkout",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debugging",
+    "tags": [
+      "interview",
+      "react",
+      "diagnosis",
+      "race-condition",
+      "state-management"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-rendering-object-dependency-infinite-loop",
+    "title": "Loop Infinito por Dependência de Objeto",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debugging",
+    "tags": [
+      "useEffect",
+      "infinite-loop",
+      "object-dependency"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1200,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-state-race-condition-user-profile",
+    "title": "Race Condition não Tratada em Requisições",
+    "language": "react",
+    "difficulty": "HARD",
+    "type": "debugging",
+    "tags": [
+      "useEffect",
+      "race-condition",
+      "data-fetching"
+    ],
+    "estimatedTime": 18,
+    "recommendedElo": 1600,
+    "status": "ACTIVE"
+  }
+]

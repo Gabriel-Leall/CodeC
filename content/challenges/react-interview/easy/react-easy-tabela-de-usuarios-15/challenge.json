@@ -1,0 +1,14 @@
+{
+  "id": "react-easy-tabela-de-usuarios-15",
+  "title": "Entrevista: Diagnóstico rápido em tabela de usuários",
+  "difficulty": "EASY",
+  "recommendedElo": 1260,
+  "question": "Você está em uma entrevista técnica e recebeu este componente de tabela de usuários.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useEffect;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",
+  "tags": [
+    "interview",
+    "react",
+    "debugging",
+    "hooks",
+    "state"
+  ]
+}

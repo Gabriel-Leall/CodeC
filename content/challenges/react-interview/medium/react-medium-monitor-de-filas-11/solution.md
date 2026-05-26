@@ -1,0 +1,24 @@
+### Problemas Encontrados
+1. Dependência instável (`options`) no `useEffect` causa refetch em todo render.
+2. `items.sort(...)` muta o array de estado e cria efeitos colaterais invisíveis.
+3. Uso de `key={idx}` pode associar linha errada após reordenação.
+
+### Correção Prioritária
+- Primeiro estabilizar o gatilho de fetch usando dependências primitivas (`teamId`, `query`).
+- Depois tornar ordenação imutável: `[...items].sort(...)`.
+- Por fim corrigir chave para `item.id`.
+
+### Patch sugerido
+```tsx
+useEffect(() => {
+  const ctrl = new AbortController();
+  setLoading(true);
+  fetch(`/api/${item.api}?teamId=${teamId}&q=${query}`, { signal: ctrl.signal })
+    .then(r => r.json())
+    .then(data => setItems(data.items))
+    .finally(() => setLoading(false));
+  return () => ctrl.abort();
+}, [teamId, query]);
+
+const top = useMemo(() => [...items].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 5), [items]);
+```

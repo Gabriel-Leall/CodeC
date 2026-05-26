@@ -1,0 +1,14 @@
+{
+  "id": "react-easy-lista-de-alunos-2",
+  "title": "Entrevista: Diagnóstico rápido em lista de alunos",
+  "difficulty": "EASY",
+  "recommendedElo": 1140,
+  "question": "Você está em uma entrevista técnica e recebeu este componente de lista de alunos.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useEffect;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",
+  "tags": [
+    "interview",
+    "react",
+    "debugging",
+    "hooks",
+    "state"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "react-medium-upload-de-arquivos-8",
+  "title": "Entrevista: análise de causa raiz em upload de arquivos",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1400,
+  "question": "Cenário de entrevista: o time reporta comportamento intermitente em upload de arquivos.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo estado de progresso sobrescrito + concorrência.\nDepois proponha um plano de correção incremental com justificativa técnica.",
+  "tags": [
+    "interview",
+    "react",
+    "diagnosis",
+    "race-condition",
+    "state-management"
+  ]
+}

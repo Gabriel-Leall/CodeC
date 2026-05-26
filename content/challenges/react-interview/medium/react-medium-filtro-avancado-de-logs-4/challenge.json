@@ -1,0 +1,14 @@
+{
+  "id": "react-medium-filtro-avancado-de-logs-4",
+  "title": "Entrevista: análise de causa raiz em filtro avançado de logs",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1500,
+  "question": "Cenário de entrevista: o time reporta comportamento intermitente em filtro avançado de logs.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo dependências incompletas + memo inválido.\nDepois proponha um plano de correção incremental com justificativa técnica.",
+  "tags": [
+    "interview",
+    "react",
+    "diagnosis",
+    "race-condition",
+    "state-management"
+  ]
+}

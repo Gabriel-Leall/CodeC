@@ -14,6 +14,8 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:generate:challenges": "bun run ./src/generate-challenges-content.ts",
+    "db:sync:challenges:index": "bun run ./src/sync-challenges-index.ts",
     "db:seed:challenges": "bun run ./src/seed-challenges.ts",
     "postinstall": "prisma generate",
     "db:studio": "prisma studio"
