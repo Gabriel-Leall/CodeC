@@ -234,7 +234,7 @@ export async function getChallenge(id: string) {
   }
 }
 
-export async function submitAttempt(challengeId: string, userAnswer: string) {
+export async function submitAttempt(challengeId: string, userAnswer: string, usedHint?: boolean) {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -282,7 +282,10 @@ export async function submitAttempt(challengeId: string, userAnswer: string) {
       });
 
       const isFirstAttempt = previousAttemptsCount === 0;
-      const eloChange = isFirstAttempt ? Math.round(calculateEloDelta(score)) : 0;
+      let eloChange = isFirstAttempt ? Math.round(calculateEloDelta(score)) : 0;
+      if (usedHint && eloChange > 7) {
+        eloChange = 7;
+      }
       const newElo = isFirstAttempt ? Math.max(100, freshUser.elo + eloChange) : freshUser.elo;
 
       if (isFirstAttempt) {
@@ -306,6 +309,8 @@ export async function submitAttempt(challengeId: string, userAnswer: string) {
       return { eloChange, newElo, isFirstAttempt };
     });
 
+    revalidatePath("/profile");
+    revalidatePath("/challenges");
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/challenges");
 

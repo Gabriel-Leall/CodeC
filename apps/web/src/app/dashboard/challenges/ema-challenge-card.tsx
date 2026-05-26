@@ -64,7 +64,7 @@ export function EmaChallengeCard({
 
       {/* Challenge Title */}
       <Link
-        href={`/dashboard/train/${challenge.id}`}
+        href={`/train/${challenge.id}`}
         className="text-xs font-serif font-bold text-foreground hover:text-primary transition-colors hover:underline line-clamp-2 min-h-[32px] text-center"
       >
         {challenge.title}
@@ -80,7 +80,7 @@ export function EmaChallengeCard({
           {getDifficultyLabel(challenge.difficulty)}
         </span>
 
-        <Link href={`/dashboard/train/${challenge.id}`}>
+        <Link href={`/train/${challenge.id}`}>
           <Button
             size="sm"
             className="h-6 gap-1 rounded-none text-[9px] font-mono uppercase bg-primary hover:bg-primary/90 text-primary-foreground border border-primary/20 transition-all shadow-[1px_1px_0px_rgba(0,0,0,0.15)] active:translate-y-0.5 active:shadow-none"
