@@ -1,6 +1,6 @@
 {
   "id": "react-medium-feed-de-recomendacoes-16",
-  "title": "Entrevista: análise de causa raiz em feed de recomendações",
+  "title": "Feed de Recomendações com Ordenação Mutável",
   "difficulty": "MEDIUM",
   "recommendedElo": 1500,
   "question": "Cenário de entrevista: o time reporta comportamento intermitente em feed de recomendações.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo prefetch redundante + invalidação ausente.\nDepois proponha um plano de correção incremental com justificativa técnica.",

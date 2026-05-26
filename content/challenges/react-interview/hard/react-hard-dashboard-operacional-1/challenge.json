@@ -1,6 +1,6 @@
 {
   "id": "react-hard-dashboard-operacional-1",
-  "title": "Entrevista sênior: incidente em dashboard operacional",
+  "title": "Dashboard Operacional com Eventos Fora de Sincronia",
   "difficulty": "HARD",
   "recommendedElo": 1650,
   "question": "Você está em uma entrevista para vaga sênior. O avaliador diz que este componente de dashboard operacional está causando incidentes em produção.\nIdentifique pelo menos 4 problemas independentes (não apenas sintomas) e conecte cada um ao impacto real.\nObrigatório cobrir: race condition, stale closure e mutação de estado.\nFeche com uma estratégia de correção em fases (hotfix, estabilização e refactor).",

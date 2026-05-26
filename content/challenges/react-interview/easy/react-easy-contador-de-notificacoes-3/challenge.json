@@ -1,6 +1,6 @@
 {
   "id": "react-easy-contador-de-notificacoes-3",
-  "title": "Entrevista: Diagnóstico rápido em contador de notificações",
+  "title": "Contador de Notificações que Não Reage",
   "difficulty": "EASY",
   "recommendedElo": 1180,
   "question": "Você está em uma entrevista técnica e recebeu este componente de contador de notificações.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useEffect;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",

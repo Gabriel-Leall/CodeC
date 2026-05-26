@@ -1,6 +1,6 @@
 {
   "id": "react-hard-pipeline-de-aprovacao-9",
-  "title": "Entrevista sênior: incidente em pipeline de aprovação",
+  "title": "Pipeline de Aprovação com Estado Mutável em Tempo Real",
   "difficulty": "HARD",
   "recommendedElo": 1770,
   "question": "Você está em uma entrevista para vaga sênior. O avaliador diz que este componente de pipeline de aprovação está causando incidentes em produção.\nIdentifique pelo menos 4 problemas independentes (não apenas sintomas) e conecte cada um ao impacto real.\nObrigatório cobrir: efeitos encadeados sem isolamento, rollback parcial e estado fantasma.\nFeche com uma estratégia de correção em fases (hotfix, estabilização e refactor).",

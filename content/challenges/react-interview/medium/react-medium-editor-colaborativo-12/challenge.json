@@ -1,6 +1,6 @@
 {
   "id": "react-medium-editor-colaborativo-12",
-  "title": "Entrevista: análise de causa raiz em editor colaborativo",
+  "title": "Editor Colaborativo com Requisições em Loop",
   "difficulty": "MEDIUM",
   "recommendedElo": 1600,
   "question": "Cenário de entrevista: o time reporta comportamento intermitente em editor colaborativo.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo aplicação de patch fora de ordem + condição de corrida.\nDepois proponha um plano de correção incremental com justificativa técnica.",

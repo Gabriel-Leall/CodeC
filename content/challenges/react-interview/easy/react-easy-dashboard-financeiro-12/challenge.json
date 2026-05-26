@@ -1,6 +1,6 @@
 {
   "id": "react-easy-dashboard-financeiro-12",
-  "title": "Entrevista: Diagnóstico rápido em dashboard financeiro",
+  "title": "Dashboard Financeiro com Métricas Congeladas",
   "difficulty": "EASY",
   "recommendedElo": 1140,
   "question": "Você está em uma entrevista técnica e recebeu este componente de dashboard financeiro.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useEffect;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",

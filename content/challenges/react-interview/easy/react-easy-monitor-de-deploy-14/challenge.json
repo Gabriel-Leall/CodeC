@@ -1,6 +1,6 @@
 {
   "id": "react-easy-monitor-de-deploy-14",
-  "title": "Entrevista: Diagnóstico rápido em monitor de deploy",
+  "title": "Monitor de Deploy com Status Congelado",
   "difficulty": "EASY",
   "recommendedElo": 1220,
   "question": "Você está em uma entrevista técnica e recebeu este componente de monitor de deploy.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useRef;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",

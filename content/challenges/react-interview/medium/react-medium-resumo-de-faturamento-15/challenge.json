@@ -1,6 +1,6 @@
 {
   "id": "react-medium-resumo-de-faturamento-15",
-  "title": "Entrevista: análise de causa raiz em resumo de faturamento",
+  "title": "Resumo de Faturamento com Efeito Instável",
   "difficulty": "MEDIUM",
   "recommendedElo": 1450,
   "question": "Cenário de entrevista: o time reporta comportamento intermitente em resumo de faturamento.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo cache local desatualizado + efeito com deps incompletas.\nDepois proponha um plano de correção incremental com justificativa técnica.",

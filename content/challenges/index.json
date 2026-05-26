@@ -16,7 +16,7 @@
   },
   {
     "id": "react-easy-agenda-de-entrevistas-10",
-    "title": "Entrevista: Diagnóstico rápido em agenda de entrevistas",
+    "title": "Agenda de Entrevistas com Busca Travada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -33,7 +33,7 @@
   },
   {
     "id": "react-easy-carrinho-de-compras-9",
-    "title": "Entrevista: Diagnóstico rápido em carrinho de compras",
+    "title": "Carrinho de Compras que Não Atualiza",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -50,7 +50,7 @@
   },
   {
     "id": "react-easy-catalogo-de-cursos-13",
-    "title": "Entrevista: Diagnóstico rápido em catálogo de cursos",
+    "title": "Catálogo de Cursos com Lista Congelada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -67,7 +67,7 @@
   },
   {
     "id": "react-easy-contador-de-notificacoes-3",
-    "title": "Entrevista: Diagnóstico rápido em contador de notificações",
+    "title": "Contador de Notificações que Não Reage",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -84,7 +84,7 @@
   },
   {
     "id": "react-easy-dashboard-financeiro-12",
-    "title": "Entrevista: Diagnóstico rápido em dashboard financeiro",
+    "title": "Dashboard Financeiro com Métricas Congeladas",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -101,7 +101,7 @@
   },
   {
     "id": "react-easy-feed-de-artigos-8",
-    "title": "Entrevista: Diagnóstico rápido em feed de artigos",
+    "title": "Feed de Artigos com Busca Desatualizada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -118,7 +118,7 @@
   },
   {
     "id": "react-easy-filtro-de-produtos-1",
-    "title": "Entrevista: Diagnóstico rápido em filtro de produtos",
+    "title": "Filtro de Produtos com Busca Travada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -135,7 +135,7 @@
   },
   {
     "id": "react-easy-grade-de-tickets-5",
-    "title": "Entrevista: Diagnóstico rápido em grade de tickets",
+    "title": "Grade de Tickets que Não Re-renderiza",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -152,7 +152,7 @@
   },
   {
     "id": "react-easy-lista-de-alunos-2",
-    "title": "Entrevista: Diagnóstico rápido em lista de alunos",
+    "title": "Lista de Alunos com Estado Mutado",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -169,7 +169,7 @@
   },
   {
     "id": "react-easy-lista-de-tarefas-11",
-    "title": "Entrevista: Diagnóstico rápido em lista de tarefas",
+    "title": "Lista de Tarefas que Não Atualiza",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -186,7 +186,7 @@
   },
   {
     "id": "react-easy-monitor-de-deploy-14",
-    "title": "Entrevista: Diagnóstico rápido em monitor de deploy",
+    "title": "Monitor de Deploy com Status Congelado",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -203,7 +203,7 @@
   },
   {
     "id": "react-easy-painel-de-pedidos-4",
-    "title": "Entrevista: Diagnóstico rápido em painel de pedidos",
+    "title": "Painel de Pedidos com Atualização Quebrada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -220,7 +220,7 @@
   },
   {
     "id": "react-easy-ranking-de-jogadores-7",
-    "title": "Entrevista: Diagnóstico rápido em ranking de jogadores",
+    "title": "Ranking de Jogadores com Pontuação Travada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -237,7 +237,7 @@
   },
   {
     "id": "react-easy-tabela-de-usuarios-15",
-    "title": "Entrevista: Diagnóstico rápido em tabela de usuários",
+    "title": "Tabela de Usuários com Busca Inconsistente",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -254,7 +254,7 @@
   },
   {
     "id": "react-easy-timeline-de-eventos-6",
-    "title": "Entrevista: Diagnóstico rápido em timeline de eventos",
+    "title": "Timeline de Eventos com Lista Desatualizada",
     "language": "react",
     "difficulty": "EASY",
     "type": "debugging",
@@ -271,7 +271,7 @@
   },
   {
     "id": "react-hard-backoffice-de-pagamentos-5",
-    "title": "Entrevista sênior: incidente em backoffice de pagamentos",
+    "title": "Backoffice de Pagamentos com Estado em Tempo Real Quebrado",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -288,7 +288,7 @@
   },
   {
     "id": "react-hard-central-de-incidentes-criticos-15",
-    "title": "Entrevista sênior: incidente em central de incidentes críticos",
+    "title": "Central de Incidentes Críticos com Atualização em Tempo Real Quebrada",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -305,7 +305,7 @@
   },
   {
     "id": "react-hard-console-de-feature-flags-7",
-    "title": "Entrevista sênior: incidente em console de feature flags",
+    "title": "Console de Feature Flags com Eventos Fora de Sincronia",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -322,7 +322,7 @@
   },
   {
     "id": "react-hard-controle-de-comissoes-13",
-    "title": "Entrevista sênior: incidente em controle de comissões",
+    "title": "Controle de Comissões com Estado Mutável em Produção",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -339,7 +339,7 @@
   },
   {
     "id": "react-hard-dashboard-operacional-1",
-    "title": "Entrevista sênior: incidente em dashboard operacional",
+    "title": "Dashboard Operacional com Eventos Fora de Sincronia",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -356,7 +356,7 @@
   },
   {
     "id": "react-hard-gestao-de-inventario-8",
-    "title": "Entrevista sênior: incidente em gestão de inventário",
+    "title": "Gestão de Inventário com Painel em Tempo Real Quebrado",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -373,7 +373,7 @@
   },
   {
     "id": "react-hard-hub-de-integracoes-11",
-    "title": "Entrevista sênior: incidente em hub de integrações",
+    "title": "Hub de Integrações com Eventos Fora de Sincronia",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -390,7 +390,7 @@
   },
   {
     "id": "react-hard-mesa-de-operacoes-financeiras-14",
-    "title": "Entrevista sênior: incidente em mesa de operações financeiras",
+    "title": "Mesa de Operações Financeiras com Sincronização Quebrada",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -407,7 +407,7 @@
   },
   {
     "id": "react-hard-monitor-de-fraude-6",
-    "title": "Entrevista sênior: incidente em monitor de fraude",
+    "title": "Monitor de Fraude com Eventos Fora de Sincronia",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -424,7 +424,7 @@
   },
   {
     "id": "react-hard-motor-de-busca-interno-3",
-    "title": "Entrevista sênior: incidente em motor de busca interno",
+    "title": "Motor de Busca Interno com Painel em Tempo Real Quebrado",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -441,7 +441,7 @@
   },
   {
     "id": "react-hard-orquestrador-de-deploy-4",
-    "title": "Entrevista sênior: incidente em orquestrador de deploy",
+    "title": "Orquestrador de Deploy com Eventos Fora de Sincronia",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -458,7 +458,7 @@
   },
   {
     "id": "react-hard-painel-de-atendimento-em-tempo-real-2",
-    "title": "Entrevista sênior: incidente em painel de atendimento em tempo real",
+    "title": "Painel de Atendimento em Tempo Real com Estado Quebrado",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -475,7 +475,7 @@
   },
   {
     "id": "react-hard-painel-de-observabilidade-10",
-    "title": "Entrevista sênior: incidente em painel de observabilidade",
+    "title": "Painel de Observabilidade com Sincronização em Tempo Real Quebrada",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -492,7 +492,7 @@
   },
   {
     "id": "react-hard-pipeline-de-aprovacao-9",
-    "title": "Entrevista sênior: incidente em pipeline de aprovação",
+    "title": "Pipeline de Aprovação com Estado Mutável em Tempo Real",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -509,7 +509,7 @@
   },
   {
     "id": "react-hard-sistema-de-agendamento-12",
-    "title": "Entrevista sênior: incidente em sistema de agendamento",
+    "title": "Sistema de Agendamento com Eventos Fora de Sincronia",
     "language": "react",
     "difficulty": "HARD",
     "type": "debugging",
@@ -526,7 +526,7 @@
   },
   {
     "id": "react-medium-busca-incremental-de-clientes-1",
-    "title": "Entrevista: análise de causa raiz em busca incremental de clientes",
+    "title": "Busca Incremental de Clientes com Efeito Instável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -543,7 +543,7 @@
   },
   {
     "id": "react-medium-chat-de-suporte-5",
-    "title": "Entrevista: análise de causa raiz em chat de suporte",
+    "title": "Chat de Suporte com Busca Intermitente",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -560,7 +560,7 @@
   },
   {
     "id": "react-medium-editor-colaborativo-12",
-    "title": "Entrevista: análise de causa raiz em editor colaborativo",
+    "title": "Editor Colaborativo com Requisições em Loop",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -577,7 +577,7 @@
   },
   {
     "id": "react-medium-feed-de-recomendacoes-16",
-    "title": "Entrevista: análise de causa raiz em feed de recomendações",
+    "title": "Feed de Recomendações com Ordenação Mutável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -594,7 +594,7 @@
   },
   {
     "id": "react-medium-filtro-avancado-de-logs-4",
-    "title": "Entrevista: análise de causa raiz em filtro avançado de logs",
+    "title": "Filtro Avançado de Logs com Efeito Instável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -611,7 +611,7 @@
   },
   {
     "id": "react-medium-grade-de-permissoes-7",
-    "title": "Entrevista: análise de causa raiz em grade de permissões",
+    "title": "Grade de Permissões com Requisições em Cascata",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -628,7 +628,7 @@
   },
   {
     "id": "react-medium-lista-paginada-de-vendas-9",
-    "title": "Entrevista: análise de causa raiz em lista paginada de vendas",
+    "title": "Lista Paginada de Vendas com Ordenação Mutável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -645,7 +645,7 @@
   },
   {
     "id": "react-medium-monitor-de-filas-11",
-    "title": "Entrevista: análise de causa raiz em monitor de filas",
+    "title": "Monitor de Filas com Busca Intermitente",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -662,7 +662,7 @@
   },
   {
     "id": "react-medium-painel-de-metricas-6",
-    "title": "Entrevista: análise de causa raiz em painel de métricas",
+    "title": "Painel de Métricas com Re-fetch Instável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -679,7 +679,7 @@
   },
   {
     "id": "react-medium-painel-de-sla-13",
-    "title": "Entrevista: análise de causa raiz em painel de SLA",
+    "title": "Painel de SLA com Ordenação Mutável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -696,7 +696,7 @@
   },
   {
     "id": "react-medium-resumo-de-assinaturas-10",
-    "title": "Entrevista: análise de causa raiz em resumo de assinaturas",
+    "title": "Resumo de Assinaturas com Requisições em Cascata",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -713,7 +713,7 @@
   },
   {
     "id": "react-medium-resumo-de-faturamento-15",
-    "title": "Entrevista: análise de causa raiz em resumo de faturamento",
+    "title": "Resumo de Faturamento com Efeito Instável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -730,7 +730,7 @@
   },
   {
     "id": "react-medium-sincronizacao-de-perfil-2",
-    "title": "Entrevista: análise de causa raiz em sincronização de perfil",
+    "title": "Sincronização de Perfil com Requisições em Loop",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -747,7 +747,7 @@
   },
   {
     "id": "react-medium-timeline-de-auditoria-14",
-    "title": "Entrevista: análise de causa raiz em timeline de auditoria",
+    "title": "Timeline de Auditoria com Lista Mutável",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -764,7 +764,7 @@
   },
   {
     "id": "react-medium-triagem-de-incidentes-17",
-    "title": "Entrevista: análise de causa raiz em triagem de incidentes",
+    "title": "Triagem de Incidentes com Busca Intermitente",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -781,7 +781,7 @@
   },
   {
     "id": "react-medium-upload-de-arquivos-8",
-    "title": "Entrevista: análise de causa raiz em upload de arquivos",
+    "title": "Upload de Arquivos com Re-fetch em Loop",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",
@@ -798,7 +798,7 @@
   },
   {
     "id": "react-medium-wizard-de-checkout-3",
-    "title": "Entrevista: análise de causa raiz em wizard de checkout",
+    "title": "Wizard de Checkout com Requisições em Cascata",
     "language": "react",
     "difficulty": "MEDIUM",
     "type": "debugging",

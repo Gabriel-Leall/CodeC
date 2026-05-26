@@ -1,6 +1,6 @@
 {
   "id": "react-medium-painel-de-metricas-6",
-  "title": "Entrevista: análise de causa raiz em painel de métricas",
+  "title": "Painel de Métricas com Re-fetch Instável",
   "difficulty": "MEDIUM",
   "recommendedElo": 1600,
   "question": "Cenário de entrevista: o time reporta comportamento intermitente em painel de métricas.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo polling sem cleanup + setState em componente desmontado.\nDepois proponha um plano de correção incremental com justificativa técnica.",

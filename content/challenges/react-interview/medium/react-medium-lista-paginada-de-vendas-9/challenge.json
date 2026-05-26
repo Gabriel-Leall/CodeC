@@ -1,6 +1,6 @@
 {
   "id": "react-medium-lista-paginada-de-vendas-9",
-  "title": "Entrevista: análise de causa raiz em lista paginada de vendas",
+  "title": "Lista Paginada de Vendas com Ordenação Mutável",
   "difficulty": "MEDIUM",
   "recommendedElo": 1450,
   "question": "Cenário de entrevista: o time reporta comportamento intermitente em lista paginada de vendas.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo merge incorreto de páginas + chave instável.\nDepois proponha um plano de correção incremental com justificativa técnica.",

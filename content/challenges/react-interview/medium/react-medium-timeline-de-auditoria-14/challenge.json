@@ -1,6 +1,6 @@
 {
   "id": "react-medium-timeline-de-auditoria-14",
-  "title": "Entrevista: análise de causa raiz em timeline de auditoria",
+  "title": "Timeline de Auditoria com Lista Mutável",
   "difficulty": "MEDIUM",
   "recommendedElo": 1400,
   "question": "Cenário de entrevista: o time reporta comportamento intermitente em timeline de auditoria.\nVocê deve explicar a causa raiz e priorizar o que corrigir primeiro.\nMostre no mínimo três problemas no código, incluindo filtro por data inconsistente + timezone ignorado.\nDepois proponha um plano de correção incremental com justificativa técnica.",

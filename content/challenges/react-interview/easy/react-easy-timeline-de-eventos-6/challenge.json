@@ -1,6 +1,6 @@
 {
   "id": "react-easy-timeline-de-eventos-6",
-  "title": "Entrevista: Diagnóstico rápido em timeline de eventos",
+  "title": "Timeline de Eventos com Lista Desatualizada",
   "difficulty": "EASY",
   "recommendedElo": 1100,
   "question": "Você está em uma entrevista técnica e recebeu este componente de timeline de eventos.\nExplique por que ele apresenta comportamento incorreto em produção.\nNa sua resposta, cubra:\n1) o erro principal envolvendo useMemo;\n2) como o bug impacta a saída observável para o usuário;\n3) a correção mínima segura com código.",

@@ -1,6 +1,6 @@
 {
   "id": "react-hard-motor-de-busca-interno-3",
-  "title": "Entrevista sênior: incidente em motor de busca interno",
+  "title": "Motor de Busca Interno com Painel em Tempo Real Quebrado",
   "difficulty": "HARD",
   "recommendedElo": 1770,
   "question": "Você está em uma entrevista para vaga sênior. O avaliador diz que este componente de motor de busca interno está causando incidentes em produção.\nIdentifique pelo menos 4 problemas independentes (não apenas sintomas) e conecte cada um ao impacto real.\nObrigatório cobrir: debounce quebrado, cache incoerente e resposta fora de ordem.\nFeche com uma estratégia de correção em fases (hotfix, estabilização e refactor).",
