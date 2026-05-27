@@ -34,7 +34,7 @@
     "db:generate:challenges": "bun run --filter @CC/db db:generate:challenges",
     "db:sync:challenges:index": "bun run --filter @CC/db db:sync:challenges:index",
     "db:migrate": "bun run --filter @CC/db db:migrate",
-    "db:local": "bun run --filter @CC/db db:local",
+    "db:migrate:sqlite-to-neon": "bun run --filter @CC/db db:migrate:sqlite-to-neon",
     "db:seed:challenges": "bun run --filter @CC/db db:seed:challenges",
     "doctor": "react-doctor"
   },

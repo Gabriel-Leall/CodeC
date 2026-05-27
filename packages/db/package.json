@@ -10,10 +10,10 @@
     }
   },
   "scripts": {
-    "db:local": "turso dev --db-file local.db",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:sqlite-to-neon": "bun run ./src/migrate-sqlite-to-neon.ts",
     "db:generate:challenges": "bun run ./src/generate-challenges-content.ts",
     "db:sync:challenges:index": "bun run ./src/sync-challenges-index.ts",
     "db:seed:challenges": "bun run ./src/seed-challenges.ts",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@CC/env": "workspace:*",
-    "@prisma/adapter-libsql": "^7.8.0",
+    "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"

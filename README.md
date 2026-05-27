@@ -9,7 +9,7 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **TailwindCSS** - Utility-first CSS for rapid UI development
 - **Shared UI package** - shadcn/ui primitives live in `packages/ui`
 - **Prisma** - TypeScript-first ORM
-- **SQLite/Turso** - Database engine
+- **Neon Postgres** - Serverless PostgreSQL database
 - **Authentication** - Better-Auth
 
 ## Getting Started
@@ -22,20 +22,25 @@ bun install
 
 ## Database Setup
 
-This project uses SQLite with Prisma.
+This project uses Neon Postgres with Prisma.
 
-1. Start the local SQLite database (optional):
+1. Update `apps/web/.env` with your Neon connection strings:
 
 ```bash
-bun run db:local
+DATABASE_URL=...   # app/runtime connection
+DIRECT_URL=...     # Prisma CLI connection
 ```
 
-2. Update your `.env` file in the `apps/web` directory with the appropriate connection details if needed.
-
-3. Apply the schema to your database:
+2. Apply the schema to Neon:
 
 ```bash
 bun run db:push
+```
+
+3. If you're migrating the old local SQLite data, run:
+
+```bash
+bun run db:migrate:sqlite-to-neon
 ```
 
 Then, run the development server:
@@ -94,4 +99,4 @@ CC/
 - `bun run db:generate`: Generate database client/types
 - `bun run db:migrate`: Run database migrations
 - `bun run db:studio`: Open database studio UI
-- `bun run db:local`: Start the local SQLite database
+- `bun run db:migrate:sqlite-to-neon`: Copy data from the legacy SQLite file into Neon
