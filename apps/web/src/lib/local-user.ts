@@ -12,9 +12,7 @@ export async function ensureDefaultLocalUser() {
     where: {
       email: DEFAULT_LOCAL_USER_EMAIL,
     },
-    update: {
-      name: DEFAULT_LOCAL_USER_NAME,
-    },
+    update: {},
     create: {
       id: DEFAULT_LOCAL_USER_ID,
       name: DEFAULT_LOCAL_USER_NAME,

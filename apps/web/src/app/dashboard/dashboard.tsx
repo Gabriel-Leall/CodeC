@@ -1,26 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
   Loader2,
-  Trophy,
   History,
   Layers3,
+  Pencil,
+  Check,
+  X,
 } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@CC/ui/components/card";
 
-import { getAttemptsHistory, getLocalUser } from "./actions";
+
+import { getAttemptsHistory, getLocalUser, updateLocalUserProfile } from "./actions";
 
 interface Attempt {
   id: string;
@@ -52,60 +48,160 @@ const INITIAL_ELO = 1200;
 const INITIAL_TECH_ELO = 1000;
 
 export default function Profile() {
+  const { refresh } = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [userElo, setUserElo] = useState(INITIAL_ELO);
   const [userName, setUserName] = useState("Estudante");
+  const [userImage, setUserImage] = useState<string | null>(null);
+  const [nameInput, setNameInput] = useState("Estudante");
+  const [editingName, setEditingName] = useState(false);
+  const [savingName, setSavingName] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [userRes, historyRes] = await Promise.all([
-          getLocalUser(),
-          getAttemptsHistory(),
-        ]);
-
+    void Promise.all([getLocalUser(), getAttemptsHistory()])
+      .then(([userRes, historyRes]) => {
         if (userRes.success && userRes.data) {
           setUserElo(userRes.data.elo);
           setUserName(userRes.data.name);
+          setNameInput(userRes.data.name);
+          setUserImage(userRes.data.image);
         }
 
         if (historyRes.success && historyRes.data) {
-          const mapped = historyRes.data.map(item => ({
-            ...item,
-            createdAt: new Date(item.createdAt),
-          }));
-          setAttempts(mapped);
-        } else {
-          toast.error(historyRes.error || "Erro ao buscar histórico");
+          setAttempts(
+            historyRes.data.map(item => ({
+              ...item,
+              createdAt: new Date(item.createdAt),
+            }))
+          );
+          return;
         }
-      } catch {
-        toast.error("Erro ao carregar dados do painel");
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    loadData();
+        toast.error(historyRes.error || "Erro ao buscar histórico");
+      })
+      .catch(() => {
+        toast.error("Erro ao carregar dados do painel");
+      })
+      .then(() => {
+        setLoading(false);
+      });
   }, []);
 
   const chartPoints = useMemo(() => buildChartPoints(attempts), [attempts]);
   const techRatings = useMemo(() => buildTechRatings(attempts), [attempts]);
   const showChart = attempts.length >= 2 && chartPoints.length >= 3;
-  const todayLabel = useMemo(
-    () => new Date().toLocaleDateString("pt-BR"),
-    []
-  );
+
+  const saveName = async () => {
+    setSavingName(true);
+    await updateLocalUserProfile({
+        name: nameInput,
+      })
+      .then(res => {
+        if (!res.success || !res.data) {
+          toast.error(res.error || "Erro ao atualizar perfil");
+          return;
+        }
+
+        setUserName(res.data.name);
+        setNameInput(res.data.name);
+        setEditingName(false);
+        toast.success("Nome atualizado");
+        refresh();
+      })
+      .catch(() => {
+        toast.error("Erro ao atualizar nome");
+      })
+      .then(() => {
+        setSavingName(false);
+      });
+  };
+
+  const onSelectProfileImage = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem");
+      return;
+    }
+
+    if (file.size > 1_500_000) {
+      toast.error("A imagem deve ter no máximo 1.5MB");
+      return;
+    }
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error("Erro ao ler imagem"));
+      reader.readAsDataURL(file);
+    });
+
+    const previousImage = userImage;
+    setUserImage(dataUrl);
+    setUploadingPhoto(true);
+
+    await updateLocalUserProfile({
+        name: userName,
+        image: dataUrl,
+      })
+      .then(res => {
+        if (!res.success || !res.data) {
+          setUserImage(previousImage);
+          toast.error(res.error || "Erro ao atualizar foto");
+          return;
+        }
+
+        setUserImage(res.data.image);
+        toast.success("Foto atualizada");
+        refresh();
+      })
+      .catch(() => {
+        setUserImage(previousImage);
+        toast.error("Erro ao atualizar foto");
+      })
+      .then(() => {
+        setUploadingPhoto(false);
+      });
+  };
 
   return (
-    <div className="flex-1 w-full bg-background/50 px-4 py-8 md:px-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="flex-1 w-full bg-transparent px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-12 animate-in fade-in duration-500">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+        className="hidden"
+        aria-label="Selecionar foto de perfil"
+        onChange={event => {
+          const file = event.target.files?.[0];
+          if (!file) {
+            return;
+          }
+          void onSelectProfileImage(file);
+          event.target.value = "";
+        }}
+      />
+
       <DashboardHeader
         userElo={userElo}
         userName={userName}
-        todayLabel={todayLabel}
+        userImage={userImage}
+        nameInput={nameInput}
+        editingName={editingName}
+        savingName={savingName}
+        uploadingPhoto={uploadingPhoto}
+        onNameChange={setNameInput}
+        onStartNameEdit={() => setEditingName(true)}
+        onCancelNameEdit={() => {
+          setNameInput(userName);
+          setEditingName(false);
+        }}
+        onSaveName={() => void saveName()}
+        onAvatarClick={() => fileInputRef.current?.click()}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12 border-b border-border/20">
         <EloTrendCard
           loading={loading}
           showChart={showChart}
@@ -122,38 +218,139 @@ export default function Profile() {
 function DashboardHeader({
   userElo,
   userName,
-  todayLabel,
+  userImage,
+  nameInput,
+  editingName,
+  savingName,
+  uploadingPhoto,
+  onNameChange,
+  onStartNameEdit,
+  onCancelNameEdit,
+  onSaveName,
+  onAvatarClick,
 }: {
   userElo: number;
   userName: string;
-  todayLabel: string;
+  userImage: string | null;
+  nameInput: string;
+  editingName: boolean;
+  savingName: boolean;
+  uploadingPhoto: boolean;
+  onNameChange: (value: string) => void;
+  onStartNameEdit: () => void;
+  onCancelNameEdit: () => void;
+  onSaveName: () => void;
+  onAvatarClick: () => void;
 }) {
+  const initials = userName
+    .split(" ")
+    .flatMap(part => {
+      const initial = part.trim()[0];
+      return initial ? [initial] : [];
+    })
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "TC";
+  const rankBadgeLabel = getKanjiRankLabel(userElo);
+
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/20 pb-6">
       <div className="flex items-center gap-4">
-        <div className="size-12 bg-primary/10 border border-primary/20 flex items-center justify-center text-primary rounded-none font-bold text-lg">
-          {userName.slice(0, 2).toUpperCase()}
-        </div>
+        {userImage ? (
+          <button
+            type="button"
+            onClick={onAvatarClick}
+            className="relative group size-16 rounded-full p-0.5 border border-foreground/20 hover:border-foreground/45 transition-colors flex items-center justify-center overflow-hidden shrink-0"
+            style={{ borderRadius: "48.5% 51.5% 49.5% 50.5% / 50.5% 49.5% 51.5% 48.5%" }}
+            aria-label="Trocar foto de perfil"
+            title="Clique para trocar a foto"
+          >
+            <Image
+              src={userImage}
+              alt={`Foto de ${userName}`}
+              width={64}
+              height={64}
+              unoptimized
+              className="size-full object-cover rounded-full"
+            />
+            <span className="absolute inset-0 rounded-full bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center text-[10px] font-mono text-foreground font-semibold">
+              {uploadingPhoto ? "..." : "Trocar"}
+            </span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onAvatarClick}
+            className="relative group size-16 rounded-full p-0.5 border border-foreground/20 hover:border-foreground/45 transition-colors flex items-center justify-center bg-transparent shrink-0"
+            style={{ borderRadius: "51.5% 48.5% 50.5% 49.5% / 49.5% 50.5% 48.5% 51.5%" }}
+            aria-label="Adicionar foto de perfil"
+            title="Clique para adicionar foto"
+          >
+            <div className="size-full rounded-full bg-foreground/[0.03] flex items-center justify-center text-foreground font-serif text-lg border border-dashed border-foreground/10 hover:bg-foreground/[0.06] transition-colors">
+              {initials}
+            </div>
+          </button>
+        )}
         <div>
-          <div className="text-2xs uppercase tracking-wider text-muted-foreground font-semibold">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground/80 font-mono font-semibold">
             Perfil
           </div>
-          <h1 className="text-xl font-semibold tracking-tight">{userName}</h1>
-          <p className="text-2xs text-muted-foreground mt-0.5 font-mono">
-            Usuário Local Padrão • Cadastro: {todayLabel}
+          {editingName ? (
+            <div className="mt-0.5 flex items-center gap-1.5">
+              <input
+                value={nameInput}
+                onChange={event => onNameChange(event.target.value)}
+                maxLength={60}
+                className="h-8 w-[230px] bg-background border border-border px-2.5 text-xs outline-none focus:border-primary font-mono"
+                aria-label="Editar nome de exibição"
+              />
+              <button
+                type="button"
+                onClick={onSaveName}
+                disabled={savingName}
+                className="size-8 border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary inline-flex items-center justify-center disabled:opacity-70 transition-colors"
+                aria-label="Salvar nome"
+              >
+                {savingName ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
+              </button>
+              <button
+                type="button"
+                onClick={onCancelNameEdit}
+                className="size-8 border border-border hover:bg-muted/40 inline-flex items-center justify-center transition-colors"
+                aria-label="Cancelar edição de nome"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-serif font-bold tracking-tight text-foreground">{userName}</h1>
+              <button
+                type="button"
+                onClick={onStartNameEdit}
+                className="size-7 border border-border/40 hover:bg-foreground/[0.03] inline-flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors rounded-full"
+                aria-label="Editar nome"
+                title="Editar nome"
+              >
+                <Pencil className="size-3.5" />
+              </button>
+            </div>
+          )}
+          <p className="mt-0.5 font-serif text-sm tracking-wide text-muted-foreground/90">
+            {rankBadgeLabel}
+          </p>
+          <p className="text-[10px] text-muted-foreground/80 mt-1 font-mono">
+            Clique na foto para trocar.
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 bg-card border border-border p-3 px-6 rounded-none">
-        <Trophy className="size-5 text-amber-500 shrink-0" />
-        <div>
-          <div className="text-2xs uppercase tracking-wider text-muted-foreground font-semibold">
-            Seu Rating Atual
-          </div>
-          <div className="text-xl font-mono font-bold text-foreground mt-0.5">
-            {userElo} ELO
-          </div>
+      <div className="text-left md:text-right shrink-0">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground/80 font-mono font-semibold">
+          Seu Rating Atual
+        </div>
+        <div className="text-3xl font-serif font-bold text-foreground mt-1 tracking-tight">
+          {userElo} ELO
         </div>
       </div>
     </div>
@@ -170,35 +367,33 @@ function EloTrendCard({
   chartPoints: ChartPoint[];
 }) {
   return (
-    <Card className="lg:col-span-2 border-border rounded-none">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xs uppercase tracking-wider flex items-center gap-1.5">
+    <div className="lg:col-span-2 space-y-4">
+      <div>
+        <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
           <TrendingUp className="size-4 text-primary" />
           Gráfico de Tendência ELO
-        </CardTitle>
-        <CardDescription className="text-3xs">
+        </h2>
+        <p className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">
           Sua evolução técnica baseada nas últimas tentativas corrigidas.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="h-48 flex items-center justify-center">
+        </p>
+      </div>
+      <div className="h-48 flex items-center justify-center pt-2">
         {loading ? (
           <Loader2 className="size-5 animate-spin text-muted-foreground" />
         ) : showChart ? (
           <EloTrendSvg chartPoints={chartPoints} />
         ) : (
-          <div className="flex flex-col items-center justify-center text-center p-6 gap-2 border border-dashed border-border/80 w-full h-full bg-muted/5">
-            <TrendingUp className="size-6 text-muted-foreground/60 stroke-dasharray-[2_2]" />
-            <p className="text-2xs font-semibold text-foreground">
+          <div className="flex flex-col items-start justify-center p-4 gap-2 w-full h-full">
+            <p className="text-xs font-mono font-semibold text-foreground">
               Progresso indisponível
             </p>
-            <p className="text-3xs text-muted-foreground max-w-xs">
-              Realize pelo menos 2 tentativas em desafios para visualizar seu
-              gráfico de tendência ELO.
+            <p className="text-[10px] text-muted-foreground/80 font-mono max-w-xs">
+              Realize pelo menos 2 tentativas em desafios para visualizar seu gráfico de tendência ELO.
             </p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -232,56 +427,38 @@ function EloTrendSvg({ chartPoints }: { chartPoints: ChartPoint[] }) {
     pathD += ` L ${coordinates[i].x} ${coordinates[i].y}`;
   }
 
-  const areaD = `${pathD} L ${coordinates[coordinates.length - 1].x} ${
-    height - paddingBottom
-  } L ${coordinates[0].x} ${height - paddingBottom} Z`;
-
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
       className="w-full h-full font-mono text-[9px] text-muted-foreground select-none"
     >
-      <defs>
-        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop
-            offset="0%"
-            stopColor="oklch(var(--primary))"
-            stopOpacity="0.25"
-          />
-          <stop
-            offset="100%"
-            stopColor="oklch(var(--primary))"
-            stopOpacity="0.0"
-          />
-        </linearGradient>
-      </defs>
-
       {[0, 0.5, 1].map((val, idx) => {
         const eloVal = Math.round(minElo + val * eloRange);
         const y = height - paddingBottom - val * (height - paddingTop - paddingBottom);
         return (
-          <g key={idx} className="opacity-40">
+          <g key={idx} className="opacity-30">
             <line
               x1={paddingLeft}
               y1={y}
               x2={width - paddingRight}
               y2={y}
               stroke="oklch(var(--border))"
-              strokeDasharray="3 3"
+              strokeWidth="0.75"
             />
-            <text x={10} y={y + 3} fill="currentColor" className="font-bold">
+            <text x={10} y={y + 3} fill="currentColor" className="font-mono">
               {eloVal}
             </text>
           </g>
         );
       })}
 
-      <path d={areaD} fill="url(#chartGrad)" />
       <path
         d={pathD}
         fill="none"
-        stroke="oklch(var(--primary))"
-        strokeWidth="2"
+        stroke="oklch(var(--foreground))"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         className="animate-in fade-in duration-300"
       />
 
@@ -290,10 +467,15 @@ function EloTrendSvg({ chartPoints }: { chartPoints: ChartPoint[] }) {
           <circle
             cx={coord.x}
             cy={coord.y}
-            r={3.5}
-            fill="oklch(var(--background))"
-            stroke="oklch(var(--primary))"
-            strokeWidth={2}
+            r={2.5}
+            fill="oklch(var(--foreground))"
+          />
+          <circle
+            cx={coord.x}
+            cy={coord.y}
+            r={10}
+            fill="transparent"
+            className="cursor-pointer"
           />
           <g className="opacity-0 group-hover/node:opacity-100 transition-opacity duration-150 pointer-events-none">
             <rect
@@ -301,7 +483,7 @@ function EloTrendSvg({ chartPoints }: { chartPoints: ChartPoint[] }) {
               y={coord.y - 32}
               width={120}
               height={24}
-              fill="oklch(var(--card))"
+              fill="oklch(var(--background))"
               stroke="oklch(var(--border))"
               strokeWidth={1}
             />
@@ -328,51 +510,51 @@ function TechStackRatingsCard({
   ratings: TechRating[];
 }) {
   return (
-    <Card className="border-border rounded-none">
-      <CardHeader>
-        <CardTitle className="text-xs uppercase tracking-wider flex items-center gap-1.5">
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
           <Layers3 className="size-4 text-primary" />
           Tech Stack Ratings
-        </CardTitle>
-        <CardDescription className="text-3xs">
+        </h2>
+        <p className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">
           Rating específico por tecnologia com base no histórico de tentativas.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="size-5 animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <div className="divide-y divide-border/70 border border-border/70">
-            {ratings.map(rating => (
-              <div
-                key={rating.technology}
-                className="flex items-center justify-between gap-3 px-3 py-3"
-              >
-                <div className="min-w-0">
-                  <div className="text-2xs font-semibold text-foreground">
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="size-5 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <div className="overflow-x-auto pt-2">
+          <table className="w-full text-left font-mono text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-border/20 text-muted-foreground/80 font-semibold uppercase tracking-wider text-[10px]">
+                <th className="pb-2 text-left font-mono">Tecnologia</th>
+                <th className="pb-2 text-center font-mono">Tentativas</th>
+                <th className="pb-2 text-right font-mono">Nível/ELO</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/10">
+              {ratings.map(rating => (
+                <tr key={rating.technology} className="hover:bg-foreground/[0.01] transition-colors">
+                  <td className="py-2.5 text-left font-semibold text-foreground">
                     {rating.technology}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground font-mono">
-                    {rating.attempts} tentativa{rating.attempts === 1 ? "" : "s"} registrada
-                    {rating.attempts === 1 ? "" : "s"}
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-2xs font-mono font-bold text-foreground">
-                    {rating.elo} ELO
-                  </div>
-                  <div className="text-[10px] font-mono text-primary">
-                    {rating.level}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                  </td>
+                  <td className="py-2.5 text-center text-muted-foreground">
+                    {rating.attempts}
+                  </td>
+                  <td className="py-2.5 text-right font-mono text-xs">
+                    <span className="font-semibold text-foreground">{rating.level}</span>
+                    <span className="ml-1.5 text-muted-foreground/80">({rating.elo} ELO)</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -384,78 +566,70 @@ function RecentActivitiesCard({
   attempts: Attempt[];
 }) {
   return (
-    <Card className="border-border rounded-none">
-      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/60">
-        <div>
-          <CardTitle className="text-xs uppercase tracking-wider flex items-center gap-1.5">
-            <History className="size-4 text-primary" />
-            Atividades Recentes
-          </CardTitle>
-          <CardDescription className="text-3xs">
-            Log das últimas tentativas enviadas e seus respectivos feedbacks de
-            IA.
-          </CardDescription>
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+          <History className="size-4 text-primary" />
+          Atividades Recentes
+        </h2>
+        <p className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">
+          Log das últimas tentativas enviadas e seus feedbacks de IA.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="size-5 animate-spin text-muted-foreground" />
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="size-5 animate-spin text-muted-foreground" />
-          </div>
-        ) : attempts.length === 0 ? (
-          <div className="text-center py-12 text-2xs text-muted-foreground">
-            Você ainda não realizou nenhuma tentativa. Vá para a página de
-            desafios para iniciar!
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-2xs">
-              <thead>
-                <tr className="bg-muted/30 border-b border-border font-semibold text-muted-foreground">
-                  <th className="p-3">Desafio</th>
-                  <th className="p-3">Dificuldade</th>
-                  <th className="p-3 text-right">Nota IA</th>
-                  <th className="p-3 text-right">Variação ELO</th>
-                  <th className="p-3 text-right">Data</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {attempts.map(attempt => (
-                  <tr key={attempt.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-3 font-medium text-foreground">
-                      {attempt.challenge.title}
-                    </td>
-                    <td className="p-3">
-                      <span className="text-[10px] font-mono">
-                        {getDifficultyLabel(attempt.challenge.difficulty)}
+      ) : attempts.length === 0 ? (
+        <div className="py-6 text-xs text-muted-foreground/80 font-mono">
+          Nenhuma atividade recente encontrada. Inicie um desafio para comecar.
+        </div>
+      ) : (
+        <div className="overflow-x-auto pt-2">
+          <table className="w-full text-left font-mono text-xs">
+            <thead>
+              <tr className="border-b border-border/25 text-muted-foreground/80 font-semibold uppercase tracking-wider text-[10px]">
+                <th className="py-2.5 px-2">Desafio</th>
+                <th className="py-2.5 px-2">Dificuldade</th>
+                <th className="py-2.5 px-2 text-right">Nota IA</th>
+                <th className="py-2.5 px-2 text-right">Variação ELO</th>
+                <th className="py-2.5 px-2 text-right">Data</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/10">
+              {attempts.map(attempt => (
+                <tr key={attempt.id} className="hover:bg-foreground/[0.01] transition-colors">
+                  <td className="py-2.5 px-2 font-medium text-foreground">
+                    {attempt.challenge.title}
+                  </td>
+                  <td className="py-2.5 px-2 text-muted-foreground text-[10px]">
+                    {getDifficultyLabel(attempt.challenge.difficulty)}
+                  </td>
+                  <td className="py-2.5 px-2 text-right font-bold text-foreground">
+                    {attempt.score.toFixed(1)}/10
+                  </td>
+                  <td className="py-2.5 px-2 text-right">
+                    {attempt.eloChange >= 0 ? (
+                      <span className="text-primary font-bold">
+                        +{attempt.eloChange}
                       </span>
-                    </td>
-                    <td className="p-3 text-right font-mono font-bold text-foreground">
-                      {attempt.score.toFixed(1)}/10
-                    </td>
-                    <td className="p-3 text-right font-mono">
-                      {attempt.eloChange >= 0 ? (
-                        <span className="text-emerald-500 font-bold inline-flex items-center gap-0.5">
-                          <ArrowUpRight className="size-3" />+{attempt.eloChange}
-                        </span>
-                      ) : (
-                        <span className="text-rose-500 font-bold inline-flex items-center gap-0.5">
-                          <ArrowDownRight className="size-3" />
-                          {attempt.eloChange}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-3 text-right font-mono text-muted-foreground">
-                      {attempt.createdAt.toLocaleDateString("pt-BR")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                    ) : (
+                      <span className="text-destructive font-bold">
+                        {attempt.eloChange}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2.5 px-2 text-right text-muted-foreground">
+                    {attempt.createdAt.toLocaleDateString("pt-BR")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -518,8 +692,10 @@ function buildTechRatings(attempts: Attempt[]): TechRating[] {
 function inferTechnologies(tags: string): string[] {
   const normalizedTags = tags
     .split(",")
-    .map(tag => tag.trim().toLowerCase())
-    .filter(Boolean);
+    .flatMap(tag => {
+      const normalizedTag = tag.trim().toLowerCase();
+      return normalizedTag ? [normalizedTag] : [];
+    });
 
   const technologies = new Set<string>(["React"]);
 
@@ -561,6 +737,19 @@ function getTechLevel(elo: number) {
     return "L2 Junior";
   }
   return "L1 Trainee";
+}
+
+function getKanjiRankLabel(elo: number) {
+  if (elo >= 1800) return "三段 · 3rd Dan";
+  if (elo >= 1700) return "二段 · 2nd Dan";
+  if (elo >= 1600) return "初段 · 1st Dan";
+  if (elo >= 1500) return "一級 · 1st Kyu";
+  if (elo >= 1400) return "二級 · 2nd Kyu";
+  if (elo >= 1300) return "三級 · 3rd Kyu";
+  if (elo >= 1200) return "四級 · 4th Kyu";
+  if (elo >= 1100) return "五級 · 5th Kyu";
+  if (elo >= 1000) return "六級 · 6th Kyu";
+  return "七級 · 7th Kyu";
 }
 
 function getDifficultyLabel(diff: string) {

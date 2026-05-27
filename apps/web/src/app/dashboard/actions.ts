@@ -157,6 +157,59 @@ export async function getLocalUser() {
   }
 }
 
+function isValidProfileImage(input: string) {
+  return /^data:image\/(png|jpe?g|webp|gif);base64,[a-zA-Z0-9+/=]+$/.test(input);
+}
+
+export async function updateLocalUserProfile(params: { name: string; image?: string | null }) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session) {
+      await ensureDefaultLocalUser();
+    }
+
+    const user = await ensureDefaultLocalUser();
+    const name = params.name.trim().slice(0, 60);
+
+    if (name.length < 2) {
+      return { success: false, error: "Nome precisa ter pelo menos 2 caracteres" };
+    }
+
+    let image: string | null | undefined = undefined;
+    if (params.image === null) {
+      image = null;
+    } else if (typeof params.image === "string") {
+      if (!isValidProfileImage(params.image)) {
+        return { success: false, error: "Formato de imagem inválido" };
+      }
+      if (params.image.length > 2_000_000) {
+        return { success: false, error: "Imagem muito grande (máx. 2MB em base64)" };
+      }
+      image = params.image;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name,
+        ...(image !== undefined ? { image } : {}),
+      },
+    });
+
+    revalidatePath("/", "layout");
+    revalidatePath("/profile");
+    revalidatePath("/dashboard");
+    revalidatePath("/challenges");
+
+    return { success: true, data: updatedUser };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro ao atualizar perfil";
+    return { success: false, error: message };
+  }
+}
+
 export async function getChallenges(params?: { limit?: number; offset?: number }) {
   try {
     const session = await auth.api.getSession({

@@ -1,33 +1,39 @@
-"use client";
 import Link from "next/link";
-
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
+import { NavLink } from "./nav-link";
 
 export default function Header() {
   const links = [
-    { to: "/challenges", label: "Desafios" },
-    { to: "/profile", label: "Perfil" },
+    { href: "/challenges", label: "Desafios" },
   ] as const;
 
   return (
-    <div>
-      <div className="flex flex-row items-center justify-between px-2 py-1">
-        <nav className="flex gap-4 text-lg">
-          {links.map(({ to, label }) => {
-            return (
-              <Link key={to} href={to}>
-                {label}
-              </Link>
-            );
-          })}
+    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/30 px-6 py-3 flex items-center justify-between">
+      <div className="flex items-center gap-5">
+        {/* Brand Logo */}
+        <Link
+          href="/"
+          className="font-serif text-lg font-bold tracking-wide text-foreground hover:opacity-85 transition-opacity select-none"
+        >
+          道 PATH
+        </Link>
+        {/* Thin vertical divider */}
+        <div className="h-4 w-[1px] bg-border/40" />
+        {/* Navigation Links */}
+        <nav className="flex items-center gap-6 font-mono text-[13px] tracking-wide select-none">
+          {links.map(({ href, label }) => (
+            <NavLink key={href} href={href}>
+              {label}
+            </NavLink>
+          ))}
         </nav>
-        <div className="flex items-center gap-2">
-          <ModeToggle />
-          <UserMenu />
-        </div>
       </div>
-      <hr />
-    </div>
+      <div className="flex items-center gap-4">
+        <ModeToggle />
+        <UserMenu />
+      </div>
+    </header>
   );
 }
+
