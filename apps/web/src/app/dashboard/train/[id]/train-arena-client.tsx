@@ -2,11 +2,9 @@
 
 import { useState, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
-import { toast } from "sonner";
 import {
   Loader2,
   ChevronLeft,
-  BookOpen,
   HelpCircle,
   Play,
   ArrowUpRight,
@@ -19,6 +17,9 @@ import {
 } from "lucide-react";
 
 import { Button } from "@CC/ui/components/button";
+import {
+  ZenToast,
+} from "@CC/ui/components/zen";
 import { submitAttempt } from "../../actions";
 
 export interface Challenge {
@@ -217,6 +218,10 @@ export default function TrainArenaClient({
   const [answerLocked, setAnswerLocked] = useState(false);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [showComparison, setShowComparison] = useState(false);
+  const [zenToastOpen, setZenToastOpen] = useState(false);
+  const [zenToastTone, setZenToastTone] = useState<"success" | "error" | "warning" | "info">("info");
+  const [zenToastTitle, setZenToastTitle] = useState("Aviso");
+  const [zenToastMessage, setZenToastMessage] = useState("");
   
   // Hint states
   const [usedHint, setUsedHint] = useState(false);
@@ -249,6 +254,15 @@ export default function TrainArenaClient({
   const canSubmit =
     !submitting && !answerLocked && answerLength >= MIN_ANSWER_LENGTH;
 
+  const showZenToast = (tone: "success" | "error" | "warning" | "info", title: string, message: string) => {
+    setZenToastTone(tone);
+    setZenToastTitle(title);
+    setZenToastMessage(message);
+    setZenToastOpen(false);
+    window.setTimeout(() => setZenToastOpen(true), 20);
+    window.setTimeout(() => setZenToastOpen(false), 3200);
+  };
+
   const handleSubmit = async (e?: FormEvent) => {
     if (e) {
       e.preventDefault();
@@ -258,9 +272,7 @@ export default function TrainArenaClient({
     }
 
     if (answerLength < MIN_ANSWER_LENGTH) {
-      toast.error(
-        `Escreva pelo menos ${MIN_ANSWER_LENGTH} caracteres para enviar.`
-      );
+      showZenToast("warning", "Diagnóstico incompleto", `Escreva pelo menos ${MIN_ANSWER_LENGTH} caracteres para enviar.`);
       return;
     }
 
@@ -271,14 +283,14 @@ export default function TrainArenaClient({
       const res = await submitAttempt(id, userAnswer, usedHint);
       if (res.success && res.data) {
         setResult(res.data as AttemptResult);
-        toast.success("Diagnóstico avaliado com sucesso!");
+        showZenToast("success", "Diagnóstico avaliado", "Sua resposta foi processada com sucesso.");
       } else {
         setAnswerLocked(false);
-        toast.error(res.error || "Erro ao avaliar resposta");
+        showZenToast("error", "Falha na avaliação", res.error || "Erro ao avaliar resposta");
       }
     } catch {
       setAnswerLocked(false);
-      toast.error("Erro ao enviar resposta para correção");
+      showZenToast("error", "Erro de envio", "Erro ao enviar resposta para correção");
     } finally {
       setSubmitting(false);
     }
@@ -343,7 +355,6 @@ export default function TrainArenaClient({
           {challenge.title}
         </span>
       </div>
-
       <div className="flex-1 flex flex-col lg:flex-row gap-5 min-h-0 overflow-hidden">
         {/* Left Column (64% width, h-full): The Code Editor */}
         <div className="lg:w-[64%] w-full flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0d0d0d] h-full min-h-0 overflow-hidden">
@@ -676,6 +687,11 @@ export default function TrainArenaClient({
             )}
           </div>
         </div>
+      </div>
+      <div className="fixed bottom-4 right-4 z-[80]">
+        <ZenToast open={zenToastOpen} tone={zenToastTone} title={zenToastTitle}>
+          {zenToastMessage}
+        </ZenToast>
       </div>
     </div>
   );

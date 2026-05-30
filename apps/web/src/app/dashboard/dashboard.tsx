@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import {
   TrendingUp,
   Loader2,
@@ -13,6 +12,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { ZenToast } from "@CC/ui/components/zen";
 
 
 
@@ -59,6 +59,19 @@ export default function Profile() {
   const [editingName, setEditingName] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [zenToastOpen, setZenToastOpen] = useState(false);
+  const [zenToastTone, setZenToastTone] = useState<"success" | "error" | "warning" | "info">("info");
+  const [zenToastTitle, setZenToastTitle] = useState("Aviso");
+  const [zenToastMessage, setZenToastMessage] = useState("");
+
+  const showZenToast = (tone: "success" | "error" | "warning" | "info", title: string, message: string) => {
+    setZenToastTone(tone);
+    setZenToastTitle(title);
+    setZenToastMessage(message);
+    setZenToastOpen(false);
+    window.setTimeout(() => setZenToastOpen(true), 20);
+    window.setTimeout(() => setZenToastOpen(false), 3200);
+  };
 
   useEffect(() => {
     void Promise.all([getLocalUser(), getAttemptsHistory()])
@@ -80,10 +93,10 @@ export default function Profile() {
           return;
         }
 
-        toast.error(historyRes.error || "Erro ao buscar histórico");
+        showZenToast("error", "Falha ao carregar", historyRes.error || "Erro ao buscar histórico");
       })
       .catch(() => {
-        toast.error("Erro ao carregar dados do painel");
+        showZenToast("error", "Falha ao carregar", "Erro ao carregar dados do painel");
       })
       .then(() => {
         setLoading(false);
@@ -101,18 +114,18 @@ export default function Profile() {
       })
       .then(res => {
         if (!res.success || !res.data) {
-          toast.error(res.error || "Erro ao atualizar perfil");
+          showZenToast("error", "Falha ao atualizar", res.error || "Erro ao atualizar perfil");
           return;
         }
 
         setUserName(res.data.name);
         setNameInput(res.data.name);
         setEditingName(false);
-        toast.success("Nome atualizado");
+        showZenToast("success", "Perfil atualizado", "Nome atualizado com sucesso.");
         refresh();
       })
       .catch(() => {
-        toast.error("Erro ao atualizar nome");
+        showZenToast("error", "Falha ao atualizar", "Erro ao atualizar nome");
       })
       .then(() => {
         setSavingName(false);
@@ -121,12 +134,12 @@ export default function Profile() {
 
   const onSelectProfileImage = async (file: File) => {
     if (!file.type.startsWith("image/")) {
-      toast.error("Selecione um arquivo de imagem");
+      showZenToast("warning", "Arquivo inválido", "Selecione um arquivo de imagem");
       return;
     }
 
     if (file.size > 1_500_000) {
-      toast.error("A imagem deve ter no máximo 1.5MB");
+      showZenToast("warning", "Arquivo muito grande", "A imagem deve ter no máximo 1.5MB");
       return;
     }
 
@@ -148,17 +161,17 @@ export default function Profile() {
       .then(res => {
         if (!res.success || !res.data) {
           setUserImage(previousImage);
-          toast.error(res.error || "Erro ao atualizar foto");
+          showZenToast("error", "Falha ao atualizar", res.error || "Erro ao atualizar foto");
           return;
         }
 
         setUserImage(res.data.image);
-        toast.success("Foto atualizada");
+        showZenToast("success", "Perfil atualizado", "Foto atualizada com sucesso.");
         refresh();
       })
       .catch(() => {
         setUserImage(previousImage);
-        toast.error("Erro ao atualizar foto");
+        showZenToast("error", "Falha ao atualizar", "Erro ao atualizar foto");
       })
       .then(() => {
         setUploadingPhoto(false);
@@ -211,6 +224,11 @@ export default function Profile() {
       </div>
 
       <RecentActivitiesCard loading={loading} attempts={attempts} />
+      <div className="fixed bottom-4 right-4 z-[80]">
+        <ZenToast open={zenToastOpen} tone={zenToastTone} title={zenToastTitle}>
+          {zenToastMessage}
+        </ZenToast>
+      </div>
     </div>
   );
 }

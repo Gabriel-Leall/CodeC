@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useReducer, useState } from "react";
-import { toast } from "sonner";
 import {
   Search,
   Filter,
   Loader2,
-  GraduationCap,
 } from "lucide-react";
 
 import { Button } from "@CC/ui/components/button";
 import { Input } from "@CC/ui/components/input";
 import { HankoStamp } from "@CC/ui/components/hanko-stamp";
+import {
+  ZenEmptyState,
+  ZenLoading,
+  ZenToast,
+} from "@CC/ui/components/zen";
 import { getChallenges } from "../actions";
 import { eloToDanRank } from "@/lib/rating";
 import {
@@ -121,19 +124,19 @@ function ChallengesFilters({
   onSearchChange: (query: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-6 items-center border-y border-border/60 py-5 max-w-2xl mx-auto w-full">
+    <div className="flex flex-col gap-6 items-center border-y border-[color:var(--zen-border)] dark:border-border/60 py-5 max-w-2xl mx-auto w-full">
       <div className="relative w-full max-w-md">
-        <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground/60" />
+        <Search className="absolute left-3 top-2.5 size-4 text-[color:var(--zen-muted)] dark:text-muted-foreground/60" />
         <Input
           placeholder="Buscar por título ou tag (ex: useEffect, closures)…"
-          className="pl-10 h-9 rounded-none border border-border/80 bg-card/45 focus:bg-card focus:ring-0 focus:border-primary/50 text-xs font-mono text-center"
+          className="pl-10 h-9 rounded-none border border-[color:var(--zen-border)] dark:border-border/80 bg-[color:var(--zen-washi)] dark:bg-card/45 focus:bg-[color:var(--zen-washi)] dark:focus:bg-card focus:ring-0 focus:border-[color:var(--zen-hanko)] dark:focus:border-primary/50 text-xs font-mono text-center text-[color:var(--zen-ink)] dark:text-foreground placeholder:text-[color:var(--zen-muted)] dark:placeholder:text-muted-foreground"
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
         />
       </div>
 
       <div className="flex flex-wrap gap-4 items-center justify-center w-full">
-        <span className="text-[10px] text-muted-foreground/60 flex items-center gap-1 font-mono uppercase tracking-widest mr-2">
+        <span className="text-[10px] text-[color:var(--zen-muted)] dark:text-muted-foreground/60 flex items-center gap-1 font-mono uppercase tracking-widest mr-2">
           <Filter className="size-3" /> Trilha:
         </span>
         {(["ALL", "EASY", "MEDIUM", "HARD"] as const).map(diff => (
@@ -143,8 +146,8 @@ function ChallengesFilters({
             onClick={() => onFilterChange(diff)}
             className={`relative h-10 px-4 text-xs font-serif font-bold uppercase tracking-widest transition-all duration-300 focus:outline-none flex items-center justify-center ${
               filterDifficulty === diff
-                ? "text-rose-800 dark:text-rose-400 scale-105"
-                : "text-muted-foreground/80 hover:text-foreground"
+                ? "text-[color:var(--zen-hanko)] dark:text-rose-400 scale-105"
+                : "text-[color:var(--zen-muted)] dark:text-muted-foreground/80 hover:text-[color:var(--zen-ink)] dark:hover:text-foreground"
             }`}
           >
             {filterDifficulty === diff && <HankoStamp />}
@@ -163,28 +166,28 @@ function RankBadge({ userElo }: { userElo: number }) {
 
   return (
     <div className="flex flex-col items-center pt-2">
-      <div className="relative font-serif border border-border bg-card/85 p-4 text-center flex flex-col justify-center items-center rounded-none shadow-[3px_3px_0px_rgba(0,0,0,0.06)] w-64 z-10">
-        <span className="text-[9px] uppercase tracking-widest text-muted-foreground font-mono">
+      <div className="relative font-serif border border-[color:var(--zen-border)] dark:border-border bg-[color:var(--zen-washi)] dark:bg-card/85 p-4 text-center flex flex-col justify-center items-center rounded-none shadow-none dark:shadow-[3px_3px_0px_rgba(0,0,0,0.06)] w-64 z-10">
+        <span className="text-[9px] uppercase tracking-widest text-[color:var(--zen-muted)] dark:text-muted-foreground font-mono">
           Rank de Diagnóstico
         </span>
-        <div className="text-2xl font-bold text-foreground mt-1 font-serif leading-none">
+        <div className="text-2xl font-bold text-[color:var(--zen-ink)] dark:text-foreground mt-1 font-serif leading-none">
           {danRank.kanji} <span className="text-sm font-normal">({danRank.kyuDan})</span>
         </div>
         <div className="mt-2.5">
-          <span className="text-[11px] font-sans italic text-primary font-medium block">
+          <span className="text-[11px] font-sans italic text-[color:var(--zen-moss)] dark:text-primary font-medium block">
             {danRank.description}
           </span>
-          <span className="text-[10px] font-mono text-muted-foreground block mt-0.5">
+          <span className="text-[10px] font-mono text-[color:var(--zen-muted)] dark:text-muted-foreground block mt-0.5">
             {userElo} ELO
           </span>
         </div>
 
-        <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 rounded-full border border-border/80 bg-background flex items-center justify-center">
-          <div className="size-1 rounded-full bg-primary" />
+        <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 rounded-full border border-[color:var(--zen-border)] dark:border-border/80 bg-[color:var(--zen-washi)] dark:bg-background flex items-center justify-center">
+          <div className="size-1 rounded-full bg-[color:var(--zen-hanko)] dark:bg-primary" />
         </div>
       </div>
 
-      <div className="w-0.5 h-8 bg-border/80" />
+      <div className="w-0.5 h-8 bg-[color:var(--zen-border)] dark:bg-border/80" />
     </div>
   );
 }
@@ -199,25 +202,16 @@ function ChallengesStatePanel({
   animated?: boolean;
 }) {
   return (
-    <div
-      className={`flex flex-col items-center justify-center py-24 text-center px-4 border border-border/60 bg-card/20 ${
-        animated ? "animate-in fade-in duration-300" : ""
-      }`}
-    >
-      <GraduationCap className="size-10 text-muted-foreground mb-3 opacity-60" />
-      <h3 className="text-sm font-serif font-bold text-foreground/80">{title}</h3>
-      <p className="text-xs text-muted-foreground mt-1 max-w-sm font-mono">{description}</p>
+    <div className={animated ? "animate-in fade-in duration-300" : ""}>
+      <ZenEmptyState title={title}>{description}</ZenEmptyState>
     </div>
   );
 }
 
 function ChallengesLoadingState() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 gap-3">
-      <Loader2 className="size-6 animate-spin text-primary" />
-      <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-        Invocando a Trilha…
-      </p>
+    <div className="zen-paper flex items-center justify-center border border-[color:var(--zen-border)] py-16">
+      <ZenLoading label="Invocando a Trilha…" />
     </div>
   );
 }
@@ -398,8 +392,17 @@ function CardPosition({
 export default function ChallengesPage() {
   const [state, dispatch] = useReducer(challengesReducer, initialState);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [zenToastOpen, setZenToastOpen] = useState(false);
+  const [zenToastMessage, setZenToastMessage] = useState("");
   const loading = state.challenges === undefined;
   const challenges = state.challenges ?? [];
+
+  const showZenErrorToast = (message: string) => {
+    setZenToastMessage(message);
+    setZenToastOpen(false);
+    window.setTimeout(() => setZenToastOpen(true), 20);
+    window.setTimeout(() => setZenToastOpen(false), 3200);
+  };
 
   useEffect(() => {
     const fetchInitialChallenges = async () => {
@@ -416,11 +419,11 @@ export default function ChallengesPage() {
           });
         } else {
           dispatch({ type: "initialFailed" });
-          toast.error(res.error || "Erro ao carregar desafios");
+          showZenErrorToast(res.error || "Erro ao carregar desafios");
         }
       } catch {
         dispatch({ type: "initialFailed" });
-        toast.error("Erro ao conectar ao servidor");
+        showZenErrorToast("Erro ao conectar ao servidor");
       }
     };
 
@@ -455,10 +458,10 @@ export default function ChallengesPage() {
           },
         });
       } else {
-        toast.error(res.error || "Erro ao carregar mais desafios");
+        showZenErrorToast(res.error || "Erro ao carregar mais desafios");
       }
     } catch {
-      toast.error("Erro ao conectar ao servidor");
+      showZenErrorToast("Erro ao conectar ao servidor");
     } finally {
       dispatch({ type: "loadingMore", payload: false });
     }
@@ -499,7 +502,7 @@ export default function ChallengesPage() {
   }
 
   return (
-    <div className="flex-1 w-full bg-background/30 px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="flex-1 w-full bg-background/30 dark:bg-background/30 bg-[color:var(--zen-washi)] px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
       <ChallengesHeader />
       <ChallengesFilters
         filterDifficulty={state.filterDifficulty}
@@ -578,7 +581,7 @@ export default function ChallengesPage() {
             variant="outline"
             onClick={loadMoreChallenges}
             disabled={state.loadingMore}
-            className="h-9 rounded-none font-mono uppercase text-xs px-6 border-border/80 bg-card hover:bg-secondary/50 text-foreground"
+            className="h-9 rounded-none font-mono uppercase text-xs px-6 border-[color:var(--zen-border)] dark:border-border/80 bg-[color:var(--zen-washi)] dark:bg-card hover:bg-[color:color-mix(in_oklch,var(--zen-ink)_5%,transparent)] dark:hover:bg-secondary/50 text-[color:var(--zen-ink)] dark:text-foreground"
           >
             {state.loadingMore ? (
               <>
@@ -591,6 +594,11 @@ export default function ChallengesPage() {
           </Button>
         </div>
       ) : null}
+      <div className="fixed bottom-4 right-4 z-[80]">
+        <ZenToast open={zenToastOpen} tone="error" title="Falha de carregamento">
+          {zenToastMessage}
+        </ZenToast>
+      </div>
     </div>
   );
 }
