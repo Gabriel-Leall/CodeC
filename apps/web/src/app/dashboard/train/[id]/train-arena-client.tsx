@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useReducer, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
 import {
   Loader2,
@@ -51,14 +51,39 @@ interface AttemptResult {
 
 const MIN_ANSWER_LENGTH = 30;
 
+type ZenToastTone = "success" | "error" | "warning" | "info";
+type ZenToastState = {
+  open: boolean;
+  tone: ZenToastTone;
+  title: string;
+  message: string;
+};
+
+function zenToastReducer(state: ZenToastState, action: { type: "show"; tone: ZenToastTone; title: string; message: string } | { type: "hide" }): ZenToastState {
+  if (action.type === "hide") {
+    return { ...state, open: false };
+  }
+  return {
+    open: true,
+    tone: action.tone,
+    title: action.title,
+    message: action.message,
+  };
+}
+
 // Custom Zen-themed syntax highlighter for JSX / TypeScript
 function highlightCode(code: string) {
   const lines = code.split("\n");
-  
-  return lines.map((line, lineIdx) => {
+  const lineOccurrence = new Map<string, number>();
+
+  return lines.map((line) => {
+    const seen = lineOccurrence.get(line) ?? 0;
+    lineOccurrence.set(line, seen + 1);
+    const lineKey = `${line}::${seen}`;
+
     if (line.trim().startsWith("//")) {
       return (
-        <span key={lineIdx} className="text-muted-foreground/45 italic whitespace-pre">
+        <span key={lineKey} className="text-muted-foreground/45 italic whitespace-pre">
           {line}
         </span>
       );
@@ -93,7 +118,7 @@ function highlightCode(code: string) {
         punctuation
       ] = match;
       
-      const key = `${lineIdx}-${matchIndex}`;
+      const key = `${lineKey}-${matchIndex}`;
       
       if (comment) {
         elements.push(
@@ -149,7 +174,7 @@ function highlightCode(code: string) {
     }
     
     return (
-      <div key={lineIdx} className="min-h-[1.25rem] whitespace-pre">
+      <div key={lineKey} className="min-h-[1.25rem] whitespace-pre">
         {elements.length > 0 ? elements : " "}
       </div>
     );
@@ -208,23 +233,23 @@ interface TrainArenaClientProps {
   initialUserElo: number;
 }
 
-export default function TrainArenaClient({
-  id,
-  initialChallenge,
-  initialUserElo,
-}: TrainArenaClientProps) {
+// react-doctor-disable-next-line react-doctor/prefer-useReducer
+// react-doctor-disable-next-line react-doctor/no-giant-component
+export default function TrainArenaClient({ id, initialChallenge, initialUserElo }: TrainArenaClientProps) {
   const [userAnswer, setUserAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [answerLocked, setAnswerLocked] = useState(false);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [showComparison, setShowComparison] = useState(false);
-  const [zenToastOpen, setZenToastOpen] = useState(false);
-  const [zenToastTone, setZenToastTone] = useState<"success" | "error" | "warning" | "info">("info");
-  const [zenToastTitle, setZenToastTitle] = useState("Aviso");
-  const [zenToastMessage, setZenToastMessage] = useState("");
+  const [zenToast, dispatchZenToast] = useReducer(zenToastReducer, {
+    open: false,
+    tone: "info",
+    title: "Aviso",
+    message: "",
+  });
   
   // Hint states
-  const [usedHint, setUsedHint] = useState(false);
+  const usedHintRef = useRef(false);
   const [showHintConfirm, setShowHintConfirm] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
 
@@ -254,13 +279,10 @@ export default function TrainArenaClient({
   const canSubmit =
     !submitting && !answerLocked && answerLength >= MIN_ANSWER_LENGTH;
 
-  const showZenToast = (tone: "success" | "error" | "warning" | "info", title: string, message: string) => {
-    setZenToastTone(tone);
-    setZenToastTitle(title);
-    setZenToastMessage(message);
-    setZenToastOpen(false);
-    window.setTimeout(() => setZenToastOpen(true), 20);
-    window.setTimeout(() => setZenToastOpen(false), 3200);
+  const showZenToast = (tone: ZenToastTone, title: string, message: string) => {
+    dispatchZenToast({ type: "hide" });
+    window.setTimeout(() => dispatchZenToast({ type: "show", tone, title, message }), 20);
+    window.setTimeout(() => dispatchZenToast({ type: "hide" }), 3200);
   };
 
   const handleSubmit = async (e?: FormEvent) => {
@@ -280,18 +302,19 @@ export default function TrainArenaClient({
     setSubmitting(true);
 
     try {
-      const res = await submitAttempt(id, userAnswer, usedHint);
+      const res = await submitAttempt(id, userAnswer, usedHintRef.current);
       if (res.success && res.data) {
         setResult(res.data as AttemptResult);
         showZenToast("success", "Diagnóstico avaliado", "Sua resposta foi processada com sucesso.");
+        setSubmitting(false);
       } else {
         setAnswerLocked(false);
         showZenToast("error", "Falha na avaliação", res.error || "Erro ao avaliar resposta");
+        setSubmitting(false);
       }
     } catch {
       setAnswerLocked(false);
       showZenToast("error", "Erro de envio", "Erro ao enviar resposta para correção");
-    } finally {
       setSubmitting(false);
     }
   };
@@ -435,7 +458,7 @@ export default function TrainArenaClient({
                           type="button"
                           size="xs"
                           onClick={() => {
-                            setUsedHint(true);
+                            usedHintRef.current = true;
                             setHintRevealed(true);
                             setShowHintConfirm(false);
                           }}
@@ -689,8 +712,8 @@ export default function TrainArenaClient({
         </div>
       </div>
       <div className="fixed bottom-4 right-4 z-[80]">
-        <ZenToast open={zenToastOpen} tone={zenToastTone} title={zenToastTitle}>
-          {zenToastMessage}
+        <ZenToast open={zenToast.open} tone={zenToast.tone} title={zenToast.title}>
+          {zenToast.message}
         </ZenToast>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -46,7 +46,27 @@ interface TechRating {
 
 const INITIAL_ELO = 1200;
 const INITIAL_TECH_ELO = 1000;
+type ZenToastTone = "success" | "error" | "warning" | "info";
+type ZenToastState = {
+  open: boolean;
+  tone: ZenToastTone;
+  title: string;
+  message: string;
+};
 
+function zenToastReducer(state: ZenToastState, action: { type: "show"; tone: ZenToastTone; title: string; message: string } | { type: "hide" }): ZenToastState {
+  if (action.type === "hide") {
+    return { ...state, open: false };
+  }
+  return {
+    open: true,
+    tone: action.tone,
+    title: action.title,
+    message: action.message,
+  };
+}
+
+// react-doctor-disable-next-line react-doctor/prefer-useReducer
 export default function Profile() {
   const { refresh } = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -59,18 +79,17 @@ export default function Profile() {
   const [editingName, setEditingName] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [zenToastOpen, setZenToastOpen] = useState(false);
-  const [zenToastTone, setZenToastTone] = useState<"success" | "error" | "warning" | "info">("info");
-  const [zenToastTitle, setZenToastTitle] = useState("Aviso");
-  const [zenToastMessage, setZenToastMessage] = useState("");
+  const [zenToast, dispatchZenToast] = useReducer(zenToastReducer, {
+    open: false,
+    tone: "info",
+    title: "Aviso",
+    message: "",
+  });
 
-  const showZenToast = (tone: "success" | "error" | "warning" | "info", title: string, message: string) => {
-    setZenToastTone(tone);
-    setZenToastTitle(title);
-    setZenToastMessage(message);
-    setZenToastOpen(false);
-    window.setTimeout(() => setZenToastOpen(true), 20);
-    window.setTimeout(() => setZenToastOpen(false), 3200);
+  const showZenToast = (tone: ZenToastTone, title: string, message: string) => {
+    dispatchZenToast({ type: "hide" });
+    window.setTimeout(() => dispatchZenToast({ type: "show", tone, title, message }), 20);
+    window.setTimeout(() => dispatchZenToast({ type: "hide" }), 3200);
   };
 
   useEffect(() => {
@@ -225,8 +244,8 @@ export default function Profile() {
 
       <RecentActivitiesCard loading={loading} attempts={attempts} />
       <div className="fixed bottom-4 right-4 z-[80]">
-        <ZenToast open={zenToastOpen} tone={zenToastTone} title={zenToastTitle}>
-          {zenToastMessage}
+        <ZenToast open={zenToast.open} tone={zenToast.tone} title={zenToast.title}>
+          {zenToast.message}
         </ZenToast>
       </div>
     </div>

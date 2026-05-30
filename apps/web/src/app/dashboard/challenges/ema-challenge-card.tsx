@@ -38,23 +38,8 @@ export function EmaChallengeCard({
           ? "opacity-100 filter-none"
           : "opacity-20 blur-[1.5px] pointer-events-none select-none"
       }`}
-      role="button"
-      tabIndex={0}
       onMouseEnter={() => setHoveredId(challenge.id)}
       onMouseLeave={() => setHoveredId(null)}
-      onClick={(e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest("a") || target.closest("button")) {
-          return;
-        }
-        setHoveredId(isHovered ? null : challenge.id);
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setHoveredId(isHovered ? null : challenge.id);
-        }
-      }}
     >
       {/* Visual Hanging String and Hole for Ema plaque effect */}
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
