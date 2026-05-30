@@ -1,0 +1,46 @@
+@layer utilities {
+  .zen-focus {
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+  }
+
+  .zen-focus:focus-visible {
+    outline-color: color-mix(in oklch, var(--zen-hanko) 72%, var(--zen-ink));
+  }
+
+  .zen-letter-drop {
+    transform-origin: top right;
+  }
+
+  .zen-letter-drop[data-open] {
+    animation: zenLetterDrop 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .zen-letter-drop[data-closed] {
+    animation: zenLetterFold 160ms ease-out both;
+  }
+}
+
+@keyframes zenLetterDrop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -18px, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes zenLetterFold {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0) scale(0.98);
+  }
+}
