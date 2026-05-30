@@ -307,11 +307,11 @@ export default function TrainArenaClient({
   const getLevelCompatibility = (recommendedElo: number) => {
     const delta = recommendedElo - userElo;
     if (delta <= 150) {
-      return {
-        label: "Nível Compatível",
-        className:
-          "inline-flex items-center border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-      };
+        return {
+          label: "Nível Compatível",
+          className:
+          "inline-flex items-center border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:border-[#86a697]/45 dark:bg-[#86a697]/10 dark:text-[#86a697]",
+        };
     }
 
     if (delta > 200) {
@@ -330,50 +330,50 @@ export default function TrainArenaClient({
   const parsedQ = parseQuestion(challenge.question);
 
   return (
-    <div className="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-5 lg:px-6 py-4 flex flex-col gap-4 overflow-hidden h-full min-h-0 bg-background/50 animate-in fade-in duration-300">
-      <div className="flex items-center gap-2 border-b border-border pb-3 shrink-0">
+    <div className="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-5 lg:px-6 py-4 flex flex-col gap-4 overflow-hidden h-full min-h-0 bg-background/50 dark:bg-[#0d0d0d] animate-in fade-in duration-300">
+      <div className="flex items-center gap-2 border-b border-border dark:border-[#373c38] pb-3 shrink-0">
         <Link href="/challenges">
           <Button variant="ghost" size="xs" className="h-7 text-muted-foreground">
             <ChevronLeft className="size-3.5 mr-1" />
             Voltar aos Desafios
           </Button>
         </Link>
-        <span className="text-3xs text-muted-foreground font-mono">/</span>
-        <span className="text-3xs text-muted-foreground font-mono font-bold truncate">
+        <span className="text-3xs text-muted-foreground dark:text-[#bdc0ba] font-mono">/</span>
+        <span className="text-3xs text-muted-foreground dark:text-[#bdc0ba] font-mono font-bold truncate">
           {challenge.title}
         </span>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row gap-5 min-h-0 overflow-hidden">
         {/* Left Column (64% width, h-full): The Code Editor */}
-        <div className="lg:w-[64%] w-full flex flex-col border border-border bg-card h-full min-h-0 overflow-hidden">
+        <div className="lg:w-[64%] w-full flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0d0d0d] h-full min-h-0 overflow-hidden">
           {/* File Tab Header (IDE style) */}
-          <div className="border-b border-border flex items-center justify-between shrink-0 bg-muted/10 h-9">
+          <div className="border-b border-border dark:border-[#373c38] flex items-center justify-between shrink-0 bg-muted/10 dark:bg-[#131313] h-9">
             <div className="flex items-center h-full">
               {/* Active Tab */}
-              <div className="h-full border-r border-border bg-card px-4 flex items-center gap-2 text-xs font-mono font-medium text-foreground relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary">
+              <div className="h-full border-r border-border dark:border-[#373c38] bg-card dark:bg-[#0d0d0d] px-4 flex items-center gap-2 text-xs font-mono font-medium text-foreground dark:text-[#faf9f6] relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary">
                 <FileCode className="size-3.5 text-primary/70" />
                 <span>EasyCase1.tsx</span>
               </div>
               {/* Inactive Tab Spacer */}
-              <div className="h-full flex items-center px-3 text-muted-foreground/30 select-none">
+              <div className="h-full flex items-center px-3 text-muted-foreground/30 dark:text-[#bdc0ba]/30 select-none">
                 <span className="text-3xs font-mono font-bold">...</span>
               </div>
             </div>
             <div className="px-3 shrink-0">
-              <span className="text-4xs font-mono border border-border px-1.5 py-0.5 uppercase font-bold text-foreground">
+              <span className="text-4xs font-mono border border-border dark:border-[#373c38] px-1.5 py-0.5 uppercase font-bold text-foreground dark:text-[#faf9f6]">
                 {getDifficultyLabel(challenge.difficulty)}
               </span>
             </div>
           </div>
 
-          <div className="flex-1 flex font-mono text-[11px] leading-relaxed overflow-y-auto select-text bg-muted/5 min-h-0">
-            <div className="py-4 pl-3 pr-2 text-right text-muted-foreground/35 border-r border-border select-none bg-muted/10 font-semibold w-10 shrink-0">
+          <div className="flex-1 flex font-mono text-[11px] leading-relaxed overflow-y-auto select-text bg-muted/5 dark:bg-[#111111] min-h-0">
+            <div className="py-4 pl-3 pr-2 text-right text-muted-foreground/35 dark:text-[#bdc0ba]/35 border-r border-border dark:border-[#373c38] select-none bg-muted/10 dark:bg-[#131313] font-semibold w-10 shrink-0">
               {lines.map((_, i) => (
                 <div key={i}>{i + 1}</div>
               ))}
             </div>
-            <pre className="py-4 px-3 overflow-x-auto flex-1 text-foreground leading-5 font-mono">
+            <pre className="py-4 px-3 overflow-x-auto flex-1 text-foreground dark:text-[#faf9f6] leading-5 font-mono">
               {highlightCode(challenge.code)}
             </pre>
           </div>
@@ -382,8 +382,8 @@ export default function TrainArenaClient({
         {/* Right Column (36% width, h-full) */}
         <div className="lg:w-[36%] w-full h-full min-h-0 grid grid-rows-[4fr_6fr] gap-4 overflow-hidden">
           {/* Top Section (40% height): Pergunta de Diagnóstico (permanently visible) */}
-          <div className="row-span-1 border border-border bg-card p-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
-            <div className="flex items-center justify-between shrink-0 pb-1.5 border-b border-border/40">
+          <div className="row-span-1 border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
+            <div className="flex items-center justify-between shrink-0 pb-1.5 border-b border-border/40 dark:border-[#373c38]">
               <h3 className="text-3xs font-mono font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
                 <HelpCircle className="size-3.5 text-primary/70" />
                 Pergunta de Diagnóstico
@@ -398,7 +398,7 @@ export default function TrainArenaClient({
               ) : null}
             </div>
             
-            <div className="flex-1 overflow-y-auto text-xs text-foreground leading-relaxed flex flex-col gap-3 font-mono">
+            <div className="flex-1 overflow-y-auto text-xs text-foreground dark:text-[#faf9f6] leading-relaxed flex flex-col gap-3 font-mono">
               <p className="whitespace-pre-wrap">{parsedQ.mainPrompt}</p>
               
               {/* Hint System */}
@@ -415,7 +415,7 @@ export default function TrainArenaClient({
                       Pedir Dica
                     </Button>
                   ) : (
-                    <div className="p-3 border border-amber-500/30 bg-amber-500/5 flex flex-col gap-2 rounded-none animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="p-3 border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/8 flex flex-col gap-2 rounded-none animate-in fade-in slide-in-from-top-1 duration-150">
                       <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold leading-normal">
                         Pedir uma dica limitará seu ganho máximo para +7 ELO neste desafio. Revelar dica?
                       </p>
@@ -446,7 +446,7 @@ export default function TrainArenaClient({
                   )}
                 </div>
               ) : (
-                <div className="mt-2 p-3 border border-border bg-muted/20 rounded-none animate-in fade-in duration-200">
+                 <div className="mt-2 p-3 border border-border dark:border-[#373c38] bg-muted/20 dark:bg-[#151515] rounded-none animate-in fade-in duration-200">
                   <div className="flex items-center gap-1.5 text-3xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1.5">
                     <AlertCircle className="size-3" />
                     <span>Dica Ativada (Ganho de ELO limitado a +7)</span>
@@ -462,7 +462,7 @@ export default function TrainArenaClient({
           {/* Bottom Section (60% height): Interactive Input Area / Loading / Feedback */}
           <div className="row-span-1 min-h-0 flex flex-col overflow-hidden">
             {submitting && !result ? (
-              <div className="flex-1 flex flex-col border border-border bg-card p-5 items-center justify-center text-center gap-3 h-full">
+               <div className="flex-1 flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-5 items-center justify-center text-center gap-3 h-full">
                 <Loader2 className="size-6 animate-spin text-muted-foreground" />
                 <p className="text-xs font-medium text-foreground">
                   Analisando sua resposta com base na rubrica sênior…
@@ -472,16 +472,16 @@ export default function TrainArenaClient({
                 </p>
               </div>
             ) : !result ? (
-              <form
-                onSubmit={handleSubmit}
-                className="flex-1 flex flex-col border border-border bg-card p-4 gap-3 justify-between min-h-0"
-              >
+               <form
+                 onSubmit={handleSubmit}
+                 className="flex-1 flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-4 gap-3 justify-between min-h-0"
+               >
                 <div className="gap-2 flex-1 flex flex-col min-h-0">
                   <div className="shrink-0">
                     <h3 className="text-xs font-semibold uppercase tracking-wider">
                       Seu Diagnóstico Técnico
                     </h3>
-                    <p className="text-3xs text-muted-foreground mt-0.5">
+                    <p className="text-3xs text-muted-foreground dark:text-[#bdc0ba] mt-0.5">
                       Escreva detalhadamente o erro de lógica e como consertá-lo.
                     </p>
                   </div>
@@ -490,7 +490,7 @@ export default function TrainArenaClient({
                     <textarea
                       placeholder="Explique o bug aqui…"
                       aria-label="Resposta do diagnóstico técnico"
-                      className="w-full flex-1 rounded-none border border-border/50 bg-muted/30 hover:bg-muted/45 focus:bg-muted/60 p-3 text-xs outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:ring-0 font-mono resize-none leading-relaxed transition-colors duration-150 min-h-0"
+                      className="w-full flex-1 rounded-none border border-border/50 dark:border-[#373c38] bg-muted/30 dark:bg-[#121212] hover:bg-muted/45 dark:hover:bg-[#171717] focus:bg-muted/60 dark:focus:bg-[#1b1b1b] p-3 text-xs text-foreground dark:text-[#faf9f6] outline-none placeholder:text-muted-foreground/50 dark:placeholder:text-[#bdc0ba]/45 focus:border-primary dark:focus:border-[#86a697] focus:ring-0 font-mono resize-none leading-relaxed transition-colors duration-150 min-h-0"
                       value={userAnswer}
                       onChange={e => setUserAnswer(e.target.value)}
                       onKeyDown={handleKeyDown}
@@ -500,11 +500,11 @@ export default function TrainArenaClient({
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-border shrink-0 flex flex-col gap-1.5">
+                <div className="pt-3 border-t border-border dark:border-[#373c38] shrink-0 flex flex-col gap-1.5">
                   <Button
                     type="submit"
                     disabled={!canSubmit}
-                    className="w-full h-9 rounded-none font-mono uppercase text-xs"
+                    className="w-full h-9 rounded-none font-mono uppercase text-xs dark:border-[#86a697] dark:bg-[#2d4a3d] dark:text-[#faf9f6] dark:hover:bg-[#365847]"
                   >
                     {submitting ? (
                       <>
@@ -518,7 +518,7 @@ export default function TrainArenaClient({
                       </>
                     )}
                   </Button>
-                  <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono px-1">
+                  <div className="flex justify-between items-center text-[10px] text-muted-foreground dark:text-[#bdc0ba] font-mono px-1">
                     <span>
                       {answerLength}/{MIN_ANSWER_LENGTH} caracteres mínimos
                     </span>
@@ -529,11 +529,11 @@ export default function TrainArenaClient({
                 </div>
               </form>
             ) : (
-              <div className="flex-1 border border-border bg-card p-4 gap-4 flex flex-col justify-between overflow-y-auto min-h-0">
+               <div className="flex-1 border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-4 gap-4 flex flex-col justify-between overflow-y-auto min-h-0">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center bg-muted/30 border border-border p-3 shrink-0">
+                  <div className="flex justify-between items-center bg-muted/30 dark:bg-[#151515] border border-border dark:border-[#373c38] p-3 shrink-0">
                     <div>
-                      <span className="text-4xs font-mono uppercase text-muted-foreground">
+                      <span className="text-4xs font-mono uppercase text-muted-foreground dark:text-[#bdc0ba]">
                         Avaliação Final
                       </span>
                       <div className="text-lg font-mono font-semibold text-foreground mt-0.5">
@@ -541,7 +541,7 @@ export default function TrainArenaClient({
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-4xs font-mono uppercase text-muted-foreground">
+                      <span className="text-4xs font-mono uppercase text-muted-foreground dark:text-[#bdc0ba]">
                         Variação Rating
                       </span>
                       <div className="mt-0.5">
@@ -565,17 +565,17 @@ export default function TrainArenaClient({
                   </div>
 
                   <div className="space-y-1">
-                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground dark:text-[#bdc0ba] flex items-center gap-1.5">
                       <CheckCircle2 className="size-3 text-emerald-500" />
                       Feedback do Tech Lead
                     </h4>
-                    <p className="text-xs text-foreground italic leading-relaxed bg-muted/10 p-2.5 border border-border/60">
+                    <p className="text-xs text-foreground dark:text-[#faf9f6] italic leading-relaxed bg-muted/10 dark:bg-[#141414] p-2.5 border border-border/60 dark:border-[#373c38]">
                       "{result.feedback.summary}"
                     </p>
                   </div>
 
                   <div className="space-y-1.5">
-                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground dark:text-[#bdc0ba]">
                       Pontos Fortes
                     </h4>
                     <ul className="space-y-1 pl-1">
@@ -592,7 +592,7 @@ export default function TrainArenaClient({
                   </div>
 
                   <div className="space-y-1.5">
-                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground dark:text-[#bdc0ba]">
                       Pontos Cegos
                     </h4>
                     <ul className="space-y-1 pl-1">
@@ -608,7 +608,7 @@ export default function TrainArenaClient({
                     </ul>
                   </div>
 
-                  <div className="pt-2 border-t border-border/40">
+                  <div className="pt-2 border-t border-border/40 dark:border-[#373c38]">
                     <Button
                       type="button"
                       variant="outline"
@@ -629,18 +629,18 @@ export default function TrainArenaClient({
                     </Button>
 
                     {showComparison && (
-                      <div className="mt-3 p-3 border border-border bg-background/50 space-y-3 animate-in slide-in-from-top-1 duration-150 text-2xs leading-relaxed max-h-48 overflow-y-auto">
+                       <div className="mt-3 p-3 border border-border dark:border-[#373c38] bg-background/50 dark:bg-[#121212] space-y-3 animate-in slide-in-from-top-1 duration-150 text-2xs leading-relaxed max-h-48 overflow-y-auto">
                         <div className="space-y-1">
-                          <span className="font-semibold text-muted-foreground font-mono">
+                           <span className="font-semibold text-muted-foreground dark:text-[#bdc0ba] font-mono">
                             Sua Resposta:
                           </span>
-                          <p className="font-mono text-muted-foreground whitespace-pre-wrap italic">
+                           <p className="font-mono text-muted-foreground dark:text-[#bdc0ba] whitespace-pre-wrap italic">
                             "{userAnswer}"
                           </p>
                         </div>
-                        <div className="border-t border-border/40 my-2" />
+                         <div className="border-t border-border/40 dark:border-[#373c38] my-2" />
                         <div className="space-y-1">
-                          <span className="font-semibold text-primary font-mono">
+                           <span className="font-semibold text-primary dark:text-[#86a697] font-mono">
                             Solução de Referência:
                           </span>
                           <div className="prose dark:prose-invert max-w-none text-foreground whitespace-pre-wrap">
@@ -652,7 +652,7 @@ export default function TrainArenaClient({
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border flex gap-2 shrink-0">
+                 <div className="pt-4 border-t border-border dark:border-[#373c38] flex gap-2 shrink-0">
                   <Button
                     type="button"
                     variant="outline"

@@ -1,6 +1,4 @@
 :root {
-  --zen-kuro: #080808;
-  --zen-ro: #0c0c0c;
   --zen-washi: oklch(96.08% 0.0097 86.13);
   --zen-ink: oklch(20.44% 0.0076 96.54);
   --zen-sumi: oklch(32% 0.01 96.54);
@@ -12,42 +10,18 @@
 }
 
 .dark {
-  --zen-washi: oklch(88% 0.011 86.13);
-  --zen-ink: oklch(18% 0.008 96.54);
-  --zen-sumi: oklch(72% 0.009 96.54);
-  --zen-hanko: oklch(58% 0.18 32);
-  --zen-moss: oklch(59.6% 0.09 153.25);
+  --zen-kuro: #0d0d0d;
+  --zen-gofun: #faf9f6;
+  --zen-shironezumi: #bdc0ba;
+  --zen-sabiseiji: #86a697;
+  --zen-suoh: #7e2639;
+  --zen-aisumicha: #373c38;
+  --zen-washi: var(--zen-kuro);
+  --zen-ink: var(--zen-gofun);
+  --zen-sumi: var(--zen-shironezumi);
+  --zen-hanko: var(--zen-suoh);
+  --zen-moss: var(--zen-sabiseiji);
   --zen-gold: oklch(74% 0.11 76);
-  --zen-border: oklch(36% 0.009 96.54);
-  --zen-muted: oklch(68% 0.008 86.13);
-}
-
-.dark[data-zen-dark-surface="kuro"] {
-  --background: var(--zen-kuro);
-  --card: color-mix(in oklch, var(--zen-kuro) 92%, white);
-  --popover: color-mix(in oklch, var(--zen-kuro) 90%, white);
-  --secondary: color-mix(in oklch, var(--zen-kuro) 86%, white);
-  --muted: color-mix(in oklch, var(--zen-kuro) 86%, white);
-  --accent: color-mix(in oklch, var(--zen-kuro) 82%, white);
-  --border: color-mix(in oklch, var(--zen-kuro) 72%, white);
-  --input: color-mix(in oklch, var(--zen-kuro) 72%, white);
-  --sidebar: color-mix(in oklch, var(--zen-kuro) 94%, white);
-  --sidebar-border: color-mix(in oklch, var(--zen-kuro) 72%, white);
-  --zen-ink: var(--zen-kuro);
-  --zen-border: color-mix(in oklch, var(--zen-kuro) 70%, white);
-}
-
-.dark[data-zen-dark-surface="ro"] {
-  --background: var(--zen-ro);
-  --card: color-mix(in oklch, var(--zen-ro) 92%, white);
-  --popover: color-mix(in oklch, var(--zen-ro) 90%, white);
-  --secondary: color-mix(in oklch, var(--zen-ro) 86%, white);
-  --muted: color-mix(in oklch, var(--zen-ro) 86%, white);
-  --accent: color-mix(in oklch, var(--zen-ro) 82%, white);
-  --border: color-mix(in oklch, var(--zen-ro) 72%, white);
-  --input: color-mix(in oklch, var(--zen-ro) 72%, white);
-  --sidebar: color-mix(in oklch, var(--zen-ro) 94%, white);
-  --sidebar-border: color-mix(in oklch, var(--zen-ro) 72%, white);
-  --zen-ink: var(--zen-ro);
-  --zen-border: color-mix(in oklch, var(--zen-ro) 70%, white);
+  --zen-border: var(--zen-aisumicha);
+  --zen-muted: var(--zen-shironezumi);
 }
