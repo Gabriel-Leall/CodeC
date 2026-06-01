@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import type { EChartsOption } from "echarts";
 import {
   TrendingUp,
   Loader2,
   History,
-  Layers3,
+  TreePine,
+  Atom,
+  Flower2,
+  Landmark,
+  Waves,
   Pencil,
   Check,
   X,
@@ -17,6 +23,7 @@ import { ZenToast } from "@kodan/ui/components/zen";
 
 
 import { getAttemptsHistory, getLocalUser, updateLocalUserProfile } from "./actions";
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 interface Attempt {
   id: string;
@@ -46,6 +53,9 @@ interface TechRating {
 
 const INITIAL_ELO = 1200;
 const INITIAL_TECH_ELO = 1000;
+const MIN_ELO = 100;
+const ELO_FORMATTER = new Intl.NumberFormat("pt-BR");
+const TECH_ELO_FORMATTER = new Intl.NumberFormat("pt-BR", { useGrouping: false });
 type ZenToastTone = "success" | "error" | "warning" | "info";
 type ZenToastState = {
   open: boolean;
@@ -122,9 +132,9 @@ export default function Profile() {
       });
   }, []);
 
-  const chartPoints = useMemo(() => buildChartPoints(attempts), [attempts]);
-  const techRatings = useMemo(() => buildTechRatings(attempts), [attempts]);
-  const showChart = attempts.length >= 2 && chartPoints.length >= 3;
+  const chartPoints = buildChartPoints(attempts);
+  const techRatings = buildTechRatings(attempts);
+  const showChart = chartPoints.length >= 2;
 
   const saveName = async () => {
     setSavingName(true);
@@ -198,7 +208,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex-1 w-full bg-transparent px-4 py-8 md:px-8 max-w-5xl mx-auto space-y-12 animate-in fade-in duration-500">
+    <div className="flex-1 w-full bg-transparent px-4 py-10 md:px-8 md:py-12 max-w-5xl mx-auto space-y-16 animate-in fade-in duration-500">
       <input
         ref={fileInputRef}
         type="file"
@@ -233,13 +243,17 @@ export default function Profile() {
         onAvatarClick={() => fileInputRef.current?.click()}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12 border-b border-border/20">
-        <EloTrendCard
-          loading={loading}
-          showChart={showChart}
-          chartPoints={chartPoints}
-        />
-        <TechStackRatingsCard loading={loading} ratings={techRatings} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 pb-12 border-b border-border/20">
+        <div className="min-w-0">
+          <EloTrendCard
+            loading={loading}
+            showChart={showChart}
+            chartPoints={chartPoints}
+          />
+        </div>
+        <div className="min-w-0">
+          <TechStackRatingsCard loading={loading} ratings={techRatings} />
+        </div>
       </div>
 
       <RecentActivitiesCard loading={loading} attempts={attempts} />
@@ -291,22 +305,21 @@ function DashboardHeader({
   const rankBadgeLabel = getKanjiRankLabel(userElo);
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/20 pb-6">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-border/20 pb-8">
+      <div className="flex items-start gap-5">
         {userImage ? (
           <button
             type="button"
             onClick={onAvatarClick}
-            className="relative group size-16 rounded-full p-0.5 border border-foreground/20 hover:border-foreground/45 transition-colors flex items-center justify-center overflow-hidden shrink-0"
-            style={{ borderRadius: "48.5% 51.5% 49.5% 50.5% / 50.5% 49.5% 51.5% 48.5%" }}
+            className="relative group size-20 rounded-full p-0.5 border border-foreground/20 hover:border-foreground/45 transition-colors flex items-center justify-center overflow-hidden shrink-0"
             aria-label="Trocar foto de perfil"
             title="Clique para trocar a foto"
           >
             <Image
               src={userImage}
               alt={`Foto de ${userName}`}
-              width={64}
-              height={64}
+              width={80}
+              height={80}
               unoptimized
               className="size-full object-cover rounded-full"
             />
@@ -318,12 +331,11 @@ function DashboardHeader({
           <button
             type="button"
             onClick={onAvatarClick}
-            className="relative group size-16 rounded-full p-0.5 border border-foreground/20 hover:border-foreground/45 transition-colors flex items-center justify-center bg-transparent shrink-0"
-            style={{ borderRadius: "51.5% 48.5% 50.5% 49.5% / 49.5% 50.5% 48.5% 51.5%" }}
+            className="relative group size-20 rounded-full p-0.5 border border-foreground/20 hover:border-foreground/45 transition-colors flex items-center justify-center bg-transparent shrink-0"
             aria-label="Adicionar foto de perfil"
             title="Clique para adicionar foto"
           >
-            <div className="size-full rounded-full bg-foreground/[0.03] flex items-center justify-center text-foreground font-serif text-lg border border-dashed border-foreground/10 hover:bg-foreground/[0.06] transition-colors">
+            <div className="size-full rounded-full bg-foreground/[0.03] flex items-center justify-center text-foreground font-serif text-xl border border-dashed border-foreground/10 hover:bg-foreground/[0.06] transition-colors">
               {initials}
             </div>
           </button>
@@ -361,7 +373,7 @@ function DashboardHeader({
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-serif font-bold tracking-tight text-foreground">{userName}</h1>
+              <h1 className="text-3xl font-serif font-bold tracking-tight text-foreground">{userName}</h1>
               <button
                 type="button"
                 onClick={onStartNameEdit}
@@ -373,21 +385,22 @@ function DashboardHeader({
               </button>
             </div>
           )}
-          <p className="mt-0.5 font-serif text-sm tracking-wide text-muted-foreground/90">
+          <p className="mt-1 font-serif text-sm tracking-wide text-muted-foreground/90">
             {rankBadgeLabel}
           </p>
-          <p className="text-[10px] text-muted-foreground/80 mt-1 font-mono">
+          <p className="text-xs text-muted-foreground/80 mt-1 font-mono">
             Clique na foto para trocar.
           </p>
         </div>
       </div>
 
-      <div className="text-left md:text-right shrink-0">
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground/80 font-mono font-semibold">
+      <div className="text-left md:text-right shrink-0 pt-2 md:pt-0">
+        <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80 font-mono font-semibold">
           Seu Rating Atual
         </div>
-        <div className="text-3xl font-serif font-bold text-foreground mt-1 tracking-tight">
-          {userElo} ELO
+        <div className="mt-1.5 flex items-end gap-2 md:justify-end font-mono font-bold tracking-tight text-foreground">
+          <span className="text-4xl tabular-nums">{userElo}</span>
+          <span className="text-xl">ELO</span>
         </div>
       </div>
     </div>
@@ -404,7 +417,7 @@ function EloTrendCard({
   chartPoints: ChartPoint[];
 }) {
   return (
-    <div className="lg:col-span-2 space-y-4">
+    <div className="space-y-4">
       <div>
         <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
           <TrendingUp className="size-4 text-primary" />
@@ -414,18 +427,18 @@ function EloTrendCard({
           Sua evolução técnica baseada nas últimas tentativas corrigidas.
         </p>
       </div>
-      <div className="h-48 flex items-center justify-center pt-2">
+      <div className="h-56 flex items-center justify-center pt-2">
         {loading ? (
           <Loader2 className="size-5 animate-spin text-muted-foreground" />
         ) : showChart ? (
-          <EloTrendSvg chartPoints={chartPoints} />
+          <EloTrendChart chartPoints={chartPoints} />
         ) : (
           <div className="flex flex-col items-start justify-center p-4 gap-2 w-full h-full">
             <p className="text-xs font-mono font-semibold text-foreground">
               Progresso indisponível
             </p>
             <p className="text-[10px] text-muted-foreground/80 font-mono max-w-xs">
-              Realize pelo menos 2 tentativas em desafios para visualizar seu gráfico de tendência ELO.
+              Realize pelo menos 1 tentativa em desafios para visualizar seu gráfico de tendência ELO.
             </p>
           </div>
         )}
@@ -434,108 +447,167 @@ function EloTrendCard({
   );
 }
 
-function EloTrendSvg({ chartPoints }: { chartPoints: ChartPoint[] }) {
-  const width = 600;
-  const height = 180;
-  const paddingLeft = 45;
-  const paddingRight = 20;
-  const paddingTop = 20;
-  const paddingBottom = 20;
+function EloTrendChart({ chartPoints }: { chartPoints: ChartPoint[] }) {
+  const safePoints = chartPoints.filter(
+    point =>
+      Number.isFinite(point.elo) &&
+      Number.isFinite(point.change) &&
+      point.title.trim().length > 0 &&
+      point.date.trim().length > 0
+  );
+  const pointsCount = safePoints.length;
 
-  const elos = chartPoints.map(p => p.elo);
-  const maxElo = Math.max(...elos, 1250);
-  const minElo = Math.max(100, Math.min(...elos, 1150));
-  const eloRange = maxElo - minElo || 100;
-  const pointsCount = chartPoints.length;
-
-  const coordinates = chartPoints.map((point, index) => {
-    const x =
-      paddingLeft +
-      (index / (pointsCount - 1)) * (width - paddingLeft - paddingRight);
-    const y =
-      height -
-      paddingBottom -
-      ((point.elo - minElo) / eloRange) * (height - paddingTop - paddingBottom);
-    return { x, y, elo: point.elo, change: point.change };
-  });
-
-  let pathD = `M ${coordinates[0].x} ${coordinates[0].y}`;
-  for (let i = 1; i < coordinates.length; i++) {
-    pathD += ` L ${coordinates[i].x} ${coordinates[i].y}`;
+  if (pointsCount < 2) {
+    return (
+      <div className="w-full h-full flex items-center justify-start">
+        <p className="text-[10px] text-muted-foreground/80 font-mono">
+          Dados insuficientes para renderizar a tendência.
+        </p>
+      </div>
+    );
   }
 
+  const elos = safePoints.map(point => point.elo);
+  const minRaw = Math.min(...elos);
+  const maxRaw = Math.max(...elos);
+  const dynamicPad = Math.max(25, Math.ceil((maxRaw - minRaw || 40) * 0.2));
+  const minElo = Math.max(
+    MIN_ELO,
+    Math.floor((Math.min(minRaw, INITIAL_ELO) - dynamicPad) / 10) * 10
+  );
+  const maxElo = Math.ceil((Math.max(maxRaw, INITIAL_ELO) + dynamicPad) / 10) * 10;
+  const option: EChartsOption = {
+    animationDuration: 550,
+    animationEasing: "cubicOut",
+    grid: {
+      left: 42,
+      right: 14,
+      top: 18,
+      bottom: 28,
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: { type: "line", snap: true },
+      backgroundColor: "#f5f2eb",
+      borderColor: "#dcd7cb",
+      borderWidth: 1,
+      padding: [8, 10],
+      textStyle: {
+        color: "#1e1f1c",
+        fontFamily: "JetBrains Mono, Fira Code, monospace",
+        fontSize: 11,
+      },
+      formatter: params => {
+        const data = Array.isArray(params) ? params[0] : params;
+        if (!data || typeof data.dataIndex !== "number") {
+          return "Sem dados";
+        }
+        const point = safePoints[data.dataIndex];
+        if (!point) {
+          return "Sem dados";
+        }
+
+        return [
+          `<div style="font-weight:700;margin-bottom:4px;">${point.date}</div>`,
+          `<div>ELO: ${ELO_FORMATTER.format(point.elo)} (${point.change >= 0 ? `+${point.change}` : point.change})</div>`,
+          `<div style="opacity:.78;margin-top:2px;">${point.title}</div>`,
+        ].join("");
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: safePoints.map(point => point.date),
+      axisLine: { lineStyle: { color: "rgba(220,215,203,.8)" } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: "rgba(90,94,101,.8)",
+        fontSize: 10,
+        fontFamily: "JetBrains Mono, Fira Code, monospace",
+        interval: index => pointsCount <= 6 || index % 2 === 0,
+      },
+    },
+    yAxis: {
+      type: "value",
+      min: minElo,
+      max: maxElo,
+      splitNumber: 4,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: "rgba(90,94,101,.8)",
+        fontSize: 10,
+        fontFamily: "JetBrains Mono, Fira Code, monospace",
+        formatter: value => ELO_FORMATTER.format(Number(value)),
+      },
+      splitLine: {
+        lineStyle: {
+          color: "rgba(220,215,203,.45)",
+          width: 1,
+          type: "dashed",
+        },
+      },
+    },
+    series: [
+      {
+        type: "line",
+        data: safePoints.map(point => point.elo),
+        smooth: 0.25,
+        showSymbol: true,
+        symbol: "circle",
+        symbolSize: 7,
+        lineStyle: {
+          color: "#1e1f1c",
+          width: 2.25,
+        },
+        itemStyle: {
+          color: "#1e1f1c",
+          borderColor: "#f5f2eb",
+          borderWidth: 1.5,
+        },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(31,61,47,.22)" },
+              { offset: 1, color: "rgba(31,61,47,.02)" },
+            ],
+          },
+        },
+        markLine: {
+          silent: true,
+          symbol: "none",
+          label: {
+            formatter: "Base ELO",
+            color: "rgba(90,94,101,.75)",
+            fontSize: 9,
+            fontFamily: "JetBrains Mono, Fira Code, monospace",
+            position: "insideEndTop",
+          },
+          lineStyle: {
+            color: "rgba(140,45,25,.65)",
+            type: "dotted",
+            width: 1,
+          },
+          data: [{ yAxis: INITIAL_ELO }],
+        },
+      },
+    ],
+  };
+
   return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-full font-mono text-[9px] text-muted-foreground select-none"
-    >
-      {[0, 0.5, 1].map((val, idx) => {
-        const eloVal = Math.round(minElo + val * eloRange);
-        const y = height - paddingBottom - val * (height - paddingTop - paddingBottom);
-        return (
-          <g key={idx} className="opacity-30">
-            <line
-              x1={paddingLeft}
-              y1={y}
-              x2={width - paddingRight}
-              y2={y}
-              stroke="oklch(var(--border))"
-              strokeWidth="0.75"
-            />
-            <text x={10} y={y + 3} fill="currentColor" className="font-mono">
-              {eloVal}
-            </text>
-          </g>
-        );
-      })}
-
-      <path
-        d={pathD}
-        fill="none"
-        stroke="oklch(var(--foreground))"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="animate-in fade-in duration-300"
+    <div className="h-full w-full rounded-sm border border-border/30 bg-[oklch(var(--background))] p-1">
+      <ReactECharts
+        option={option}
+        style={{ width: "100%", height: "100%" }}
+        opts={{ renderer: "svg" }}
+        notMerge
       />
-
-      {coordinates.map((coord, idx) => (
-        <g key={idx} className="group/node">
-          <circle
-            cx={coord.x}
-            cy={coord.y}
-            r={2.5}
-            fill="oklch(var(--foreground))"
-          />
-          <circle
-            cx={coord.x}
-            cy={coord.y}
-            r={10}
-            fill="transparent"
-            className="cursor-pointer"
-          />
-          <g className="opacity-0 group-hover/node:opacity-100 transition-opacity duration-150 pointer-events-none">
-            <rect
-              x={Math.max(5, coord.x - 60)}
-              y={coord.y - 32}
-              width={120}
-              height={24}
-              fill="oklch(var(--background))"
-              stroke="oklch(var(--border))"
-              strokeWidth={1}
-            />
-            <text
-              x={coord.x}
-              y={coord.y - 18}
-              textAnchor="middle"
-              className="fill-foreground font-bold text-[8px]"
-            >
-              ELO: {coord.elo} ({coord.change >= 0 ? `+${coord.change}` : coord.change})
-            </text>
-          </g>
-        </g>
-      ))}
-    </svg>
+    </div>
   );
 }
 
@@ -547,14 +619,14 @@ function TechStackRatingsCard({
   ratings: TechRating[];
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0">
       <div>
         <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-          <Layers3 className="size-4 text-primary" />
-          Tech Stack Ratings
+          <TreePine className="size-4 text-primary" />
+          Tech Stack Garden
         </h2>
-        <p className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">
-          Rating específico por tecnologia com base no histórico de tentativas.
+        <p className="text-[10px] text-muted-foreground/80 font-mono mt-0.5 max-w-sm">
+          Sua fundação técnica visualizada como pedras de progresso no jardim de treino.
         </p>
       </div>
 
@@ -563,32 +635,53 @@ function TechStackRatingsCard({
           <Loader2 className="size-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="overflow-x-auto pt-2">
-          <table className="w-full text-left font-mono text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-border/20 text-muted-foreground/80 font-semibold uppercase tracking-wider text-[10px]">
-                <th className="pb-2 text-left font-mono">Tecnologia</th>
-                <th className="pb-2 text-center font-mono">Tentativas</th>
-                <th className="pb-2 text-right font-mono">Nível/ELO</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/10">
-              {ratings.map(rating => (
-                <tr key={rating.technology} className="hover:bg-foreground/[0.01] transition-colors">
-                  <td className="py-2.5 text-left font-semibold text-foreground">
-                    {rating.technology}
-                  </td>
-                  <td className="py-2.5 text-center text-muted-foreground">
-                    {rating.attempts}
-                  </td>
-                  <td className="py-2.5 text-right font-mono text-xs">
-                    <span className="font-semibold text-foreground">{rating.level}</span>
-                    <span className="ml-1.5 text-muted-foreground/80">({rating.elo} ELO)</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="pt-1">
+          <div className="grid grid-cols-1 gap-4">
+            {ratings.map((rating, index) => (
+              <article
+                key={rating.technology}
+                className="relative overflow-hidden border border-border/25 bg-foreground/[0.02] p-4"
+                style={{ borderRadius: getTechStoneRadius(index) }}
+              >
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 opacity-[0.12]"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle at 2px 2px, oklch(var(--foreground) / 0.24) 1px, transparent 0)",
+                    backgroundSize: "12px 12px",
+                  }}
+                />
+                <div className="relative min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex flex-1 items-start gap-3">
+                      <div className="mt-0.5 shrink-0 size-9 rounded-full border border-border/30 bg-background/55 flex items-center justify-center text-muted-foreground">
+                        <TechGardenIcon technology={rating.technology} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-serif text-sm md:text-base leading-snug font-semibold tracking-tight text-foreground">
+                          {rating.technology}
+                        </p>
+                        <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground/75 font-mono">
+                          {getTechGardenAlias(rating.technology)}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="shrink-0 border border-border/30 bg-background/40 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-[0.14em] text-muted-foreground/80">
+                      {getTechRankSuffix(rating.elo)}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 border-t border-border/20 pt-2.5 flex items-end justify-between gap-2">
+                    <p className="text-xs font-mono font-semibold text-foreground">{rating.level}</p>
+                    <p className="text-xs font-mono text-muted-foreground/85 tabular-nums">
+                      {TECH_ELO_FORMATTER.format(rating.elo)} ELO
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -681,7 +774,7 @@ function buildChartPoints(attempts: Attempt[]): ChartPoint[] {
   let current = INITIAL_ELO;
 
   const eloPoints = chronological.map(attempt => {
-    current = Math.max(100, current + attempt.eloChange);
+    current = Math.max(MIN_ELO, current + attempt.eloChange);
     return {
       elo: current,
       title: attempt.challenge.title,
@@ -710,7 +803,7 @@ function buildTechRatings(attempts: Attempt[]): TechRating[] {
         attempts: 0,
       };
       ratings.set(technology, {
-        elo: Math.max(100, current.elo + attempt.eloChange),
+        elo: Math.max(MIN_ELO, current.elo + attempt.eloChange),
         attempts: current.attempts + 1,
       });
     }
@@ -774,6 +867,56 @@ function getTechLevel(elo: number) {
     return "L2 Junior";
   }
   return "L1 Trainee";
+}
+
+function TechGardenIcon({ technology }: { technology: string }) {
+  const normalized = technology.trim().toLowerCase();
+  if (normalized.includes("react hooks")) {
+    return <Flower2 className="size-[18px]" />;
+  }
+  if (normalized.includes("react")) {
+    return <Atom className="size-[18px]" />;
+  }
+  if (normalized.includes("typescript")) {
+    return <Landmark className="size-[18px]" />;
+  }
+  if (normalized.includes("async")) {
+    return <Waves className="size-[18px]" />;
+  }
+  return <TreePine className="size-[18px]" />;
+}
+
+function getTechGardenAlias(technology: string) {
+  const normalized = technology.trim().toLowerCase();
+  if (normalized.includes("react hooks")) {
+    return "Lotus Path";
+  }
+  if (normalized.includes("react")) {
+    return "Bonsai State";
+  }
+  if (normalized.includes("typescript")) {
+    return "Temple Order";
+  }
+  if (normalized.includes("async")) {
+    return "Flow Current";
+  }
+  return "Silent Craft";
+}
+
+function getTechStoneRadius(index: number) {
+  const patterns = [
+    "2rem 2.6rem 2.2rem 2.8rem / 2.2rem 2.8rem 2.1rem 2.4rem",
+    "2.6rem 2rem 2.8rem 2rem / 2.4rem 2.1rem 2.7rem 2.2rem",
+    "1.9rem 2.7rem 2rem 2.5rem / 2.5rem 2rem 2.8rem 2rem",
+    "2.5rem 2.1rem 2.6rem 2rem / 2rem 2.6rem 2.2rem 2.8rem",
+  ];
+  return patterns[index % patterns.length]!;
+}
+
+function getTechRankSuffix(elo: number) {
+  const fullRank = getKanjiRankLabel(elo);
+  const rankParts = fullRank.split("·");
+  return (rankParts[1] ?? fullRank).trim();
 }
 
 function getKanjiRankLabel(elo: number) {
