@@ -1,1 +1,18 @@
 @import "@CC/ui/globals.css";
+
+body:has([data-entry-gate="true"]) header[data-app-header="true"] {
+  display: none;
+}
+
+@keyframes dojo-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
