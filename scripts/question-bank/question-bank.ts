@@ -109,7 +109,7 @@ export function renderSeedMarkdown(seed: QuestionBankSeed) {
 export function validateSeedMarkdown(markdown: string) {
   const errors: string[] = [];
 
-  if (!markdown.startsWith("---\n")) {
+  if (!/^---\r?\n/.test(markdown)) {
     errors.push("Missing frontmatter opening marker");
   }
 

@@ -48,6 +48,12 @@ describe("question bank toolkit", () => {
     expect(errors.some(error => error.includes("Main Prompt"))).toBe(true);
   });
 
+  test("accepts frontmatter rendered with CRLF line endings", () => {
+    const markdown = renderSeedMarkdown(sampleSeed).replaceAll("\n", "\r\n");
+
+    expect(validateSeedMarkdown(markdown)).toEqual([]);
+  });
+
   test("keeps the agreed corpus split", () => {
     const stats = collectQuestionBankStats(questionBankSeeds);
 
