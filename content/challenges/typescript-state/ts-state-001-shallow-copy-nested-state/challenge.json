@@ -1,0 +1,16 @@
+{
+  "id": "ts-state-001-shallow-copy-nested-state",
+  "title": "Cópia Rasa com Estado Aninhado Compartilhado",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1450,
+  "question": "Explique por que esta função parece criar um novo estado, mas ainda permite mutação retroativa do valor anterior.\nNa sua resposta, cubra:\n1) o problema principal envolvendo cópia rasa de objeto aninhado;\n2) como o estado antigo continua sendo afetado;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "state",
+    "immutability",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 9
+}

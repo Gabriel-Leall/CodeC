@@ -1,0 +1,17 @@
+{
+  "id": "react-memo-001-usememo-side-effect",
+  "title": "useMemo com Efeito Colateral Embutido",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1490,
+  "question": "Explique por que este uso de `useMemo` é tecnicamente inadequado, mesmo que o cálculo do total pareça correto.\nNa sua resposta, cubra:\n1) o erro principal envolvendo mistura de memoização com efeito colateral;\n2) qual contrato do hook está sendo violado ou abusado;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "useMemo",
+    "side-effects",
+    "rendering",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

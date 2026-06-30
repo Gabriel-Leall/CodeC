@@ -1,0 +1,17 @@
+{
+  "id": "ts-async-003-abort-controller-leak",
+  "title": "AbortController Reutilizado Entre Requisicoes",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1500,
+  "question": "Explique por que, depois de uma tentativa cancelada, este client pode passar a falhar imediatamente nas proximas requisicoes.\nNa sua resposta, cubra:\n1) o erro principal envolvendo reutilizacao de um `AbortController` abortado;\n2) como o estado abortado vaza para chamadas futuras;\n3) a correcao minima segura com codigo.",
+  "tags": [
+    "typescript",
+    "async",
+    "abort-controller",
+    "fetch",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 10
+}

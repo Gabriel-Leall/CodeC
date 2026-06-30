@@ -1,0 +1,16 @@
+{
+  "id": "ts-arch-003-overload-contract-drift",
+  "title": "Overload Incoerente com a Implementação",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1480,
+  "question": "Explique por que estes overloads prometem um contrato que o corpo da função não cumpre.\nNa sua resposta, cubra:\n1) o erro principal envolvendo drift entre overload e implementação;\n2) qual o risco técnico para quem consome a API;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "overload",
+    "contracts",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 9
+}

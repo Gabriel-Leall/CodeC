@@ -1,0 +1,17 @@
+{
+  "id": "react-memo-002-filtered-list-stale-dependency",
+  "title": "Lista Filtrada Memoizada com Dependencia Faltando",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1480,
+  "question": "O time diz que a lista filtrada para de reagir quando o texto de busca muda. Explique a causa raiz.\nNa sua resposta, cubra:\n1) o erro principal envolvendo dependencia faltando no `useMemo`;\n2) como isso congela uma derivacao antiga na interface;\n3) a correcao minima segura com codigo.",
+  "tags": [
+    "react",
+    "useMemo",
+    "dependencies",
+    "derived-state",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

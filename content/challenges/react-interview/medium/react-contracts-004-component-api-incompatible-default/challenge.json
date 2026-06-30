@@ -1,0 +1,17 @@
+{
+  "id": "react-contracts-004-component-api-incompatible-default",
+  "title": "Default de Prop que Quebra o Contrato Visual",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1470,
+  "question": "Você recebeu este componente de avatar em uma entrevista técnica. Explique por que o valor default parece inocente, mas quebra o contrato visual da API.\nNa sua resposta, cubra:\n1) o erro principal envolvendo um default semanticamente inválido;\n2) como esse contrato ruim aparece na interface ou no consumo do componente;\n3) a correção mínima segura com código.",
+  "tags": [
+    "interview",
+    "react",
+    "component-api",
+    "defaults",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

@@ -1,0 +1,17 @@
+{
+  "id": "react-state-003-key-instability-on-reorder",
+  "title": "Lista Reordenável com Key Instável",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1480,
+  "question": "Explique por que esta lista pode misturar estados visuais entre linhas depois da reordenação.\nNa sua resposta, cubra:\n1) o problema principal envolvendo identidade de item e uso do índice como key;\n2) como isso afeta a reconciliação do React;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "rendering",
+    "keys",
+    "lists",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}
