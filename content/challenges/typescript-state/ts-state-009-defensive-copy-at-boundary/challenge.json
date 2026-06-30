@@ -1,0 +1,16 @@
+{
+  "id": "ts-state-009-defensive-copy-at-boundary",
+  "title": "Borda sem Cópia Defensiva",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1470,
+  "question": "Explique por que esta classe parece encapsular o estado, mas ainda permite mutação externa do seu conteúdo.\nNa sua resposta, cubra:\n1) o problema principal envolvendo vazamento de referência na borda da API;\n2) como um consumidor externo ainda altera o estado interno;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "state",
+    "api-boundary",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 9
+}

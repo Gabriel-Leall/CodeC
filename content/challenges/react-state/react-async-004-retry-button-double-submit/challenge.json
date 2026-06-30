@@ -1,0 +1,17 @@
+{
+  "id": "react-async-004-retry-button-double-submit",
+  "title": "Retry com Janela para Double Submit",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1480,
+  "question": "O time diz que, ao clicar rápido no botão de retry, a mesma operação pode ser enviada duas vezes. Explique por quê.\nNa sua resposta, cubra:\n1) o erro principal envolvendo a janela entre evento e lock efetivo;\n2) como dois cliques próximos ainda conseguem atravessar a proteção;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "async",
+    "retry",
+    "double-submit",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

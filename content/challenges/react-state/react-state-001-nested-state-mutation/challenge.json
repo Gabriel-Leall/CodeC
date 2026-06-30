@@ -1,0 +1,17 @@
+{
+  "id": "react-state-001-nested-state-mutation",
+  "title": "Mutação Direta em Estado Aninhado",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1450,
+  "question": "Explique por que esta atualização pode falhar em refletir a mudança na interface.\nNa sua resposta, cubra:\n1) o problema principal envolvendo mutação direta do estado anterior;\n2) por que isso conflita com o modelo de renderização do React;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "state",
+    "mutation",
+    "rendering",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

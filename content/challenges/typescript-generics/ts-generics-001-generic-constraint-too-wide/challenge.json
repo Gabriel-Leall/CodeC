@@ -1,0 +1,16 @@
+{
+  "id": "ts-generics-001-generic-constraint-too-wide",
+  "title": "Constraint Genérico Largo Demais",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1470,
+  "question": "Explique por que este helper parece genérico e reutilizável, mas na prática já depende de uma propriedade específica.\nNa sua resposta, cubra:\n1) o erro principal envolvendo um constraint amplo demais;\n2) por que o cast posterior denuncia um contrato mal modelado;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "generics",
+    "constraints",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 9
+}

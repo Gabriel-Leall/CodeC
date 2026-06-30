@@ -36,7 +36,9 @@
     "db:migrate": "bun run --filter @CC/db db:migrate",
     "db:migrate:sqlite-to-neon": "bun run --filter @CC/db db:migrate:sqlite-to-neon",
     "db:seed:challenges": "bun run --filter @CC/db db:seed:challenges",
-    "doctor": "react-doctor"
+    "doctor": "react-doctor",
+    "question-bank:generate": "bun run ./scripts/question-bank/generate.ts",
+    "question-bank:validate": "bun run ./scripts/question-bank/validate.ts"
   },
   "dependencies": {
     "@CC/env": "workspace:*"

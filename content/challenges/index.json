@@ -1,5 +1,39 @@
 [
   {
+    "id": "react-effects-001-stale-closure-interval",
+    "title": "Contador com Intervalo Preso em Stale Closure",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debug",
+    "tags": [
+      "react",
+      "hooks",
+      "useEffect",
+      "stale-closure",
+      "debugging"
+    ],
+    "estimatedTime": 7,
+    "recommendedElo": 1300,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-effects-005-event-listener-stale-prop",
+    "title": "Listener Global Preso em Prop Antiga",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "hooks",
+      "event-listener",
+      "stale-closure",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1470,
+    "status": "ACTIVE"
+  },
+  {
     "id": "react-hooks-stale-closure-useeffect",
     "title": "O Fechamento Obsoleto (Stale Closure) no useEffect",
     "language": "react",
@@ -12,6 +46,23 @@
     ],
     "estimatedTime": 12,
     "recommendedElo": 1400,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-contracts-001-controlled-uncontrolled-input",
+    "title": "Input Alternando entre Controlado e Não Controlado",
+    "language": "react",
+    "difficulty": "EASY",
+    "type": "debug",
+    "tags": [
+      "interview",
+      "react",
+      "forms",
+      "controlled",
+      "debugging"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1450,
     "status": "ACTIVE"
   },
   {
@@ -525,6 +576,23 @@
     "status": "ACTIVE"
   },
   {
+    "id": "react-contracts-004-component-api-incompatible-default",
+    "title": "Default de Prop que Quebra o Contrato Visual",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "interview",
+      "react",
+      "component-api",
+      "defaults",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1470,
+    "status": "ACTIVE"
+  },
+  {
     "id": "react-medium-busca-incremental-de-clientes-1",
     "title": "Busca Incremental de Clientes com Efeito Instável",
     "language": "react",
@@ -829,6 +897,57 @@
     "status": "ACTIVE"
   },
   {
+    "id": "react-effects-002-object-dependency-loop",
+    "title": "Busca com Dependência de Objeto Instável",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "useEffect",
+      "dependencies",
+      "rendering",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-memo-001-usememo-side-effect",
+    "title": "useMemo com Efeito Colateral Embutido",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "useMemo",
+      "side-effects",
+      "rendering",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1490,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-state-003-key-instability-on-reorder",
+    "title": "Lista Reordenável com Key Instável",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "rendering",
+      "keys",
+      "lists",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1480,
+    "status": "ACTIVE"
+  },
+  {
     "id": "react-state-race-condition-user-profile",
     "title": "Race Condition não Tratada em Requisições",
     "language": "react",
@@ -841,6 +960,221 @@
     ],
     "estimatedTime": 18,
     "recommendedElo": 1600,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-async-001-fetch-out-of-order",
+    "title": "Perfil Sobrescrito por Resposta Fora de Ordem",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "async",
+      "race-condition",
+      "data-fetching",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1490,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-async-003-loading-flag-shared-between-requests",
+    "title": "Loading Único para Requisições Concorrentes",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "async",
+      "loading-state",
+      "race-condition",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1510,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-async-004-retry-button-double-submit",
+    "title": "Retry com Janela para Double Submit",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "async",
+      "retry",
+      "double-submit",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1480,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-state-001-nested-state-mutation",
+    "title": "Mutação Direta em Estado Aninhado",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "state",
+      "mutation",
+      "rendering",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "react-state-004-optimistic-counter-race",
+    "title": "Contador Otimista com Race entre Cliques",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "state",
+      "optimistic-ui",
+      "race-condition",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1500,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-arch-003-overload-contract-drift",
+    "title": "Overload Incoerente com a Implementação",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "overload",
+      "contracts",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1480,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-async-001-race-guard-after-await",
+    "title": "Guarda Antes do Await Não Congela o Domínio",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "async",
+      "race-condition",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-async-007-stale-cache-write",
+    "title": "Resposta Lenta Sobrescrevendo Cache Mais Novo",
+    "language": "typescript",
+    "difficulty": "HARD",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "async",
+      "cache",
+      "stale-write",
+      "debugging"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1680,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-generics-001-generic-constraint-too-wide",
+    "title": "Constraint Genérico Largo Demais",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "generics",
+      "constraints",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1470,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-generics-008-generic-reducer-action-payload",
+    "title": "Reducer Genérico Sem Vínculo entre Ação e Payload",
+    "language": "typescript",
+    "difficulty": "HARD",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "generics",
+      "reducer",
+      "actions",
+      "debugging"
+    ],
+    "estimatedTime": 12,
+    "recommendedElo": 1670,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-state-001-shallow-copy-nested-state",
+    "title": "Cópia Rasa com Estado Aninhado Compartilhado",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "state",
+      "immutability",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1450,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-state-009-defensive-copy-at-boundary",
+    "title": "Borda sem Cópia Defensiva",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "state",
+      "api-boundary",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1470,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-types-003-user-defined-type-guard-lie",
+    "title": "Type Guard que Promete Mais do que Prova",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "type-guard",
+      "runtime",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1490,
     "status": "ACTIVE"
   }
 ]
