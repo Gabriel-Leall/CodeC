@@ -1,0 +1,17 @@
+{
+  "id": "ts-types-005-in-operator-on-partial-record",
+  "title": "Narrowing Enganoso com in em Partial Record",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1460,
+  "question": "Explique por que esta checagem com `in` parece garantir um numero, mas ainda permite um valor indefinido escapar.\nNa sua resposta, cubra:\n1) o erro principal envolvendo `in` em um `Partial<Record<...>>`;\n2) por que a presenca da chave nao garante que o valor seja utilizavel;\n3) a correcao minima segura com codigo.",
+  "tags": [
+    "typescript",
+    "narrowing",
+    "record",
+    "partial",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 8
+}

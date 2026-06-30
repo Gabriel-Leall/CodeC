@@ -931,6 +931,23 @@
     "status": "ACTIVE"
   },
   {
+    "id": "react-memo-002-filtered-list-stale-dependency",
+    "title": "Lista Filtrada Memoizada com Dependencia Faltando",
+    "language": "react",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "react",
+      "useMemo",
+      "dependencies",
+      "derived-state",
+      "debugging"
+    ],
+    "estimatedTime": 9,
+    "recommendedElo": 1480,
+    "status": "ACTIVE"
+  },
+  {
     "id": "react-state-003-key-instability-on-reorder",
     "title": "Lista Reordenável com Key Instável",
     "language": "react",
@@ -1080,6 +1097,23 @@
     "status": "ACTIVE"
   },
   {
+    "id": "ts-async-003-abort-controller-leak",
+    "title": "AbortController Reutilizado Entre Requisicoes",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "async",
+      "abort-controller",
+      "fetch",
+      "debugging"
+    ],
+    "estimatedTime": 10,
+    "recommendedElo": 1500,
+    "status": "ACTIVE"
+  },
+  {
     "id": "ts-async-007-stale-cache-write",
     "title": "Resposta Lenta Sobrescrevendo Cache Mais Novo",
     "language": "typescript",
@@ -1110,6 +1144,23 @@
     ],
     "estimatedTime": 9,
     "recommendedElo": 1470,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-generics-006-api-helper-returns-any",
+    "title": "Helper Generico que Finge Retornar T",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "generics",
+      "api",
+      "any",
+      "debugging"
+    ],
+    "estimatedTime": 10,
+    "recommendedElo": 1520,
     "status": "ACTIVE"
   },
   {
@@ -1175,6 +1226,23 @@
     ],
     "estimatedTime": 9,
     "recommendedElo": 1490,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "ts-types-005-in-operator-on-partial-record",
+    "title": "Narrowing Enganoso com in em Partial Record",
+    "language": "typescript",
+    "difficulty": "MEDIUM",
+    "type": "debug",
+    "tags": [
+      "typescript",
+      "narrowing",
+      "record",
+      "partial",
+      "debugging"
+    ],
+    "estimatedTime": 8,
+    "recommendedElo": 1460,
     "status": "ACTIVE"
   }
 ]
