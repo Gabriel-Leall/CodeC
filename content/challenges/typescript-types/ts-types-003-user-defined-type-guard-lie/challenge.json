@@ -1,0 +1,16 @@
+{
+  "id": "ts-types-003-user-defined-type-guard-lie",
+  "title": "Type Guard que Promete Mais do que Prova",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1490,
+  "question": "Explique por que este type guard parece elegante, mas entrega uma falsa sensação de segurança para o restante do código.\nNa sua resposta, cubra:\n1) o erro principal envolvendo a promessa feita ao compilador;\n2) por que a checagem atual é insuficiente em runtime;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "type-guard",
+    "runtime",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 9
+}

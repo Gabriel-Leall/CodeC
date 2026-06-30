@@ -1,0 +1,17 @@
+{
+  "id": "ts-generics-006-api-helper-returns-any",
+  "title": "Helper Generico que Finge Retornar T",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1520,
+  "question": "Voce recebeu este helper HTTP em uma revisao. Explique por que o generic parece seguro, mas nao protege nada em runtime nem no contrato real.\nNa sua resposta, cubra:\n1) o erro principal envolvendo cast de `any` para um generic decorativo;\n2) como isso cria uma falsa seguranca para quem consome a funcao;\n3) a correcao minima segura com codigo.",
+  "tags": [
+    "typescript",
+    "generics",
+    "api",
+    "any",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 10
+}

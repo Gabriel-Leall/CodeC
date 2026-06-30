@@ -1,0 +1,17 @@
+{
+  "id": "react-contracts-001-controlled-uncontrolled-input",
+  "title": "Input Alternando entre Controlado e Não Controlado",
+  "difficulty": "EASY",
+  "recommendedElo": 1450,
+  "question": "Você recebeu este input em uma entrevista técnica. Explique por que ele pode alternar entre dois contratos de formulário ao longo da vida do componente.\nNa sua resposta, cubra:\n1) o problema principal envolvendo input controlado e não controlado;\n2) como isso aparece como warning ou comportamento estranho;\n3) a correção mínima segura com código.",
+  "tags": [
+    "interview",
+    "react",
+    "forms",
+    "controlled",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 8
+}

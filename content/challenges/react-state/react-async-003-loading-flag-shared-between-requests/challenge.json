@@ -1,0 +1,17 @@
+{
+  "id": "react-async-003-loading-flag-shared-between-requests",
+  "title": "Loading Único para Requisições Concorrentes",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1510,
+  "question": "Explique por que esta tela pode esconder o indicador de loading cedo demais quando várias atualizações acontecem quase juntas.\nNa sua resposta, cubra:\n1) o problema principal de modelagem do loading;\n2) como uma request pode desligar o loading da outra;\n3) uma correção mínima segura com código.",
+  "tags": [
+    "react",
+    "async",
+    "loading-state",
+    "race-condition",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

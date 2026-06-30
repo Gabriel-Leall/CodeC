@@ -1,0 +1,17 @@
+{
+  "id": "react-effects-001-stale-closure-interval",
+  "title": "Contador com Intervalo Preso em Stale Closure",
+  "difficulty": "EASY",
+  "recommendedElo": 1300,
+  "question": "Você recebeu este contador em uma revisão técnica. Explique por que ele trava em vez de crescer continuamente.\nNa sua resposta, cubra:\n1) o erro principal envolvendo stale closure no `useEffect`;\n2) como o bug aparece para o usuário ao longo do tempo;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "hooks",
+    "useEffect",
+    "stale-closure",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 7
+}

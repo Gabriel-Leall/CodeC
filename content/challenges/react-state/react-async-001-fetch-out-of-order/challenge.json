@@ -1,0 +1,17 @@
+{
+  "id": "react-async-001-fetch-out-of-order",
+  "title": "Perfil Sobrescrito por Resposta Fora de Ordem",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1490,
+  "question": "O time diz que, ao trocar rapidamente de usuário, esta tela às vezes mostra o perfil errado. Explique por quê.\nNa sua resposta, cubra:\n1) o bug principal de concorrência entre requisições;\n2) como a resposta errada chega a sobrescrever o estado correto;\n3) uma correção mínima segura com código.",
+  "tags": [
+    "react",
+    "async",
+    "race-condition",
+    "data-fetching",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

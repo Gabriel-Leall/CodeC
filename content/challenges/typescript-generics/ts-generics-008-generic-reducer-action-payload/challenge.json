@@ -1,0 +1,17 @@
+{
+  "id": "ts-generics-008-generic-reducer-action-payload",
+  "title": "Reducer Genérico Sem Vínculo entre Ação e Payload",
+  "difficulty": "HARD",
+  "recommendedElo": 1670,
+  "question": "Explique por que este reducer genérico parece flexível, mas perde a relação correta entre tipo de ação e payload.\nNa sua resposta, cubra:\n1) o erro principal envolvendo um generic único para ações de naturezas diferentes;\n2) como isso enfraquece a segurança do payload;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "generics",
+    "reducer",
+    "actions",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 12
+}

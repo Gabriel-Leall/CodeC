@@ -1,0 +1,17 @@
+{
+  "id": "react-effects-005-event-listener-stale-prop",
+  "title": "Listener Global Preso em Prop Antiga",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1470,
+  "question": "Explique por que este atalho global pode continuar executando mesmo depois de a flag de habilitação mudar.\nNa sua resposta, cubra:\n1) o problema principal envolvendo closure antiga no listener registrado;\n2) como isso se manifesta para o usuário;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "hooks",
+    "event-listener",
+    "stale-closure",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

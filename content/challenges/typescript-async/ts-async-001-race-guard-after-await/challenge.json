@@ -1,0 +1,16 @@
+{
+  "id": "ts-async-001-race-guard-after-await",
+  "title": "Guarda Antes do Await Não Congela o Domínio",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1450,
+  "question": "Explique por que esta checagem inicial não garante que o draft ainda esteja válido no fim da operação.\nNa sua resposta, cubra:\n1) o erro principal envolvendo a janela temporal criada pelo await;\n2) como o draft pode mudar mesmo depois da guarda inicial;\n3) a correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "async",
+    "race-condition",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 9
+}

@@ -1,0 +1,17 @@
+{
+  "id": "react-state-004-optimistic-counter-race",
+  "title": "Contador Otimista com Race entre Cliques",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1500,
+  "question": "Explique por que interações rápidas podem deixar este contador otimista em um valor incorreto.\nNa sua resposta, cubra:\n1) o problema principal envolvendo uso de state fechado na closure;\n2) como cliques próximos competem usando o mesmo snapshot antigo;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "state",
+    "optimistic-ui",
+    "race-condition",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}

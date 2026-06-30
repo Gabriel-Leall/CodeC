@@ -1,0 +1,17 @@
+{
+  "id": "ts-async-007-stale-cache-write",
+  "title": "Resposta Lenta Sobrescrevendo Cache Mais Novo",
+  "difficulty": "HARD",
+  "recommendedElo": 1680,
+  "question": "Explique como esta rotina de refresh permite que uma resposta antiga sobrescreva um valor mais novo no cache.\nNa sua resposta, cubra:\n1) o bug principal de stale write entre requests concorrentes;\n2) como a ordem de conclusão quebra a expectativa do cache;\n3) uma correção mínima segura com código.",
+  "tags": [
+    "typescript",
+    "async",
+    "cache",
+    "stale-write",
+    "debugging"
+  ],
+  "language": "typescript",
+  "type": "debug",
+  "estimatedTime": 12
+}

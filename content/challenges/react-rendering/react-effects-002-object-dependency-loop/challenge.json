@@ -1,0 +1,17 @@
+{
+  "id": "react-effects-002-object-dependency-loop",
+  "title": "Busca com Dependência de Objeto Instável",
+  "difficulty": "MEDIUM",
+  "recommendedElo": 1450,
+  "question": "O time reporta que este componente dispara buscas repetidas mesmo quando o usuário não muda o filtro. Explique a causa raiz.\nNa sua resposta, cubra:\n1) o problema principal envolvendo identidade de objeto nas dependências;\n2) por que isso causa refetch ou rerender desnecessário;\n3) a correção mínima segura com código.",
+  "tags": [
+    "react",
+    "useEffect",
+    "dependencies",
+    "rendering",
+    "debugging"
+  ],
+  "language": "react",
+  "type": "debug",
+  "estimatedTime": 9
+}
