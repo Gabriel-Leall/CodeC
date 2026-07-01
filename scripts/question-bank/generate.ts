@@ -1,8 +1,9 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { questionBankSeeds } from "./bank-data";
 import {
+  findDuplicateSeedOutputPaths,
   getSeedOutputPath,
   renderQuestionBankReadme,
   renderSeedMarkdown,
@@ -11,6 +12,14 @@ import {
 const outputRoot = path.resolve(process.cwd(), "content", "question-bank");
 
 async function generate() {
+  const duplicatePaths = findDuplicateSeedOutputPaths(outputRoot, questionBankSeeds);
+  if (duplicatePaths.length > 0) {
+    throw new Error(`Duplicate seed output paths detected:\n${duplicatePaths.join("\n")}`);
+  }
+
+  await rm(outputRoot, { recursive: true, force: true });
+  await mkdir(outputRoot, { recursive: true });
+
   for (const seed of questionBankSeeds) {
     const filePath = getSeedOutputPath(outputRoot, seed);
     await mkdir(path.dirname(filePath), { recursive: true });

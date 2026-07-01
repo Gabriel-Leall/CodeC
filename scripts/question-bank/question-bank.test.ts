@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 
 import {
   collectQuestionBankStats,
+  findDuplicateSeedOutputPaths,
+  getSeedOutputPath,
   renderSeedMarkdown,
   validateSeedMarkdown,
   type QuestionBankSeed,
@@ -44,14 +46,46 @@ describe("question bank toolkit", () => {
   test("reports validation errors for malformed markdown", () => {
     const errors = validateSeedMarkdown("# invalid");
 
-    expect(errors.length).toBeGreaterThan(0);
-    expect(errors.some(error => error.includes("Main Prompt"))).toBe(true);
+    expect(errors).toContain("Missing frontmatter opening marker");
+    expect(errors).toContain("Missing frontmatter closing marker");
+    expect(errors).toContain("Missing section: ## Main Prompt");
   });
 
   test("accepts frontmatter rendered with CRLF line endings", () => {
     const markdown = renderSeedMarkdown(sampleSeed).replaceAll("\n", "\r\n");
 
     expect(validateSeedMarkdown(markdown)).toEqual([]);
+  });
+
+  test("rejects markdown when a required section only appears inside a code fence", () => {
+    const markdown = [
+      "---",
+      "id: ts-sample-001",
+      "---",
+      "## Main Prompt",
+      "Prompt real",
+      "## Coverage Checklist",
+      "1. item",
+      "## Mini Snippet",
+      "```ts",
+      "## Expected Answer Summary",
+      "```",
+      "## Expansion Notes",
+      "Notas",
+    ].join("\n");
+
+    expect(validateSeedMarkdown(markdown)).toContain("Missing section: ## Expected Answer Summary");
+  });
+
+  test("detects duplicate seed output paths before generation", () => {
+    const duplicateSeed: QuestionBankSeed = {
+      ...sampleSeed,
+      title: "Seed duplicada",
+    };
+
+    expect(findDuplicateSeedOutputPaths("content/question-bank", [sampleSeed, duplicateSeed])).toEqual([
+      `ts-sample-001 and ts-sample-001 map to ${getSeedOutputPath("content/question-bank", sampleSeed)}`,
+    ]);
   });
 
   test("keeps the agreed corpus split", () => {

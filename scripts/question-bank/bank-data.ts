@@ -460,17 +460,17 @@ const typescriptGenericsAndInference = buildTheme("typescript", "generics-and-in
   },
   {
     id: "ts-generics-004-mapped-type-key-remap",
-    title: "Remapeamento de chaves em mapped type",
+    title: "Prefixando chaves em mapped type",
     challengeType: "explain-concept",
     difficulty: "MEDIUM",
     recommendedElo: 1420,
     tags: ["typescript", "mapped-types", "template-literal-types"],
-    mainPrompt: "Explique o conceito de remapeamento de chaves e por que ele e util.",
+    mainPrompt: "Explique como esse mapped type renomeia chaves e por que esse tipo de transformacao e util.",
     miniSnippet: `type PrefixKeys<T> = {
-  [K in keyof T as K]: T[K];
+  [K in keyof T as \`prefix_\${string & K}\`]: T[K];
 };`,
-    expectedAnswerSummary: "A resposta deve explicar como mapped types conseguem transformar a superficie de um tipo de forma mecanica e segura. Em producao isso ajuda em adapters e contratos derivados.",
-    expansionNotes: "Pode crescer para serializacao e clients.",
+    expectedAnswerSummary: "A resposta deve explicar que o mapped type reaproveita os valores de T enquanto cria novas chaves com prefixo. Em producao isso ajuda em adapters, payloads serializados e contratos derivados.",
+    expansionNotes: "Pode crescer para serializacao, clients e nomes derivados por convencao.",
   },
   {
     id: "ts-generics-005-conditional-type-distribution",

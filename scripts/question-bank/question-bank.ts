@@ -108,13 +108,35 @@ export function renderSeedMarkdown(seed: QuestionBankSeed) {
 
 export function validateSeedMarkdown(markdown: string) {
   const errors: string[] = [];
+  const lines = markdown.split(/\r?\n/);
 
-  if (!/^---\r?\n/.test(markdown)) {
+  if (lines[0] !== "---") {
     errors.push("Missing frontmatter opening marker");
   }
 
+  const frontmatterClosingIndex = lines.indexOf("---", 1);
+  if (frontmatterClosingIndex === -1) {
+    errors.push("Missing frontmatter closing marker");
+  }
+
+  const headingLines = new Set<string>();
+  let insideCodeFence = false;
+
+  for (let index = Math.max(frontmatterClosingIndex + 1, 0); index < lines.length; index += 1) {
+    const line = lines[index];
+
+    if (line.startsWith("```")) {
+      insideCodeFence = !insideCodeFence;
+      continue;
+    }
+
+    if (!insideCodeFence) {
+      headingLines.add(line);
+    }
+  }
+
   for (const section of REQUIRED_SECTIONS) {
-    if (!markdown.includes(section)) {
+    if (!headingLines.has(section)) {
       errors.push(`Missing section: ${section}`);
     }
   }
@@ -124,6 +146,25 @@ export function validateSeedMarkdown(markdown: string) {
 
 export function getSeedOutputPath(rootDir: string, seed: QuestionBankSeed) {
   return path.join(rootDir, seed.language, seed.theme, `${seed.id}.md`);
+}
+
+export function findDuplicateSeedOutputPaths(rootDir: string, seeds: QuestionBankSeed[]) {
+  const seen = new Map<string, string>();
+  const duplicates: string[] = [];
+
+  for (const seed of seeds) {
+    const filePath = getSeedOutputPath(rootDir, seed);
+    const previousSeedId = seen.get(filePath);
+
+    if (previousSeedId) {
+      duplicates.push(`${previousSeedId} and ${seed.id} map to ${filePath}`);
+      continue;
+    }
+
+    seen.set(filePath, seed.id);
+  }
+
+  return duplicates;
 }
 
 export function renderQuestionBankReadme(seeds: QuestionBankSeed[]) {
