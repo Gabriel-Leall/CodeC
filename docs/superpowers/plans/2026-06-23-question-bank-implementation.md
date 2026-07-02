@@ -10,7 +10,7 @@
 
 ---
 
-### Task 1: Criar toolkit minimo do banco-base
+## Task 1: Criar toolkit minimo do banco-base
 
 **Files:**
 - Create: `scripts/question-bank/question-bank.test.ts`
@@ -46,7 +46,7 @@ Criar:
 Run: `bun test scripts/question-bank/question-bank.test.ts`
 Expected: PASS
 
-### Task 2: Gerar o banco-base em Markdown
+## Task 2: Gerar o banco-base em Markdown
 
 **Files:**
 - Create: `content/question-bank/README.md`
@@ -63,7 +63,7 @@ Expected: `content/question-bank/` preenchido com 75 arquivos de seed + `README.
 Run: `bun run question-bank:validate`
 Expected: PASS com contagem total e por linguagem
 
-### Task 3: Verificacao final
+## Task 3: Verificacao final
 
 **Files:**
 - Verify only
