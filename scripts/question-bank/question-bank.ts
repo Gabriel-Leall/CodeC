@@ -130,8 +130,8 @@ export function validateSeedMarkdown(markdown: string) {
       continue;
     }
 
-    if (!insideCodeFence) {
-      headingLines.add(line);
+    if (!insideCodeFence && line.startsWith("## ")) {
+      headingLines.add(line.trim());
     }
   }
 

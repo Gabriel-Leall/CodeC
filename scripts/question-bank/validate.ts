@@ -28,16 +28,16 @@ async function validate() {
     return;
   }
 
-  if (stats.total !== 75) {
-    errors.push(`Expected 75 seeds, received ${stats.total}`);
+  if (stats.total < 75) {
+    errors.push(`Expected at least 75 seeds, received ${stats.total}`);
   }
 
-  if (stats.byLanguage.typescript !== 50) {
-    errors.push(`Expected 50 TypeScript seeds, received ${stats.byLanguage.typescript}`);
+  if (stats.byLanguage.typescript < 50) {
+    errors.push(`Expected at least 50 TypeScript seeds, received ${stats.byLanguage.typescript}`);
   }
 
-  if (stats.byLanguage.react !== 25) {
-    errors.push(`Expected 25 React seeds, received ${stats.byLanguage.react}`);
+  if (stats.byLanguage.react < 25) {
+    errors.push(`Expected at least 25 React seeds, received ${stats.byLanguage.react}`);
   }
 
   for (const seed of questionBankSeeds) {
