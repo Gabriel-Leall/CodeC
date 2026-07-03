@@ -36,6 +36,9 @@ export const REQUIRED_SECTIONS = [
   "## Expansion Notes",
 ] as const;
 
+/**
+ * Summarizes the current corpus by language, challenge type, and theme.
+ */
 export function collectQuestionBankStats(seeds: QuestionBankSeed[]): QuestionBankStats {
   const stats: QuestionBankStats = {
     total: seeds.length,
@@ -60,6 +63,9 @@ export function collectQuestionBankStats(seeds: QuestionBankSeed[]): QuestionBan
   return stats;
 }
 
+/**
+ * Renders the YAML frontmatter for a single question-bank seed.
+ */
 function renderFrontmatter(seed: QuestionBankSeed) {
   const tagLines = seed.tags.map(tag => `  - ${tag}`).join("\n");
 
@@ -79,6 +85,9 @@ function renderFrontmatter(seed: QuestionBankSeed) {
   ].join("\n");
 }
 
+/**
+ * Converts a single seed into the canonical Markdown file persisted on disk.
+ */
 export function renderSeedMarkdown(seed: QuestionBankSeed) {
   const checklist = seed.coverageChecklist.map((item, index) => `${index + 1}. ${item}`).join("\n");
   const codeFence = seed.language === "react" ? "tsx" : "ts";
@@ -106,6 +115,9 @@ export function renderSeedMarkdown(seed: QuestionBankSeed) {
   ].join("\n");
 }
 
+/**
+ * Validates the generated Markdown structure expected by the question-bank workflow.
+ */
 export function validateSeedMarkdown(markdown: string) {
   const errors: string[] = [];
   const lines = markdown.split(/\r?\n/);
@@ -144,10 +156,16 @@ export function validateSeedMarkdown(markdown: string) {
   return errors;
 }
 
+/**
+ * Derives the on-disk file path for a seed under the question-bank output root.
+ */
 export function getSeedOutputPath(rootDir: string, seed: QuestionBankSeed) {
   return path.join(rootDir, seed.language, seed.theme, `${seed.id}.md`);
 }
 
+/**
+ * Detects storage key collisions before generation or validation can overwrite data.
+ */
 export function findDuplicateSeedOutputPaths(rootDir: string, seeds: QuestionBankSeed[]) {
   const seen = new Map<string, string>();
   const duplicates: string[] = [];
@@ -167,6 +185,9 @@ export function findDuplicateSeedOutputPaths(rootDir: string, seeds: QuestionBan
   return duplicates;
 }
 
+/**
+ * Renders the aggregate README that describes the generated corpus layout and totals.
+ */
 export function renderQuestionBankReadme(seeds: QuestionBankSeed[]) {
   const stats = collectQuestionBankStats(seeds);
   const themeLines = Object.entries(stats.byTheme)

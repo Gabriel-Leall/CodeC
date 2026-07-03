@@ -11,6 +11,9 @@ import {
 
 const outputRoot = path.resolve(process.cwd(), "content", "question-bank");
 
+/**
+ * Validates corpus counts, duplicate paths, and per-file Markdown structure.
+ */
 async function validate() {
   const stats = collectQuestionBankStats(questionBankSeeds);
   const errors: string[] = [];

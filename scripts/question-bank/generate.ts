@@ -11,6 +11,9 @@ import {
 
 const outputRoot = path.resolve(process.cwd(), "content", "question-bank");
 
+/**
+ * Regenerates the full on-disk question-bank corpus from the TypeScript manifest.
+ */
 async function generate() {
   const duplicatePaths = findDuplicateSeedOutputPaths(outputRoot, questionBankSeeds);
   if (duplicatePaths.length > 0) {

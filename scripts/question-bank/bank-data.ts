@@ -41,6 +41,9 @@ const estimatedTimeByDifficulty: Record<QuestionBankDifficulty, number> = {
   HARD: 12,
 };
 
+/**
+ * Enriches raw editorial rows with shared metadata required by the persisted seed format.
+ */
 function buildTheme(language: QuestionBankSeed["language"], theme: string, rows: SeedRow[]): QuestionBankSeed[] {
   return rows.map(row => ({
     ...row,
