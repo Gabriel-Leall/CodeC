@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@CC/ui/components/button";
+import { Button } from "@kodan/ui/components/button";
 import { Brain, ShieldAlert, Cpu, Sparkles, ChevronRight, GraduationCap } from "lucide-react";
 
 const TITLE_TEXT = `

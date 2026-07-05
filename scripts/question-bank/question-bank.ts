@@ -198,7 +198,7 @@ export function renderQuestionBankReadme(seeds: QuestionBankSeed[]) {
   return [
     "# Question Bank",
     "",
-    "Banco-base editorial para futura promocao de seeds a desafios reais do CC.",
+    "Banco-base editorial para futura promocao de seeds a desafios reais do Kodan.",
     "",
     "## Totais",
     "",

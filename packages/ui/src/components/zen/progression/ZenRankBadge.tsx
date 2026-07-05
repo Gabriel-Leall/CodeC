@@ -1,7 +1,7 @@
 "use client";
 
-import { ZenEnsoSvg } from "@CC/ui/assets/zen/enso";
-import { cn } from "@CC/ui/lib/utils";
+import { ZenEnsoSvg } from "@kodan/ui/assets/zen/enso";
+import { cn } from "@kodan/ui/lib/utils";
 import { motion } from "framer-motion";
 import { zenEase } from "../motion/presets";
 import type { ZenRank } from "../zen-types";

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@CC/ui/lib/utils";
+import { cn } from "@kodan/ui/lib/utils";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Search } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";

@@ -1,5 +1,5 @@
 {
-  "name": "CC",
+  "name": "kodan",
   "private": true,
   "workspaces": {
     "packages": [
@@ -28,23 +28,23 @@
     "build": "bun run --filter '*' build",
     "check-types": "bun run --filter '*' check-types",
     "dev:web": "bun run --filter web dev",
-    "db:push": "bun run --filter @CC/db db:push",
-    "db:studio": "bun run --filter @CC/db db:studio",
-    "db:generate": "bun run --filter @CC/db db:generate",
-    "db:generate:challenges": "bun run --filter @CC/db db:generate:challenges",
-    "db:sync:challenges:index": "bun run --filter @CC/db db:sync:challenges:index",
-    "db:migrate": "bun run --filter @CC/db db:migrate",
-    "db:migrate:sqlite-to-neon": "bun run --filter @CC/db db:migrate:sqlite-to-neon",
-    "db:seed:challenges": "bun run --filter @CC/db db:seed:challenges",
+    "db:push": "bun run --filter @kodan/db db:push",
+    "db:studio": "bun run --filter @kodan/db db:studio",
+    "db:generate": "bun run --filter @kodan/db db:generate",
+    "db:generate:challenges": "bun run --filter @kodan/db db:generate:challenges",
+    "db:sync:challenges:index": "bun run --filter @kodan/db db:sync:challenges:index",
+    "db:migrate": "bun run --filter @kodan/db db:migrate",
+    "db:migrate:sqlite-to-neon": "bun run --filter @kodan/db db:migrate:sqlite-to-neon",
+    "db:seed:challenges": "bun run --filter @kodan/db db:seed:challenges",
     "doctor": "react-doctor",
     "question-bank:generate": "bun run ./scripts/question-bank/generate.ts",
     "question-bank:validate": "bun run ./scripts/question-bank/validate.ts"
   },
   "dependencies": {
-    "@CC/env": "workspace:*"
+    "@kodan/env": "workspace:*"
   },
   "devDependencies": {
-    "@CC/config": "workspace:*",
+    "@kodan/config": "workspace:*",
     "@types/node": "^22.13.14",
     "typescript": "catalog:",
     "react-doctor": "^0.2.6"

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Criar um banco-base editorial dentro do repositorio `CC` com pelo menos 50 seeds de TypeScript e 25 seeds de React. Esse material nao entra diretamente no runtime de `content/challenges/`; ele serve como fonte curada para futura promocao a challenges reais do produto.
+Criar um banco-base editorial dentro do repositorio `Kodan` com pelo menos 50 seeds de TypeScript e 25 seeds de React. Esse material nao entra diretamente no runtime de `content/challenges/`; ele serve como fonte curada para futura promocao a challenges reais do produto.
 
 ## Constraints
 
@@ -43,7 +43,7 @@ Body obrigatorio:
 - Portugues como idioma padrao.
 - Snippets curtos e cirurgicos, mas com potencial de expansao.
 - Cada seed ja nasce com dificuldade, ELO e resposta esperada resumida.
-- A pergunta e modelada editorialmente como `mainPrompt + coverageChecklist`, mesmo que o runtime atual do `CC` ainda persista `question` como `string`.
+- A pergunta e modelada editorialmente como `mainPrompt + coverageChecklist`, mesmo que o runtime atual do `Kodan` ainda persista `question` como `string`.
 - O schema precisa acomodar tres tipos de raciocinio:
   - `debug`
   - `explain-code`

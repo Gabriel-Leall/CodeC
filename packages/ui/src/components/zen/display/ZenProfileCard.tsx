@@ -1,4 +1,4 @@
-import { cn } from "@CC/ui/lib/utils";
+import { cn } from "@kodan/ui/lib/utils";
 import type { ReactNode } from "react";
 import { ZenPaper } from "../layout/ZenPaper";
 import { DanProgress } from "../progression/DanProgress";

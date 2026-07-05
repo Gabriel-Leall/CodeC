@@ -1,5 +1,5 @@
-import { HankoMarkSvg, SumiDividerSvg } from "@CC/ui/assets/zen/sumi-strokes";
-import { cn } from "@CC/ui/lib/utils";
+import { HankoMarkSvg, SumiDividerSvg } from "@kodan/ui/assets/zen/sumi-strokes";
+import { cn } from "@kodan/ui/lib/utils";
 
 type ZenDividerProps = {
   variant?: "brush" | "bamboo" | "seal" | "sumi";
@@ -40,4 +40,3 @@ export function ZenDivider({ variant = "brush", className }: ZenDividerProps) {
 
   return <SumiDividerSvg className={cn("h-5 w-full text-[color:var(--zen-ink)] opacity-45", className)} />;
 }
-

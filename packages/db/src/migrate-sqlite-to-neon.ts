@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { Database } from "bun:sqlite";
 
-import { env } from "@CC/env/server";
+import { env } from "@kodan/env/server";
 
 import prisma from "./index";
 

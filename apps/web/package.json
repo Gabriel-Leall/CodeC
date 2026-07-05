@@ -8,10 +8,10 @@
     "start": "next start"
   },
   "dependencies": {
-    "@CC/auth": "workspace:*",
-    "@CC/db": "workspace:*",
-    "@CC/env": "workspace:*",
-    "@CC/ui": "workspace:*",
+    "@kodan/auth": "workspace:*",
+    "@kodan/db": "workspace:*",
+    "@kodan/env": "workspace:*",
+    "@kodan/ui": "workspace:*",
     "@prisma/client": "catalog:",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
@@ -24,7 +24,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@CC/config": "workspace:*",
+    "@kodan/config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^20",
     "@types/react": "catalog:",

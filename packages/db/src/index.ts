@@ -1,4 +1,4 @@
-import { env } from "@CC/env/server";
+import { env } from "@kodan/env/server";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
 import { PrismaClient } from "../prisma/generated/client";

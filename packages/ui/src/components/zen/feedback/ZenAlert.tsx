@@ -1,7 +1,7 @@
 "use client";
 
-import { EnsoCircle } from "@CC/ui/assets/zen/vector/EnsoCircle";
-import { cn } from "@CC/ui/lib/utils";
+import { EnsoCircle } from "@kodan/ui/assets/zen/vector/EnsoCircle";
+import { cn } from "@kodan/ui/lib/utils";
 import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
 import type { ReactNode } from "react";
 import { zenEase } from "../motion/presets";

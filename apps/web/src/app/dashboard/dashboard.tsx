@@ -12,7 +12,7 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { ZenToast } from "@CC/ui/components/zen";
+import { ZenToast } from "@kodan/ui/components/zen";
 
 
 
