@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@CC/ui/components/button";
+import { Button } from "@kodan/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@CC/ui/components/dropdown-menu";
+} from "@kodan/ui/components/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";

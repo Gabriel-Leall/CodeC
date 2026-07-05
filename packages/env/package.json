@@ -1,5 +1,5 @@
 {
-  "name": "@CC/env",
+  "name": "@kodan/env",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@CC/config": "workspace:*",
+    "@kodan/config": "workspace:*",
     "@types/node": "^22.13.14",
     "typescript": "catalog:"
   }

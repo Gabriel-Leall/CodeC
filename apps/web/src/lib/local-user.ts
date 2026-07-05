@@ -1,6 +1,6 @@
 import "server-only";
 
-import prisma from "@CC/db";
+import prisma from "@kodan/db";
 
 export const DEFAULT_LOCAL_USER_EMAIL = "default@trainer.com";
 export const DEFAULT_LOCAL_USER_NAME = "Treinador CCT";

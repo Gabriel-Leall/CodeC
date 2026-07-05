@@ -12,11 +12,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@CC/ui/components",
-    "utils": "@CC/ui/lib/utils",
-    "hooks": "@CC/ui/hooks",
-    "lib": "@CC/ui/lib",
-    "ui": "@CC/ui/components"
+    "components": "@kodan/ui/components",
+    "utils": "@kodan/ui/lib/utils",
+    "hooks": "@kodan/ui/hooks",
+    "lib": "@kodan/ui/lib",
+    "ui": "@kodan/ui/components"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

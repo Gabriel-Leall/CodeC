@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@CC/ui/lib/utils";
+import { cn } from "@kodan/ui/lib/utils";
 import type { HTMLMotionProps } from "framer-motion";
 import type { ReactNode } from "react";
 import { ZenDivider } from "./ZenDivider";

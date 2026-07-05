@@ -16,10 +16,10 @@ import {
   FileCode,
 } from "lucide-react";
 
-import { Button } from "@CC/ui/components/button";
+import { Button } from "@kodan/ui/components/button";
 import {
   ZenToast,
-} from "@CC/ui/components/zen";
+} from "@kodan/ui/components/zen";
 import { submitAttempt } from "../../actions";
 
 export interface Challenge {

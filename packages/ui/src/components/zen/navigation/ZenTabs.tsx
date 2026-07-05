@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@CC/ui/lib/utils";
+import { cn } from "@kodan/ui/lib/utils";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import type { ComponentProps } from "react";
 
@@ -40,4 +40,3 @@ function ZenTabsContent({ className, ...props }: ComponentProps<typeof TabsPrimi
 }
 
 export { ZenTabs, ZenTabsContent, ZenTabsList, ZenTabsTrigger };
-

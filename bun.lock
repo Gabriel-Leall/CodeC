@@ -3,12 +3,12 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "CC",
+      "name": "kodan",
       "dependencies": {
-        "@CC/env": "workspace:*",
+        "@kodan/env": "workspace:*",
       },
       "devDependencies": {
-        "@CC/config": "workspace:*",
+        "@kodan/config": "workspace:*",
         "@types/node": "^22.13.14",
         "react-doctor": "^0.2.6",
         "typescript": "catalog:",
@@ -18,10 +18,10 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
-        "@CC/auth": "workspace:*",
-        "@CC/db": "workspace:*",
-        "@CC/env": "workspace:*",
-        "@CC/ui": "workspace:*",
+        "@kodan/auth": "workspace:*",
+        "@kodan/db": "workspace:*",
+        "@kodan/env": "workspace:*",
+        "@kodan/ui": "workspace:*",
         "@prisma/client": "catalog:",
         "babel-plugin-react-compiler": "^1.0.0",
         "better-auth": "catalog:",
@@ -34,7 +34,7 @@
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@CC/config": "workspace:*",
+        "@kodan/config": "workspace:*",
         "@tailwindcss/postcss": "^4.1.18",
         "@types/node": "^20",
         "@types/react": "catalog:",
@@ -44,40 +44,40 @@
       },
     },
     "packages/auth": {
-      "name": "@CC/auth",
+      "name": "@kodan/auth",
       "dependencies": {
-        "@CC/db": "workspace:*",
-        "@CC/env": "workspace:*",
+        "@kodan/db": "workspace:*",
+        "@kodan/env": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@CC/config": "workspace:*",
+        "@kodan/config": "workspace:*",
         "typescript": "catalog:",
       },
     },
     "packages/config": {
-      "name": "@CC/config",
+      "name": "@kodan/config",
       "version": "0.0.0",
     },
     "packages/db": {
-      "name": "@CC/db",
+      "name": "@kodan/db",
       "dependencies": {
-        "@CC/env": "workspace:*",
+        "@kodan/env": "workspace:*",
         "@prisma/adapter-neon": "^7.8.0",
         "@prisma/client": "catalog:",
         "dotenv": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@CC/config": "workspace:*",
+        "@kodan/config": "workspace:*",
         "prisma": "^7.8.0",
         "typescript": "catalog:",
       },
     },
     "packages/env": {
-      "name": "@CC/env",
+      "name": "@kodan/env",
       "version": "0.0.0",
       "dependencies": {
         "@t3-oss/env-core": "^0.13.1",
@@ -86,13 +86,13 @@
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@CC/config": "workspace:*",
+        "@kodan/config": "workspace:*",
         "@types/node": "^22.13.14",
         "typescript": "catalog:",
       },
     },
     "packages/ui": {
-      "name": "@CC/ui",
+      "name": "@kodan/ui",
       "version": "0.0.0",
       "dependencies": {
         "@base-ui/react": "^1.0.0",
@@ -114,7 +114,7 @@
         "tw-animate-css": "^1.3.4",
       },
       "devDependencies": {
-        "@CC/config": "workspace:*",
+        "@kodan/config": "workspace:*",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "tailwindcss": "catalog:",
@@ -138,16 +138,6 @@
     "zod": "^4.1.13",
   },
   "packages": {
-    "@CC/auth": ["@CC/auth@workspace:packages/auth"],
-
-    "@CC/config": ["@CC/config@workspace:packages/config"],
-
-    "@CC/db": ["@CC/db@workspace:packages/db"],
-
-    "@CC/env": ["@CC/env@workspace:packages/env"],
-
-    "@CC/ui": ["@CC/ui@workspace:packages/ui"],
-
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
 
     "@antfu/ni": ["@antfu/ni@25.0.0", "", { "dependencies": { "ansis": "^4.0.0", "fzf": "^0.5.2", "package-manager-detector": "^1.3.0", "tinyexec": "^1.0.1" }, "bin": { "na": "bin/na.mjs", "ni": "bin/ni.mjs", "nr": "bin/nr.mjs", "nci": "bin/nci.mjs", "nlx": "bin/nlx.mjs", "nun": "bin/nun.mjs", "nup": "bin/nup.mjs" } }, "sha512-9q/yCljni37pkMr4sPrI3G4jqdIk074+iukc5aFJl7kmDCCsiJrbZ6zKxnES1Gwg+i9RcDZwvktl23puGslmvA=="],
@@ -355,6 +345,16 @@
     "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.5.5", "", {}, "sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og=="],
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
+
+    "@kodan/auth": ["@kodan/auth@workspace:packages/auth"],
+
+    "@kodan/config": ["@kodan/config@workspace:packages/config"],
+
+    "@kodan/db": ["@kodan/db@workspace:packages/db"],
+
+    "@kodan/env": ["@kodan/env@workspace:packages/env"],
+
+    "@kodan/ui": ["@kodan/ui@workspace:packages/ui"],
 
     "@kurkle/color": ["@kurkle/color@0.3.4", "", {}, "sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w=="],
 

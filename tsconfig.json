@@ -1,3 +1,3 @@
 {
-  "extends": "@CC/config/tsconfig.base.json"
+  "extends": "@kodan/config/tsconfig.base.json"
 }

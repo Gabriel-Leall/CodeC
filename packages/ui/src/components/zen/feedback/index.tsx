@@ -1,8 +1,8 @@
 "use client";
 
-import { EnsoCircle } from "@CC/ui/assets/zen/vector/EnsoCircle";
-import { HankoMarkSvg, SumiDividerSvg } from "@CC/ui/assets/zen/sumi-strokes";
-import { cn } from "@CC/ui/lib/utils";
+import { EnsoCircle } from "@kodan/ui/assets/zen/vector/EnsoCircle";
+import { HankoMarkSvg, SumiDividerSvg } from "@kodan/ui/assets/zen/sumi-strokes";
+import { cn } from "@kodan/ui/lib/utils";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { AnimatePresence, motion } from "framer-motion";

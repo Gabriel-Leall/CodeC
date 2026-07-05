@@ -7,14 +7,14 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { Button } from "@CC/ui/components/button";
-import { Input } from "@CC/ui/components/input";
-import { HankoStamp } from "@CC/ui/components/hanko-stamp";
+import { Button } from "@kodan/ui/components/button";
+import { Input } from "@kodan/ui/components/input";
+import { HankoStamp } from "@kodan/ui/components/hanko-stamp";
 import {
   ZenEmptyState,
   ZenLoading,
   ZenToast,
-} from "@CC/ui/components/zen";
+} from "@kodan/ui/components/zen";
 import { getChallenges } from "../actions";
 import { eloToDanRank } from "@/lib/rating";
 import {

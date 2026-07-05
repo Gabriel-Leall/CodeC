@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Play } from "lucide-react";
-import { Button } from "@CC/ui/components/button";
+import { Button } from "@kodan/ui/components/button";
 import { eloToDanRank } from "@/lib/rating";
 import {
   type Challenge,

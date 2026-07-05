@@ -1,5 +1,5 @@
-import { HankoMarkSvg } from "@CC/ui/assets/zen/sumi-strokes";
-import { cn } from "@CC/ui/lib/utils";
+import { HankoMarkSvg } from "@kodan/ui/assets/zen/sumi-strokes";
+import { cn } from "@kodan/ui/lib/utils";
 import type { ComponentProps, ReactNode } from "react";
 
 type ZenAvatarProps = ComponentProps<"div"> & {
@@ -24,4 +24,3 @@ export function ZenAvatar({ className, src, alt = "", fallback, seal = true, ...
     </div>
   );
 }
-

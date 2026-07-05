@@ -1,4 +1,4 @@
-import "@CC/env/web";
+import "@kodan/env/web";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

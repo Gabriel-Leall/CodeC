@@ -1,10 +1,10 @@
 {
-  "extends": "@CC/config/tsconfig.base.json",
+  "extends": "@kodan/config/tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "paths": {
-      "@CC/ui/*": ["./src/*"]
+      "@kodan/ui/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],

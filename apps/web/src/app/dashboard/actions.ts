@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@CC/auth";
-import prisma from "@CC/db";
-import { env } from "@CC/env/server";
+import { auth } from "@kodan/auth";
+import prisma from "@kodan/db";
+import { env } from "@kodan/env/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 

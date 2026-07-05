@@ -13,7 +13,7 @@
   "$schema": "https://r2.better-t-stack.dev/schema.json",
   "version": "3.29.0",
   "createdAt": "2026-05-24T03:43:19.363Z",
-  "reproducibleCommand": "bun create better-t-stack@latest CC --frontend next --backend self --runtime none --database sqlite --orm prisma --api none --auth better-auth --payments none --addons mcp skills --examples none --db-setup none --web-deploy none --server-deploy none --git --package-manager bun --install",
+  "reproducibleCommand": "bun create better-t-stack@latest kodan --frontend next --backend self --runtime none --database sqlite --orm prisma --api none --auth better-auth --payments none --addons mcp skills --examples none --db-setup none --web-deploy none --server-deploy none --git --package-manager bun --install",
   "database": "sqlite",
   "orm": "prisma",
   "backend": "self",

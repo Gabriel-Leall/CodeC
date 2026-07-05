@@ -1,4 +1,4 @@
-# CC
+# Kodan
 
 This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Self, and more.
 
@@ -70,7 +70,7 @@ npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
 Import shared components like this:
 
 ```tsx
-import { Button } from "@CC/ui/components/button";
+import { Button } from "@kodan/ui/components/button";
 ```
 
 ### Add app-specific blocks
@@ -80,7 +80,7 @@ If you want to add app-specific blocks instead of shared primitives, run the sha
 ## Project Structure
 
 ```
-CC/
+Kodan/
 ├── apps/
 │   └── web/         # Fullstack application (Next.js)
 ├── packages/

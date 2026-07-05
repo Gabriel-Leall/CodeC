@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@CC/ui/lib/utils";
+import { cn } from "@kodan/ui/lib/utils";
 import type { ComponentProps, ReactNode } from "react";
 
 type ZenInputProps = ComponentProps<"input"> & {
@@ -26,4 +26,3 @@ export function ZenInput({ className, label, hint, id, ...props }: ZenInputProps
     </label>
   );
 }
-

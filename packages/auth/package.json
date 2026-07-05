@@ -1,5 +1,5 @@
 {
-  "name": "@CC/auth",
+  "name": "@kodan/auth",
   "type": "module",
   "exports": {
     ".": {
@@ -11,14 +11,14 @@
   },
   "scripts": {},
   "dependencies": {
-    "@CC/db": "workspace:*",
-    "@CC/env": "workspace:*",
+    "@kodan/db": "workspace:*",
+    "@kodan/env": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@CC/config": "workspace:*",
+    "@kodan/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

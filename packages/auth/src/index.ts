@@ -1,5 +1,5 @@
-import { createPrismaClient } from "@CC/db";
-import { env } from "@CC/env/server";
+import { createPrismaClient } from "@kodan/db";
+import { env } from "@kodan/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";

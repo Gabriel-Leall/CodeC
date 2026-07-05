@@ -34,7 +34,7 @@ import {
   ZenToast,
   ZenTooltip,
   ZenDivider,
-} from "@CC/ui/components/zen";
+} from "@kodan/ui/components/zen";
 import { Moon, RotateCcw, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";

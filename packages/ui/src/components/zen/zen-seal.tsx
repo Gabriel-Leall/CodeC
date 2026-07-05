@@ -1,7 +1,7 @@
 "use client";
 
-import { HankoMarkSvg } from "@CC/ui/assets/zen/sumi-strokes";
-import { cn } from "@CC/ui/lib/utils";
+import { HankoMarkSvg } from "@kodan/ui/assets/zen/sumi-strokes";
+import { cn } from "@kodan/ui/lib/utils";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { sealImpact } from "./motion/presets";
 

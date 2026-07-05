@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@CC/ui/lib/utils";
+import { cn } from "@kodan/ui/lib/utils";
 import { motion } from "framer-motion";
 import { zenEase } from "../motion/presets";
 
