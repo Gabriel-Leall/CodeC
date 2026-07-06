@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { getStatusPresentation } from "./ema-challenge-card-helpers";
+import { getChallengeTags, getStatusPresentation } from "./ema-challenge-card-helpers";
 
 describe("ema-challenge-card-helpers", () => {
   it("retorna estado intacto quando nao ha tentativas", () => {
@@ -26,5 +26,13 @@ describe("ema-challenge-card-helpers", () => {
         label: "Revisar",
       }),
     );
+  });
+
+  it("normaliza as tags do desafio para uso nos componentes", () => {
+    expect(getChallengeTags("react, hooks,  race condition ,,")).toEqual([
+      "react",
+      "hooks",
+      "race condition",
+    ]);
   });
 });

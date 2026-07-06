@@ -129,6 +129,32 @@ export function matchesChallenge(
   return matchesSearch && matchesDifficulty;
 }
 
+export function getVisibleChallenges(
+  challenges: Challenge[],
+  searchQuery: string,
+  filterDifficulty: DifficultyFilter,
+) {
+  return challenges.filter(challenge => matchesChallenge(challenge, searchQuery, filterDifficulty));
+}
+
+export function resolveActiveChallengeId(
+  visibleChallenges: Challenge[],
+  currentActiveChallengeId: string | null,
+) {
+  if (visibleChallenges.length === 0) {
+    return null;
+  }
+
+  if (currentActiveChallengeId) {
+    const stillVisible = visibleChallenges.some(challenge => challenge.id === currentActiveChallengeId);
+    if (stillVisible) {
+      return currentActiveChallengeId;
+    }
+  }
+
+  return visibleChallenges[0]!.id;
+}
+
 export function buildChallengeRows(challenges: Challenge[]): ChallengeRow[] {
   const sortedChallenges = challenges.toSorted(
     (left, right) => left.recommendedElo - right.recommendedElo,

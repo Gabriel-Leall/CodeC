@@ -9,14 +9,14 @@ export function ChallengesTree({
   searchQuery,
   filterDifficulty,
   activeCardId,
-  setActiveCardId,
+  setFocusedCardId,
   userElo,
 }: {
   challenges: Challenge[];
   searchQuery: string;
   filterDifficulty: DifficultyFilter;
   activeCardId: string | null;
-  setActiveCardId: (id: string | null) => void;
+  setFocusedCardId: (id: string | null) => void;
   userElo: number;
 }) {
   const rows = buildChallengeRows(challenges);
@@ -52,7 +52,7 @@ export function ChallengesTree({
               rightIsActive={activeCardId === rightChallenge.id}
               leftNodeNumber={nodeNumbers[0]!}
               rightNodeNumber={nodeNumbers[1]!}
-              setActiveCardId={setActiveCardId}
+              setFocusedCardId={setFocusedCardId}
               userElo={userElo}
             />
           );
@@ -69,7 +69,7 @@ export function ChallengesTree({
             isActive={activeCardId === challenge.id}
             isLeft={rowIndex % 2 === 0}
             nodeNumber={nodeNumbers[0]!}
-            setActiveCardId={setActiveCardId}
+            setFocusedCardId={setFocusedCardId}
             userElo={userElo}
           />
         );
@@ -87,7 +87,7 @@ function PairChallengeRow({
   rightIsActive,
   leftNodeNumber,
   rightNodeNumber,
-  setActiveCardId,
+  setFocusedCardId,
   userElo,
 }: {
   leftChallenge: Challenge;
@@ -98,7 +98,7 @@ function PairChallengeRow({
   rightIsActive: boolean;
   leftNodeNumber: number;
   rightNodeNumber: number;
-  setActiveCardId: (id: string | null) => void;
+  setFocusedCardId: (id: string | null) => void;
   userElo: number;
 }) {
   return (
@@ -157,7 +157,7 @@ function PairChallengeRow({
             matched={leftMatched}
             isActive={leftIsActive}
             nodeNumber={leftNodeNumber}
-            setActiveCardId={setActiveCardId}
+            setFocusedCardId={setFocusedCardId}
             userElo={userElo}
           />
         </CardPosition>
@@ -168,7 +168,7 @@ function PairChallengeRow({
             matched={rightMatched}
             isActive={rightIsActive}
             nodeNumber={rightNodeNumber}
-            setActiveCardId={setActiveCardId}
+            setFocusedCardId={setFocusedCardId}
             userElo={userElo}
           />
         </CardPosition>
@@ -183,7 +183,7 @@ function SingleChallengeRow({
   isActive,
   isLeft,
   nodeNumber,
-  setActiveCardId,
+  setFocusedCardId,
   userElo,
 }: {
   challenge: Challenge;
@@ -191,7 +191,7 @@ function SingleChallengeRow({
   isActive: boolean;
   isLeft: boolean;
   nodeNumber: number;
-  setActiveCardId: (id: string | null) => void;
+  setFocusedCardId: (id: string | null) => void;
   userElo: number;
 }) {
   return (
@@ -235,7 +235,7 @@ function SingleChallengeRow({
             matched={matched}
             isActive={isActive}
             nodeNumber={nodeNumber}
-            setActiveCardId={setActiveCardId}
+            setFocusedCardId={setFocusedCardId}
             userElo={userElo}
           />
         </CardPosition>

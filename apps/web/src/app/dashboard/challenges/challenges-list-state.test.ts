@@ -4,7 +4,9 @@ import {
   buildChallengeRows,
   challengesReducer,
   createInitialChallengesState,
+  getVisibleChallenges,
   matchesChallenge,
+  resolveActiveChallengeId,
 } from "./challenges-list-state";
 import type { Challenge } from "./ema-challenge-card-helpers";
 
@@ -60,6 +62,31 @@ describe("challenges-list-state", () => {
       type: "single",
       items: [expect.objectContaining({ id: "3" })],
     });
+  });
+
+  it("retorna apenas os desafios visíveis para o filtro atual", () => {
+    const visibleChallenges = getVisibleChallenges(
+      [
+        makeChallenge({ id: "1", title: "Stale closure no React", difficulty: "MEDIUM" }),
+        makeChallenge({ id: "2", title: "Promise race no fetch", difficulty: "HARD" }),
+      ],
+      "react",
+      "MEDIUM",
+    );
+
+    expect(visibleChallenges).toEqual([expect.objectContaining({ id: "1" })]);
+  });
+
+  it("resolve o desafio ativo mantendo o atual quando ele ainda esta visível", () => {
+    const visibleChallenges = [
+      makeChallenge({ id: "1", recommendedElo: 900 }),
+      makeChallenge({ id: "2", recommendedElo: 1050 }),
+    ];
+
+    expect(resolveActiveChallengeId(visibleChallenges, "2")).toBe("2");
+    expect(resolveActiveChallengeId(visibleChallenges, null)).toBe("1");
+    expect(resolveActiveChallengeId(visibleChallenges, "fora-da-lista")).toBe("1");
+    expect(resolveActiveChallengeId([], "2")).toBeNull();
   });
 
   it("limpa o erro inicial quando um recarregamento funciona", () => {

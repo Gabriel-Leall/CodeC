@@ -4,6 +4,7 @@ import { Play } from "lucide-react";
 import { eloToDanRank } from "@/lib/rating";
 import {
   type Challenge,
+  getChallengeTags,
   getDifficultyColor,
   getDifficultyLabel,
   getLevelCompatibility,
@@ -16,7 +17,7 @@ interface EmaChallengeCardProps {
   matched: boolean;
   isActive: boolean;
   nodeNumber: number;
-  setActiveCardId: (id: string | null) => void;
+  setFocusedCardId: (id: string | null) => void;
   userElo: number;
 }
 
@@ -25,17 +26,14 @@ export function EmaChallengeCard({
   matched,
   isActive,
   nodeNumber,
-  setActiveCardId,
+  setFocusedCardId,
   userElo,
 }: EmaChallengeCardProps) {
   const compatibility = getLevelCompatibility(challenge.recommendedElo, userElo);
   const hasAttempt = challenge.attempts.length > 0;
   const nodeDanRank = eloToDanRank(challenge.recommendedElo);
   const statusPresentation = getStatusPresentation(challenge.attempts);
-  const tagList = challenge.tags.split(",").flatMap(tag => {
-    const normalizedTag = tag.trim();
-    return normalizedTag ? [normalizedTag] : [];
-  });
+  const tagList = getChallengeTags(challenge.tags);
   const visibleTags = tagList.slice(0, 4);
 
   return (
@@ -48,15 +46,8 @@ export function EmaChallengeCard({
             : "opacity-100 filter-none hover:scale-[1.01] hover:border-[color:var(--zen-moss)] hover:shadow-[0_12px_24px_color-mix(in_oklch,var(--zen-ink)_8%,transparent)] dark:hover:border-primary/40"
           : "pointer-events-none select-none opacity-20 blur-[1.5px]"
       }`}
-      onMouseEnter={() => setActiveCardId(challenge.id)}
-      onMouseLeave={() => setActiveCardId(null)}
-      onFocusCapture={() => setActiveCardId(challenge.id)}
-      onBlurCapture={event => {
-        const relatedTarget = event.relatedTarget;
-        if (!(relatedTarget instanceof Node) || !event.currentTarget.contains(relatedTarget)) {
-          setActiveCardId(null);
-        }
-      }}
+      onMouseEnter={() => setFocusedCardId(challenge.id)}
+      onFocusCapture={() => setFocusedCardId(challenge.id)}
     >
       <div className="pointer-events-none absolute -top-3 left-1/2 flex -translate-x-1/2 flex-col items-center">
         <div

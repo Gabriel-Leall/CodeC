@@ -79,6 +79,13 @@ export function getStatusPresentation(attempts: Attempt[]): ChallengeStatusPrese
   };
 }
 
+export function getChallengeTags(tags: string) {
+  return tags.split(",").flatMap(tag => {
+    const normalizedTag = tag.trim();
+    return normalizedTag ? [normalizedTag] : [];
+  });
+}
+
 export function getLevelCompatibility(recommendedElo: number, userElo: number) {
   const delta = recommendedElo - userElo;
   if (delta <= 150) {

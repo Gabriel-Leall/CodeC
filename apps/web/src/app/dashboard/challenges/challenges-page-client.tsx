@@ -6,11 +6,13 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { Button } from "@kodan/ui/components/button";
 import { ZenToast } from "@kodan/ui/components/zen";
 import { getChallenges } from "../actions";
+import { ChallengesFocusPanel } from "./challenges-focus-panel";
 import { CHALLENGES_PAGE_SIZE } from "./constants";
 import {
   challengesReducer,
   createInitialChallengesState,
-  matchesChallenge,
+  getVisibleChallenges,
+  resolveActiveChallengeId,
   type ChallengesInitialData,
 } from "./challenges-list-state";
 import {
@@ -32,7 +34,7 @@ export default function ChallengesPageClient({
     initialData,
     createInitialChallengesState,
   );
-  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
   const [zenToastOpen, setZenToastOpen] = useState(false);
   const [zenToastMessage, setZenToastMessage] = useState<string | undefined>(undefined);
   const toastTimeoutsRef = useRef<number[]>([]);
@@ -117,14 +119,18 @@ export default function ChallengesPageClient({
     }
   };
 
-  const hasMatches = state.challenges.some(challenge =>
-    matchesChallenge(challenge, state.searchQuery, state.filterDifficulty),
+  const visibleChallenges = getVisibleChallenges(
+    state.challenges,
+    state.searchQuery,
+    state.filterDifficulty,
   );
+  const hasMatches = visibleChallenges.length > 0;
   const hasActiveFilters =
     state.searchQuery.trim().length > 0 || state.filterDifficulty !== "ALL";
-  const visibleChallengesCount = state.challenges.filter(challenge =>
-    matchesChallenge(challenge, state.searchQuery, state.filterDifficulty),
-  ).length;
+  const visibleChallengesCount = visibleChallenges.length;
+  const activeCardId = resolveActiveChallengeId(visibleChallenges, focusedCardId);
+  const activeChallenge =
+    visibleChallenges.find(challenge => challenge.id === activeCardId) ?? visibleChallenges[0] ?? null;
 
   return (
     <div className="mx-auto w-full max-w-[1380px] px-4 py-6 md:px-6 lg:px-8">
@@ -192,14 +198,24 @@ export default function ChallengesPageClient({
                 animated
               />
             ) : (
-              <ChallengesTree
-                challenges={state.challenges}
-                searchQuery={state.searchQuery}
-                filterDifficulty={state.filterDifficulty}
-                activeCardId={activeCardId}
-                setActiveCardId={setActiveCardId}
-                userElo={state.userElo}
-              />
+              <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
+                <div className="min-w-0">
+                  <ChallengesTree
+                    challenges={state.challenges}
+                    searchQuery={state.searchQuery}
+                    filterDifficulty={state.filterDifficulty}
+                    activeCardId={activeCardId}
+                    setFocusedCardId={setFocusedCardId}
+                    userElo={state.userElo}
+                  />
+                </div>
+
+                {activeChallenge ? (
+                  <div className="min-w-0">
+                    <ChallengesFocusPanel challenge={activeChallenge} userElo={state.userElo} />
+                  </div>
+                ) : null}
+              </div>
             )}
           </div>
 
