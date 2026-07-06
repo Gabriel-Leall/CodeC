@@ -4,6 +4,8 @@ import {
   collectQuestionBankStats,
   findDuplicateSeedOutputPaths,
   getSeedOutputPath,
+  renderQuestionBankAuthoringGuide,
+  renderQuestionBankSeedTemplate,
   renderSeedMarkdown,
   validateSeedMarkdown,
   type QuestionBankSeed,
@@ -116,5 +118,26 @@ describe("question bank toolkit", () => {
     expect(stats.total).toBeGreaterThanOrEqual(75);
     expect(stats.byLanguage.typescript).toBeGreaterThanOrEqual(50);
     expect(stats.byLanguage.react).toBeGreaterThanOrEqual(25);
+  });
+
+  test("renders an authoring guide that documents the official question types", () => {
+    const guide = renderQuestionBankAuthoringGuide(questionBankSeeds);
+
+    expect(guide).toContain("## Tipos de pergunta aceitos");
+    expect(guide).toContain("### debug");
+    expect(guide).toContain("### explain-code");
+    expect(guide).toContain("### explain-concept");
+    expect(guide).toContain("Seed `debug` promove naturalmente para runtime `debugging`.");
+  });
+
+  test("renders a seed template with all required sections", () => {
+    const template = renderQuestionBankSeedTemplate();
+
+    expect(template).toContain("## Main Prompt");
+    expect(template).toContain("## Coverage Checklist");
+    expect(template).toContain("## Mini Snippet");
+    expect(template).toContain("## Expected Answer Summary");
+    expect(template).toContain("## Expansion Notes");
+    expect(template).toContain("challengeType: debug");
   });
 });

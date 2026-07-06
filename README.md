@@ -1,6 +1,7 @@
 # Kodan
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Self, and more.
+Kodan e uma plataforma de treino para leitura de codigo, diagnostico e explicacao tecnica em TypeScript e React.
+O repositorio ainda nasceu sobre [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), mas ja tem fluxo proprio de conteudo, banco de desafios e question bank editorial.
 
 ## Features
 
@@ -11,6 +12,7 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **Prisma** - TypeScript-first ORM
 - **Neon Postgres** - Serverless PostgreSQL database
 - **Authentication** - Better-Auth
+- **Question bank editorial** - Seeds curadas para futuras perguntas e desafios do Kodan
 
 ## Getting Started
 
@@ -77,12 +79,40 @@ import { Button } from "@kodan/ui/components/button";
 
 If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
 
+## Question Bank Workflow
+
+O Kodan separa duas camadas de conteudo:
+
+- `content/question-bank/`: seeds editoriais, pensadas para curadoria, revisao em PR e futura promocao.
+- `content/challenges/`: desafios jogaveis usados pelo runtime.
+
+Fonte de verdade do question bank:
+
+- `scripts/question-bank/bank-data.ts`
+
+Comandos:
+
+```bash
+bun run question-bank:generate
+bun run question-bank:validate
+```
+
+Documentacao de autoria:
+
+- `docs/question-bank/authoring-guide.md`
+- `docs/question-bank/seed-template.md`
+
 ## Project Structure
 
 ```
 Kodan/
 ├── apps/
 │   └── web/         # Fullstack application (Next.js)
+├── content/
+│   ├── challenges/  # Desafios jogaveis do runtime
+│   └── question-bank/ # Seeds editoriais geradas
+├── docs/
+│   └── question-bank/ # Guias de autoria e auditoria do banco de perguntas
 ├── packages/
 │   ├── ui/          # Shared shadcn/ui components and styles
 │   ├── auth/        # Authentication configuration & logic
@@ -100,3 +130,5 @@ Kodan/
 - `bun run db:migrate`: Run database migrations
 - `bun run db:studio`: Open database studio UI
 - `bun run db:migrate:sqlite-to-neon`: Copy data from the legacy SQLite file into Neon
+- `bun run question-bank:generate`: Regenerate the editorial question bank and its docs
+- `bun run question-bank:validate`: Validate question-bank counts, shape, and generated files

@@ -3,6 +3,7 @@ import type {
   QuestionBankDifficulty,
   QuestionBankSeed,
 } from "./question-bank";
+import { COVERAGE_CHECKLIST_BY_CHALLENGE_TYPE } from "./question-bank";
 
 type SeedRow = {
   id: string;
@@ -15,24 +16,6 @@ type SeedRow = {
   miniSnippet: string;
   expectedAnswerSummary: string;
   expansionNotes: string;
-};
-
-const checklistByType: Record<QuestionBankChallengeType, [string, string, string]> = {
-  debug: [
-    "Identificar a causa raiz no snippet",
-    "Explicar o impacto observavel para o usuario ou para o sistema",
-    "Propor a correcao minima segura com justificativa",
-  ],
-  "explain-code": [
-    "Descrever o que o codigo esta tentando fazer",
-    "Explicar onde o contrato do codigo termina ou fica fragil",
-    "Apontar trade-offs, limites ou riscos da abordagem",
-  ],
-  "explain-concept": [
-    "Definir o conceito usando o snippet como base",
-    "Explicar por que esse conceito importa na pratica",
-    "Conectar o conceito a uma decisao de modelagem ou manutencao",
-  ],
 };
 
 const estimatedTimeByDifficulty: Record<QuestionBankDifficulty, number> = {
@@ -50,7 +33,7 @@ function buildTheme(language: QuestionBankSeed["language"], theme: string, rows:
     language,
     theme,
     estimatedTime: estimatedTimeByDifficulty[row.difficulty],
-    coverageChecklist: checklistByType[row.challengeType],
+    coverageChecklist: [...COVERAGE_CHECKLIST_BY_CHALLENGE_TYPE[row.challengeType]],
   }));
 }
 
