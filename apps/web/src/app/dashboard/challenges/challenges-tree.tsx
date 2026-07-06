@@ -20,12 +20,22 @@ export function ChallengesTree({
   userElo: number;
 }) {
   const rows = buildChallengeRows(challenges);
+  const numberedRows = rows.map((row, rowIndex) => {
+    const startNumber =
+      rows.slice(0, rowIndex).reduce((count, currentRow) => count + currentRow.items.length, 0) + 1;
+
+    return {
+      row,
+      rowId: `row-${rowIndex}`,
+      nodeNumbers: row.items.map((_, itemIndex) => startNumber + itemIndex),
+    };
+  });
 
   return (
-    <div className="relative mx-auto flex w-full max-w-[860px] flex-col">
-      {rows.map((row, rowIndex) => {
-        const rowId = `row-${rowIndex}`;
-
+    <div className="relative mx-auto flex w-full max-w-[940px] flex-col">
+      <div className="absolute bottom-10 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-[linear-gradient(180deg,color-mix(in_oklch,var(--zen-ink)_16%,transparent),color-mix(in_oklch,var(--zen-ink)_4%,transparent)_18%,color-mix(in_oklch,var(--zen-ink)_12%,transparent)_82%,transparent)] md:block" />
+      <div className="absolute left-1/2 top-0 hidden size-3 -translate-x-1/2 rounded-full border border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] dark:border-border/80 dark:bg-background md:block" />
+      {numberedRows.map(({ row, rowId, nodeNumbers }, rowIndex) => {
         if (row.type === "pair") {
           const [leftChallenge, rightChallenge] = row.items;
           const leftMatched = matchesChallenge(leftChallenge, searchQuery, filterDifficulty);
@@ -40,6 +50,8 @@ export function ChallengesTree({
               rightMatched={rightMatched}
               leftIsActive={activeCardId === leftChallenge.id}
               rightIsActive={activeCardId === rightChallenge.id}
+              leftNodeNumber={nodeNumbers[0]!}
+              rightNodeNumber={nodeNumbers[1]!}
               setActiveCardId={setActiveCardId}
               userElo={userElo}
             />
@@ -56,6 +68,7 @@ export function ChallengesTree({
             matched={matched}
             isActive={activeCardId === challenge.id}
             isLeft={rowIndex % 2 === 0}
+            nodeNumber={nodeNumbers[0]!}
             setActiveCardId={setActiveCardId}
             userElo={userElo}
           />
@@ -72,6 +85,8 @@ function PairChallengeRow({
   rightMatched,
   leftIsActive,
   rightIsActive,
+  leftNodeNumber,
+  rightNodeNumber,
   setActiveCardId,
   userElo,
 }: {
@@ -81,44 +96,52 @@ function PairChallengeRow({
   rightMatched: boolean;
   leftIsActive: boolean;
   rightIsActive: boolean;
+  leftNodeNumber: number;
+  rightNodeNumber: number;
   setActiveCardId: (id: string | null) => void;
   userElo: number;
 }) {
   return (
-    <div className="relative flex min-h-[180px] w-full flex-col items-center justify-center py-4 md:block md:h-[180px] md:py-0">
+    <div className="relative flex min-h-[228px] w-full flex-col items-center justify-center py-5 md:block md:h-[228px] md:py-0">
       <svg
         aria-hidden="true"
         className="absolute inset-0 hidden size-full overflow-visible md:block"
-        viewBox="0 0 768 180"
+        viewBox="0 0 940 228"
         preserveAspectRatio="none"
         fill="none"
       >
+        <circle
+          cx="470"
+          cy="62"
+          r="5.5"
+          className="fill-[color:var(--zen-washi)] stroke-[color:var(--zen-border)] dark:fill-background dark:stroke-border/80"
+        />
         <path
-          d="M 384 0 C 300 12, 214 22, 214 56 C 214 110, 300 150, 384 180"
+          d="M 470 62 C 430 66, 374 80, 308 114"
           className={`fill-none stroke-2 transition-all duration-500 ${
             leftMatched ? "stroke-primary/45" : "stroke-border/20"
           }`}
         />
-        <line
-          x1="214"
-          y1="56"
-          x2="214"
-          y2="70"
-          className={`stroke-2 transition-all duration-500 ${
-            leftMatched ? "stroke-border/75" : "stroke-border/20"
-          }`}
-        />
         <path
-          d="M 384 0 C 468 12, 554 22, 554 56 C 554 110, 468 150, 384 180"
+          d="M 470 62 C 510 66, 566 80, 632 114"
           className={`fill-none stroke-2 transition-all duration-500 ${
             rightMatched ? "stroke-primary/45" : "stroke-border/20"
           }`}
         />
         <line
-          x1="554"
-          y1="56"
-          x2="554"
-          y2="70"
+          x1="308"
+          y1="114"
+          x2="308"
+          y2="124"
+          className={`stroke-2 transition-all duration-500 ${
+            leftMatched ? "stroke-border/75" : "stroke-border/20"
+          }`}
+        />
+        <line
+          x1="632"
+          y1="114"
+          x2="632"
+          y2="124"
           className={`stroke-2 transition-all duration-500 ${
             rightMatched ? "stroke-border/75" : "stroke-border/20"
           }`}
@@ -133,6 +156,7 @@ function PairChallengeRow({
             challenge={leftChallenge}
             matched={leftMatched}
             isActive={leftIsActive}
+            nodeNumber={leftNodeNumber}
             setActiveCardId={setActiveCardId}
             userElo={userElo}
           />
@@ -143,6 +167,7 @@ function PairChallengeRow({
             challenge={rightChallenge}
             matched={rightMatched}
             isActive={rightIsActive}
+            nodeNumber={rightNodeNumber}
             setActiveCardId={setActiveCardId}
             userElo={userElo}
           />
@@ -157,6 +182,7 @@ function SingleChallengeRow({
   matched,
   isActive,
   isLeft,
+  nodeNumber,
   setActiveCardId,
   userElo,
 }: {
@@ -164,30 +190,36 @@ function SingleChallengeRow({
   matched: boolean;
   isActive: boolean;
   isLeft: boolean;
+  nodeNumber: number;
   setActiveCardId: (id: string | null) => void;
   userElo: number;
 }) {
   return (
-    <div className="relative flex min-h-[180px] w-full flex-col items-center justify-center py-4 md:block md:h-[180px] md:py-0">
+    <div className="relative flex min-h-[228px] w-full flex-col items-center justify-center py-5 md:block md:h-[228px] md:py-0">
       <svg
         aria-hidden="true"
         className="absolute inset-0 hidden size-full overflow-visible md:block"
-        viewBox="0 0 768 180"
+        viewBox="0 0 940 228"
         preserveAspectRatio="none"
         fill="none"
       >
-        <path d="M 384 0 C 390 46, 378 134, 384 180" className="fill-none stroke-2 stroke-border/80" />
+        <circle
+          cx="470"
+          cy="62"
+          r="5.5"
+          className="fill-[color:var(--zen-washi)] stroke-[color:var(--zen-border)] dark:fill-background dark:stroke-border/80"
+        />
         <path
-          d={isLeft ? "M 384 44 C 300 44, 214 48, 214 56" : "M 384 44 C 468 44, 554 48, 554 56"}
+          d={isLeft ? "M 470 62 C 426 68, 370 82, 308 114" : "M 470 62 C 514 68, 570 82, 632 114"}
           className={`fill-none stroke-2 transition-all duration-500 ${
             matched ? "stroke-primary/45" : "stroke-border/20"
           }`}
         />
         <line
-          x1={isLeft ? "214" : "554"}
-          y1="56"
-          x2={isLeft ? "214" : "554"}
-          y2="70"
+          x1={isLeft ? "308" : "632"}
+          y1="114"
+          x2={isLeft ? "308" : "632"}
+          y2="124"
           className={`stroke-2 transition-all duration-500 ${
             matched ? "stroke-border/75" : "stroke-border/20"
           }`}
@@ -202,6 +234,7 @@ function SingleChallengeRow({
             challenge={challenge}
             matched={matched}
             isActive={isActive}
+            nodeNumber={nodeNumber}
             setActiveCardId={setActiveCardId}
             userElo={userElo}
           />
@@ -231,7 +264,7 @@ function CardPosition({
   return (
     <div
       className={`ml-12 md:ml-0 md:absolute md:top-1/2 md:-translate-y-1/2 ${
-        left ? "md:left-[84px]" : "md:left-[424px]"
+        left ? "md:left-[68px]" : "md:left-[584px]"
       }`}
     >
       <div className="absolute left-[-24px] top-1/2 h-0.5 w-6 -translate-y-1/2 bg-border/40 md:hidden" />

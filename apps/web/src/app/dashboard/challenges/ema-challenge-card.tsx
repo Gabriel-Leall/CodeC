@@ -8,12 +8,14 @@ import {
   getDifficultyLabel,
   getLevelCompatibility,
   getStatusLabel,
+  getStatusPresentation,
 } from "./ema-challenge-card-helpers";
 
 interface EmaChallengeCardProps {
   challenge: Challenge;
   matched: boolean;
   isActive: boolean;
+  nodeNumber: number;
   setActiveCardId: (id: string | null) => void;
   userElo: number;
 }
@@ -22,23 +24,28 @@ export function EmaChallengeCard({
   challenge,
   matched,
   isActive,
+  nodeNumber,
   setActiveCardId,
   userElo,
 }: EmaChallengeCardProps) {
   const compatibility = getLevelCompatibility(challenge.recommendedElo, userElo);
   const hasAttempt = challenge.attempts.length > 0;
   const nodeDanRank = eloToDanRank(challenge.recommendedElo);
+  const statusPresentation = getStatusPresentation(challenge.attempts);
   const tagList = challenge.tags.split(",").flatMap(tag => {
     const normalizedTag = tag.trim();
     return normalizedTag ? [normalizedTag] : [];
   });
+  const visibleTags = tagList.slice(0, 4);
 
   return (
     <article
       aria-hidden={!matched}
-      className={`challenge-card relative flex w-full max-w-[18rem] min-w-0 flex-col justify-between border-2 border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] p-4 pb-3.5 pt-5 text-[color:var(--zen-ink)] transition-all duration-500 ease-in-out hover:scale-[1.02] hover:border-[color:var(--zen-moss)] hover:shadow-none dark:border-border/80 dark:bg-card/95 dark:hover:border-primary/50 dark:hover:shadow-[0_0_15px_rgba(76,124,99,0.08)] md:w-[260px] md:max-w-[260px] ${
+      className={`challenge-card relative flex w-full max-w-[18rem] min-w-0 flex-col border-2 border-[color:var(--zen-border)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--zen-ink)_2%,transparent),transparent_28%)] bg-[color:var(--zen-washi)] p-4 pb-3.5 pt-5 text-[color:var(--zen-ink)] transition-all duration-500 ease-in-out dark:border-border/80 dark:bg-card/95 md:w-[288px] md:max-w-[288px] ${
         matched
-          ? "opacity-100 filter-none"
+          ? isActive
+            ? "scale-[1.02] border-[color:var(--zen-moss)] shadow-[0_18px_34px_color-mix(in_oklch,var(--zen-ink)_10%,transparent)] dark:border-primary/50 dark:shadow-[0_0_18px_rgba(76,124,99,0.12)]"
+            : "opacity-100 filter-none hover:scale-[1.01] hover:border-[color:var(--zen-moss)] hover:shadow-[0_12px_24px_color-mix(in_oklch,var(--zen-ink)_8%,transparent)] dark:hover:border-primary/40"
           : "pointer-events-none select-none opacity-20 blur-[1.5px]"
       }`}
       onMouseEnter={() => setActiveCardId(challenge.id)}
@@ -62,27 +69,48 @@ export function EmaChallengeCard({
         <div className="size-1.5 rounded-full border border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] dark:border-border/80 dark:bg-background" />
       </div>
 
-      <Link
-        href={`/train/${challenge.id}`}
-        tabIndex={matched ? undefined : -1}
-        className="min-h-[32px] min-w-0 text-center text-xs font-serif font-bold text-[color:var(--zen-ink)] transition-colors hover:text-[color:var(--zen-hanko)] hover:underline dark:text-foreground dark:hover:text-primary"
-      >
-        <span className="line-clamp-2 block">{challenge.title}</span>
-      </Link>
+      <div className="absolute inset-x-4 top-4 h-px bg-[color:color-mix(in_oklch,var(--zen-border)_78%,transparent)] dark:bg-border/45" />
 
-      <div className="mt-3 space-y-3">
+      <div className="relative flex items-start justify-between gap-3 border-b border-[color:var(--zen-border)] pb-3 dark:border-border/40">
+        <div className="min-w-0 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex border border-[color:var(--zen-border)] bg-[color:color-mix(in_oklch,var(--zen-ink)_3%,transparent)] px-2 py-1 text-[9px] font-mono uppercase tracking-[0.22em] text-[color:var(--zen-muted)] dark:border-border/60 dark:text-muted-foreground">
+              No {String(nodeNumber).padStart(2, "0")}
+            </span>
+            <span
+              className={`inline-flex border px-2 py-1 text-[9px] font-mono uppercase tracking-[0.18em] ${statusPresentation.badgeClassName}`}
+            >
+              {statusPresentation.label}
+            </span>
+          </div>
+
+          <Link
+            href={`/train/${challenge.id}`}
+            tabIndex={matched ? undefined : -1}
+            className="block min-w-0 text-left text-[0.96rem] font-serif font-bold leading-snug text-[color:var(--zen-ink)] transition-colors hover:text-[color:var(--zen-hanko)] hover:underline dark:text-foreground dark:hover:text-primary"
+          >
+            <span className="line-clamp-3 block">{challenge.title}</span>
+          </Link>
+        </div>
+
+        <div className="hidden shrink-0 border border-[color:var(--zen-border)] px-2 py-1 text-[9px] font-mono uppercase tracking-[0.18em] text-[color:var(--zen-muted)] dark:border-border/60 dark:text-muted-foreground md:block">
+          {nodeDanRank.kyuDan}
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-1 flex-col space-y-3">
         <ChallengeDetails
           challenge={challenge}
           compatibility={compatibility}
           hasAttempt={hasAttempt}
-          isActive={isActive}
+          statusPresentation={statusPresentation}
           nodeDanRank={nodeDanRank.kanji}
-          tagList={tagList}
+          visibleTags={visibleTags}
         />
 
-        <div className="flex items-center justify-between border-t border-[color:var(--zen-border)] pt-2.5 dark:border-border/40">
+        <div className="mt-auto flex items-center justify-between border-t border-[color:var(--zen-border)] pt-3 dark:border-border/40">
           <span
-            className={`border px-1.5 py-0.5 text-[8px] font-mono font-bold uppercase ${getDifficultyColor(
+            className={`border px-2 py-1 text-[8px] font-mono font-bold uppercase tracking-[0.18em] ${getDifficultyColor(
               challenge.difficulty,
             )}`}
           >
@@ -92,7 +120,7 @@ export function EmaChallengeCard({
           <Link
             href={`/train/${challenge.id}`}
             tabIndex={matched ? undefined : -1}
-            className="inline-flex h-8 items-center gap-1 border border-[color:var(--zen-hanko)] bg-[color:var(--zen-hanko)] px-2.5 text-[10px] font-mono uppercase text-white transition-all active:translate-y-0.5 hover:bg-[color:color-mix(in_oklch,var(--zen-hanko)_86%,black)] dark:border-primary/20 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+            className="inline-flex h-9 items-center gap-1 border border-[color:var(--zen-hanko)] bg-[color:var(--zen-hanko)] px-3 text-[10px] font-mono uppercase tracking-[0.18em] text-white transition-all active:translate-y-0.5 hover:bg-[color:color-mix(in_oklch,var(--zen-hanko)_86%,black)] dark:border-primary/20 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
           >
             <Play className="size-3 fill-current" />
             Treinar
@@ -107,103 +135,70 @@ function ChallengeDetails({
   challenge,
   compatibility,
   hasAttempt,
-  isActive,
+  statusPresentation,
   nodeDanRank,
-  tagList,
+  visibleTags,
 }: {
   challenge: Challenge;
   compatibility: ReturnType<typeof getLevelCompatibility>;
   hasAttempt: boolean;
-  isActive: boolean;
+  statusPresentation: ReturnType<typeof getStatusPresentation>;
   nodeDanRank: string;
-  tagList: string[];
+  visibleTags: string[];
 }) {
   const statusLabel = getStatusLabel(challenge.attempts);
 
   return (
     <>
-      <div className="grid gap-1.5 border-t border-[color:var(--zen-border)] pt-2 text-[10px] font-mono text-[color:var(--zen-ink)] dark:border-border/40 dark:text-foreground md:hidden">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">ELO:</span>
-          <span className="text-right font-bold">
-            {challenge.recommendedElo} ({nodeDanRank})
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Status:</span>
-          <span className="text-right font-bold">{statusLabel}</span>
-        </div>
-        {compatibility ? (
+      <div className="grid gap-2 text-[10px] font-mono text-[color:var(--zen-ink)] dark:text-foreground">
+        <div className="grid gap-2 border-b border-[color:var(--zen-border)] pb-3 dark:border-border/35">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Nível:</span>
-            <span className={compatibility.className}>{compatibility.label}</span>
-          </div>
-        ) : null}
-        {tagList.length > 0 ? (
-          <div className="flex flex-wrap gap-1 pt-1">
-            {tagList.map(tag => (
-              <span
-                key={tag}
-                className="border border-[color:var(--zen-border)] bg-[color:color-mix(in_oklch,var(--zen-ink)_5%,transparent)] px-1.5 py-0.5 text-[9px] uppercase text-[color:var(--zen-muted)] dark:border-border/40 dark:bg-secondary/60 dark:text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        ) : null}
-      </div>
-
-      <div
-        className={`absolute bottom-full left-1/2 mb-4 hidden w-72 -translate-x-1/2 flex-col gap-2 border-2 border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] p-3.5 shadow-none transition-all duration-300 dark:border-border/90 dark:bg-card dark:shadow-[3px_3px_0px_rgba(0,0,0,0.08)] md:flex ${
-          isActive
-            ? "visible translate-y-0 scale-100 opacity-100"
-            : "invisible translate-y-2 scale-95 opacity-0"
-        }`}
-        role="note"
-        aria-hidden={!isActive}
-      >
-        <div className="border-b border-[color:var(--zen-border)] pb-1 text-[9px] font-mono uppercase tracking-widest text-[color:var(--zen-muted)] dark:border-border/40 dark:text-muted-foreground">
-          Detalhes do Desafio
-        </div>
-
-        <div className="space-y-1.5 text-[10px] font-mono text-[color:var(--zen-ink)] dark:text-foreground">
-          <div className="flex justify-between gap-3">
-            <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Recomendado:</span>
-            <span className="text-right font-bold">
-              ELO {challenge.recommendedElo} ({nodeDanRank})
-            </span>
-          </div>
-          <div className="flex justify-between gap-3">
-            <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Status atual:</span>
+            <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Status:</span>
             <span className="text-right font-bold">{statusLabel}</span>
           </div>
-          {compatibility ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Nível:</span>
-              <span className={compatibility.className}>{compatibility.label}</span>
-            </div>
-          ) : null}
-          {!hasAttempt ? (
-            <div className="pt-1 text-[9px] text-[color:var(--zen-muted)] dark:text-muted-foreground">
-              Sem tentativas ainda.
-            </div>
-          ) : null}
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
+            {statusPresentation.note}
+          </p>
         </div>
 
-        {tagList.length > 0 ? (
-          <div className="mt-1 flex flex-wrap gap-1 border-t border-[color:var(--zen-border)] pt-2 dark:border-border/40">
-            {tagList.map(tag => (
+        <div className="grid gap-1.5 md:grid-cols-2">
+          <div className="flex items-center justify-between gap-3 md:block">
+            <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">ELO:</span>
+            <span className="text-right font-bold md:mt-1 md:block">
+              {challenge.recommendedElo} ({nodeDanRank})
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3 md:block">
+            <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Tentativas:</span>
+            <span className="text-right font-bold md:mt-1 md:block">
+              {hasAttempt ? "1+" : "0"}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[color:var(--zen-muted)] dark:text-muted-foreground">Nível:</span>
+          {compatibility ? (
+            <span className={compatibility.className}>{compatibility.label}</span>
+          ) : (
+            <span className="text-right text-[color:var(--zen-muted)] dark:text-muted-foreground">
+              Na borda do seu nível
+            </span>
+          )}
+        </div>
+
+        {visibleTags.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5 border-t border-[color:var(--zen-border)] pt-2 dark:border-border/35">
+            {visibleTags.map(tag => (
               <span
                 key={tag}
-                className="border border-[color:var(--zen-border)] bg-[color:color-mix(in_oklch,var(--zen-ink)_5%,transparent)] px-1.5 py-0.5 text-[9px] font-mono uppercase text-[color:var(--zen-muted)] dark:border-border/40 dark:bg-secondary/60 dark:text-muted-foreground"
+                className="border border-[color:var(--zen-border)] bg-[color:color-mix(in_oklch,var(--zen-ink)_4%,transparent)] px-1.5 py-1 text-[9px] uppercase tracking-[0.16em] text-[color:var(--zen-muted)] dark:border-border/40 dark:bg-secondary/30 dark:text-muted-foreground"
               >
                 {tag}
               </span>
             ))}
           </div>
         ) : null}
-
-        <div className="absolute left-1/2 top-full -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-[color:var(--zen-border)] dark:border-t-border" />
       </div>
     </>
   );
