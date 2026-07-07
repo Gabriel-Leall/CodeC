@@ -1,2 +1,3 @@
+export const CHALLENGES_INITIAL_LOAD_SIZE = 50;
 export const CHALLENGES_PAGE_SIZE = 15;
 export const DEFAULT_USER_ELO = 1200;

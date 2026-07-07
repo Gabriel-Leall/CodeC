@@ -1,10 +1,13 @@
 import { getChallenges } from "../actions";
 import ChallengesPageClient from "./challenges-page-client";
-import { CHALLENGES_PAGE_SIZE, DEFAULT_USER_ELO } from "./constants";
+import { CHALLENGES_INITIAL_LOAD_SIZE, DEFAULT_USER_ELO } from "./constants";
 import { type Challenge } from "./ema-challenge-card-helpers";
 
 export default async function ChallengesPage() {
-  const response = await getChallenges({ limit: CHALLENGES_PAGE_SIZE, offset: 0 });
+  const response = await getChallenges({
+    limit: CHALLENGES_INITIAL_LOAD_SIZE,
+    offset: 0,
+  });
 
   return (
     <ChallengesPageClient
@@ -13,12 +16,14 @@ export default async function ChallengesPage() {
           ? {
               challenges: response.data.items as Challenge[],
               hasMore: response.data.hasMore,
+              totalCount: response.data.total,
               userElo: response.data.userElo,
               initialError: null,
             }
           : {
               challenges: [],
               hasMore: false,
+              totalCount: 0,
               userElo: DEFAULT_USER_ELO,
               initialError: response.error || "Não foi possível carregar os desafios agora.",
             }

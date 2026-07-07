@@ -1,28 +1,37 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useEffect, useReducer, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
-import { Button } from "@kodan/ui/components/button";
 import { ZenToast } from "@kodan/ui/components/zen";
 import { getChallenges } from "../actions";
-import { ChallengesFocusPanel } from "./challenges-focus-panel";
-import { CHALLENGES_PAGE_SIZE } from "./constants";
+import {
+  ChallengesDocsSidebar,
+  ChallengesNavigationDrawer,
+} from "./challenges-docs-sidebar";
+import { ChallengesExplorerPanel } from "./challenges-explorer-list";
+import {
+  CHALLENGES_INITIAL_LOAD_SIZE,
+  CHALLENGES_PAGE_SIZE,
+} from "./constants";
 import {
   challengesReducer,
   createInitialChallengesState,
-  getActiveChallengeNavigation,
+  getPaginatedChallenges,
   getVisibleChallenges,
   resolveActiveChallengeId,
   type ChallengesInitialData,
 } from "./challenges-list-state";
 import {
-  ChallengesBoard,
+  getChallengeTopicDescription,
+  getChallengeTopicLabel,
+} from "./challenges-taxonomy";
+import {
+  ChallengesDesktopShell,
   ChallengesLoadingState,
-  ChallengesSidebar,
+  ChallengesMobileShell,
   ChallengesStatePanel,
 } from "./challenges-shell";
-import { ChallengesTree } from "./challenges-tree";
 import { type Challenge } from "./ema-challenge-card-helpers";
 
 export default function ChallengesPageClient({
@@ -30,31 +39,45 @@ export default function ChallengesPageClient({
 }: {
   initialData: ChallengesInitialData;
 }) {
+  const router = useRouter();
   const [state, dispatch] = useReducer(
     challengesReducer,
     initialData,
     createInitialChallengesState,
   );
-  const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
+  const [focusedChallengeId, setFocusedChallengeId] = useState<string | null>(
+    null,
+  );
+  const [navigationOpen, setNavigationOpen] = useState(false);
   const [zenToastOpen, setZenToastOpen] = useState(false);
-  const [zenToastMessage, setZenToastMessage] = useState<string | undefined>(undefined);
+  const [zenToastMessage, setZenToastMessage] = useState<string | undefined>(
+    undefined,
+  );
   const toastTimeoutsRef = useRef<number[]>([]);
 
   useEffect(
     () => () => {
-      toastTimeoutsRef.current.forEach(timeoutId => window.clearTimeout(timeoutId));
+      toastTimeoutsRef.current.forEach((timeoutId) =>
+        window.clearTimeout(timeoutId),
+      );
       toastTimeoutsRef.current = [];
     },
     [],
   );
 
   const showZenErrorToast = (message: string) => {
-    toastTimeoutsRef.current.forEach(timeoutId => window.clearTimeout(timeoutId));
+    toastTimeoutsRef.current.forEach((timeoutId) =>
+      window.clearTimeout(timeoutId),
+    );
     toastTimeoutsRef.current = [];
     setZenToastMessage(message);
     setZenToastOpen(false);
-    toastTimeoutsRef.current.push(window.setTimeout(() => setZenToastOpen(true), 20));
-    toastTimeoutsRef.current.push(window.setTimeout(() => setZenToastOpen(false), 3200));
+    toastTimeoutsRef.current.push(
+      window.setTimeout(() => setZenToastOpen(true), 20),
+    );
+    toastTimeoutsRef.current.push(
+      window.setTimeout(() => setZenToastOpen(false), 3200),
+    );
   };
 
   const loadInitialChallenges = async () => {
@@ -65,20 +88,25 @@ export default function ChallengesPageClient({
     dispatch({ type: "reloadStarted" });
 
     try {
-      const response = await getChallenges({ limit: CHALLENGES_PAGE_SIZE, offset: 0 });
+      const response = await getChallenges({
+        limit: CHALLENGES_INITIAL_LOAD_SIZE,
+        offset: 0,
+      });
       if (response.success && response.data) {
         dispatch({
           type: "reloadSucceeded",
           payload: {
             challenges: response.data.items as Challenge[],
             hasMore: response.data.hasMore,
+            totalCount: response.data.total,
             userElo: response.data.userElo,
           },
         });
         return;
       }
 
-      const errorMessage = response.error || "Não foi possível carregar os desafios agora.";
+      const errorMessage =
+        response.error || "Não foi possível carregar os desafios agora.";
       dispatch({ type: "reloadFailed", payload: errorMessage });
       showZenErrorToast(errorMessage);
     } catch {
@@ -107,6 +135,7 @@ export default function ChallengesPageClient({
           payload: {
             challenges: response.data.items as Challenge[],
             hasMore: response.data.hasMore,
+            totalCount: response.data.total,
           },
         });
         dispatch({ type: "loadingMore", payload: false });
@@ -124,148 +153,163 @@ export default function ChallengesPageClient({
     state.challenges,
     state.searchQuery,
     state.filterDifficulty,
+    state.topicFilter,
+    state.statusFilter,
+    state.typeFilter,
+    state.onlyUnsolved,
+    state.sortBy,
   );
-  const hasMatches = visibleChallenges.length > 0;
+  const paginatedChallenges = getPaginatedChallenges(
+    visibleChallenges,
+    state.page,
+    CHALLENGES_PAGE_SIZE,
+  );
+  const activeChallengeId = resolveActiveChallengeId(
+    paginatedChallenges,
+    focusedChallengeId,
+  );
+  const activeTopicKey =
+    state.topicFilter === "ALL" ? "effects-lifecycle" : state.topicFilter;
+  const topicLabel = getChallengeTopicLabel(activeTopicKey);
+  const topicDescription = getChallengeTopicDescription(activeTopicKey);
   const hasActiveFilters =
-    state.searchQuery.trim().length > 0 || state.filterDifficulty !== "ALL";
-  const visibleChallengesCount = visibleChallenges.length;
-  const activeCardId = resolveActiveChallengeId(visibleChallenges, focusedCardId);
-  const activeChallenge =
-    visibleChallenges.find(challenge => challenge.id === activeCardId) ?? visibleChallenges[0] ?? null;
-  const activeChallengeNavigation = getActiveChallengeNavigation(visibleChallenges, activeCardId);
-  const previousChallenge =
-    visibleChallenges.find(
-      challenge => challenge.id === activeChallengeNavigation.previousChallengeId,
-    ) ?? null;
-  const nextChallenge =
-    visibleChallenges.find(challenge => challenge.id === activeChallengeNavigation.nextChallengeId) ??
-    null;
+    state.searchQuery.trim().length > 0 ||
+    state.filterDifficulty !== "ALL" ||
+    state.statusFilter !== "ALL" ||
+    state.typeFilter !== "ALL" ||
+    state.onlyUnsolved ||
+    state.sortBy !== "RECENT";
+
+  const handlePageChange = async (page: number) => {
+    if (page < 1) {
+      return;
+    }
+
+    const requestedEnd = page * CHALLENGES_PAGE_SIZE;
+    if (requestedEnd > state.challenges.length && state.hasMore) {
+      await loadMoreChallenges();
+    }
+
+    dispatch({ type: "setPage", payload: page });
+  };
+
+  const openChallenge = (challengeId: string) => {
+    router.push(`/train/${challengeId}`);
+  };
+
+  const sidebar = (
+    <ChallengesDocsSidebar
+      challenges={state.challenges}
+      topicFilter={state.topicFilter}
+      filterDifficulty={state.filterDifficulty}
+      onTopicChange={(topic) => dispatch({ type: "setTopic", payload: topic })}
+      onDifficultyChange={(difficulty) =>
+        dispatch({ type: "setFilter", payload: difficulty })
+      }
+    />
+  );
+
+  const content = state.loadingInitial ? (
+    <ChallengesLoadingState />
+  ) : state.initialError ? (
+    <ChallengesStatePanel
+      title="Catálogo indisponível"
+      description={state.initialError}
+      action={
+        <button
+          type="button"
+          className="challengers-control h-10 rounded-[8px] border px-4 text-sm"
+          onClick={loadInitialChallenges}
+        >
+          Tentar novamente
+        </button>
+      }
+    />
+  ) : state.challenges.length === 0 ? (
+    <ChallengesStatePanel
+      title="Nenhum desafio carregado"
+      description="O catálogo ainda não recebeu exercícios para esta trilha."
+    />
+  ) : (
+    <ChallengesExplorerPanel
+      topicLabel={topicLabel}
+      topicDescription={topicDescription}
+      topicFilter={state.topicFilter}
+      challenges={paginatedChallenges}
+      activeChallengeId={activeChallengeId}
+      visibleCount={visibleChallenges.length}
+      page={state.page}
+      pageSize={CHALLENGES_PAGE_SIZE}
+      filterDifficulty={state.filterDifficulty}
+      statusFilter={state.statusFilter}
+      typeFilter={state.typeFilter}
+      onlyUnsolved={state.onlyUnsolved}
+      sortBy={state.sortBy}
+      hasActiveFilters={hasActiveFilters}
+      onFocusChallenge={setFocusedChallengeId}
+      onOpenChallenge={openChallenge}
+      onFilterChange={(difficulty) =>
+        dispatch({ type: "setFilter", payload: difficulty })
+      }
+      onStatusChange={(status) =>
+        dispatch({ type: "setStatus", payload: status })
+      }
+      onTypeChange={(type) => dispatch({ type: "setType", payload: type })}
+      onOnlyUnsolvedChange={(checked) =>
+        dispatch({ type: "setOnlyUnsolved", payload: checked })
+      }
+      onSortChange={(sortBy) => dispatch({ type: "setSort", payload: sortBy })}
+      onClearFilters={() => dispatch({ type: "clearFilters" })}
+      onPageChange={(page) => void handlePageChange(page)}
+    />
+  );
 
   return (
-    <div className="mx-auto w-full max-w-[1380px] px-4 py-6 md:px-6 lg:px-8">
-      <div className="grid gap-6 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] xl:grid-cols-[340px_minmax(0,1fr)]">
-        <ChallengesSidebar
-          totalChallengesCount={state.challenges.length}
-          visibleChallengesCount={visibleChallengesCount}
-          filterDifficulty={state.filterDifficulty}
-          searchQuery={state.searchQuery}
+    <main
+      data-challengers-screen="true"
+      className="h-full min-h-0 bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
+    >
+      <div className="hidden h-full min-h-0 w-full lg:block">
+        <ChallengesDesktopShell
           userElo={state.userElo}
-          onFilterChange={difficulty => dispatch({ type: "setFilter", payload: difficulty })}
-          onSearchChange={query => dispatch({ type: "setSearch", payload: query })}
-          onClearFilters={() => dispatch({ type: "clearFilters" })}
-        />
-
-        <ChallengesBoard
-          totalChallengesCount={state.challenges.length}
-          visibleChallengesCount={visibleChallengesCount}
-          filterDifficulty={state.filterDifficulty}
           searchQuery={state.searchQuery}
+          sidebar={sidebar}
+          onSearchChange={(query) =>
+            dispatch({ type: "setSearch", payload: query })
+          }
         >
-          <div className="relative w-full py-2">
-            {state.loadingInitial ? (
-              <ChallengesLoadingState />
-            ) : state.initialError ? (
-              <ChallengesStatePanel
-                title="Trilha indisponível"
-                description={state.initialError}
-                action={
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-9 rounded-none border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] px-4 font-mono text-[10px] uppercase tracking-widest text-[color:var(--zen-ink)] hover:bg-[color:color-mix(in_oklch,var(--zen-ink)_5%,transparent)] dark:border-border/80 dark:bg-card dark:text-foreground dark:hover:bg-secondary/50"
-                    onClick={loadInitialChallenges}
-                  >
-                    Tentar novamente
-                  </Button>
-                }
-              />
-            ) : state.challenges.length === 0 ? (
-              <ChallengesStatePanel
-                title="Jardim Deserto"
-                description="Nenhum desafio registrado no templo do código."
-              />
-            ) : !hasMatches ? (
-              <ChallengesStatePanel
-                title="Nenhum desafio corresponde à busca atual"
-                description={
-                  hasActiveFilters
-                    ? "A trilha continua aqui, mas nenhum nó combina com o termo ou a dificuldade selecionada."
-                    : "Nenhum desafio disponível corresponde ao estado atual."
-                }
-                action={
-                  hasActiveFilters ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-9 rounded-none border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] px-4 font-mono text-[10px] uppercase tracking-widest text-[color:var(--zen-ink)] hover:bg-[color:color-mix(in_oklch,var(--zen-ink)_5%,transparent)] dark:border-border/80 dark:bg-card dark:text-foreground dark:hover:bg-secondary/50"
-                      onClick={() => dispatch({ type: "clearFilters" })}
-                    >
-                      Limpar filtros
-                    </Button>
-                  ) : null
-                }
-                animated
-              />
-            ) : (
-              <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
-                <div className="min-w-0">
-                  <ChallengesTree
-                    challenges={state.challenges}
-                    searchQuery={state.searchQuery}
-                    filterDifficulty={state.filterDifficulty}
-                    activeCardId={activeCardId}
-                    setFocusedCardId={setFocusedCardId}
-                    userElo={state.userElo}
-                  />
-                </div>
-
-                {activeChallenge ? (
-                  <div className="min-w-0">
-                    <ChallengesFocusPanel
-                      challenge={activeChallenge}
-                      userElo={state.userElo}
-                      activePosition={activeChallengeNavigation.activeIndex + 1}
-                      totalVisible={activeChallengeNavigation.total}
-                      previousChallengeTitle={previousChallenge?.title ?? null}
-                      nextChallengeTitle={nextChallenge?.title ?? null}
-                      onSelectPrevious={
-                        previousChallenge ? () => setFocusedCardId(previousChallenge.id) : null
-                      }
-                      onSelectNext={nextChallenge ? () => setFocusedCardId(nextChallenge.id) : null}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            )}
-          </div>
-
-          {!state.loadingInitial && state.hasMore ? (
-            <div className="flex justify-center pt-4">
-              <Button
-                variant="outline"
-                onClick={loadMoreChallenges}
-                disabled={state.loadingMore}
-                className="h-9 rounded-none border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] px-6 font-mono text-xs uppercase text-[color:var(--zen-ink)] hover:bg-[color:color-mix(in_oklch,var(--zen-ink)_5%,transparent)] dark:border-border/80 dark:bg-card dark:text-foreground dark:hover:bg-secondary/50"
-              >
-                {state.loadingMore ? (
-                  <>
-                    <Loader2 className="mr-1.5 size-3.5 animate-spin" />
-                    Carregando…
-                  </>
-                ) : (
-                  "Revelar mais"
-                )}
-              </Button>
-            </div>
-          ) : null}
-        </ChallengesBoard>
+          {content}
+        </ChallengesDesktopShell>
       </div>
+
+      <ChallengesMobileShell
+        userElo={state.userElo}
+        searchQuery={state.searchQuery}
+        onSearchChange={(query) =>
+          dispatch({ type: "setSearch", payload: query })
+        }
+        onOpenNavigation={() => setNavigationOpen(true)}
+      >
+        {content}
+      </ChallengesMobileShell>
+
+      <ChallengesNavigationDrawer
+        open={navigationOpen}
+        challenges={state.challenges}
+        topicFilter={state.topicFilter}
+        filterDifficulty={state.filterDifficulty}
+        onClose={() => setNavigationOpen(false)}
+        onTopicChange={(topic) => dispatch({ type: "setTopic", payload: topic })}
+        onDifficultyChange={(difficulty) =>
+          dispatch({ type: "setFilter", payload: difficulty })
+        }
+      />
 
       <div className="fixed bottom-4 right-4 z-[80]">
         <ZenToast open={zenToastOpen} tone="error" title="Falha de carregamento">
           {zenToastMessage ?? ""}
         </ZenToast>
       </div>
-    </div>
+    </main>
   );
 }

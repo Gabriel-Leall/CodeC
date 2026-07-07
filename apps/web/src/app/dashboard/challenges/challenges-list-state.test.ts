@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
 import {
-  buildChallengeRows,
   challengesReducer,
   createInitialChallengesState,
   getActiveChallengeNavigation,
@@ -27,12 +26,14 @@ describe("challenges-list-state", () => {
     const state = createInitialChallengesState({
       challenges: [makeChallenge()],
       hasMore: true,
+      totalCount: 1,
       userElo: 1320,
       initialError: null,
     });
 
     expect(state.challenges).toHaveLength(1);
     expect(state.hasMore).toBe(true);
+    expect(state.totalCount).toBe(1);
     expect(state.userElo).toBe(1320);
     expect(state.loadingInitial).toBe(false);
     expect(state.initialError).toBeNull();
@@ -41,38 +42,35 @@ describe("challenges-list-state", () => {
   it("faz match por texto e por dificuldade", () => {
     const challenge = makeChallenge();
 
-    expect(matchesChallenge(challenge, "closure", "ALL")).toBe(true);
-    expect(matchesChallenge(challenge, "react", "MEDIUM")).toBe(true);
-    expect(matchesChallenge(challenge, "zustand", "ALL")).toBe(false);
-    expect(matchesChallenge(challenge, "closure", "HARD")).toBe(false);
-  });
-
-  it("agrupa desafios irmãos por dificuldade e proximidade de elo", () => {
-    const rows = buildChallengeRows([
-      makeChallenge({ id: "1", difficulty: "EASY", recommendedElo: 900 }),
-      makeChallenge({ id: "2", difficulty: "EASY", recommendedElo: 980 }),
-      makeChallenge({ id: "3", difficulty: "HARD", recommendedElo: 1500 }),
-    ]);
-
-    expect(rows).toHaveLength(2);
-    expect(rows[0]).toEqual({
-      type: "pair",
-      items: [expect.objectContaining({ id: "1" }), expect.objectContaining({ id: "2" })],
-    });
-    expect(rows[1]).toEqual({
-      type: "single",
-      items: [expect.objectContaining({ id: "3" })],
-    });
+    expect(matchesChallenge(challenge, "closure", "ALL", "ALL")).toBe(true);
+    expect(
+      matchesChallenge(challenge, "react", "MEDIUM", "effects-lifecycle"),
+    ).toBe(true);
+    expect(matchesChallenge(challenge, "zustand", "ALL", "ALL")).toBe(false);
+    expect(matchesChallenge(challenge, "closure", "HARD", "ALL")).toBe(false);
+    expect(matchesChallenge(challenge, "closure", "ALL", "async-races")).toBe(
+      false,
+    );
   });
 
   it("retorna apenas os desafios visíveis para o filtro atual", () => {
     const visibleChallenges = getVisibleChallenges(
       [
-        makeChallenge({ id: "1", title: "Stale closure no React", difficulty: "MEDIUM" }),
-        makeChallenge({ id: "2", title: "Promise race no fetch", difficulty: "HARD" }),
+        makeChallenge({
+          id: "1",
+          title: "Stale closure no React",
+          difficulty: "MEDIUM",
+        }),
+        makeChallenge({
+          id: "2",
+          title: "Promise race no fetch",
+          difficulty: "HARD",
+          tags: "react,race-condition,data-fetching",
+        }),
       ],
       "react",
       "MEDIUM",
+      "effects-lifecycle",
     );
 
     expect(visibleChallenges).toEqual([expect.objectContaining({ id: "1" })]);
@@ -86,7 +84,9 @@ describe("challenges-list-state", () => {
 
     expect(resolveActiveChallengeId(visibleChallenges, "2")).toBe("2");
     expect(resolveActiveChallengeId(visibleChallenges, null)).toBe("1");
-    expect(resolveActiveChallengeId(visibleChallenges, "fora-da-lista")).toBe("1");
+    expect(resolveActiveChallengeId(visibleChallenges, "fora-da-lista")).toBe(
+      "1",
+    );
     expect(resolveActiveChallengeId([], "2")).toBeNull();
   });
 
@@ -116,16 +116,20 @@ describe("challenges-list-state", () => {
     const initialState = createInitialChallengesState({
       challenges: [],
       hasMore: false,
+      totalCount: 0,
       userElo: 1200,
       initialError: "Falha anterior",
     });
 
-    const loadingState = challengesReducer(initialState, { type: "reloadStarted" });
+    const loadingState = challengesReducer(initialState, {
+      type: "reloadStarted",
+    });
     const reloadedState = challengesReducer(loadingState, {
       type: "reloadSucceeded",
       payload: {
         challenges: [makeChallenge()],
         hasMore: false,
+        totalCount: 1,
         userElo: 1280,
       },
     });
@@ -135,5 +139,37 @@ describe("challenges-list-state", () => {
     expect(reloadedState.initialError).toBeNull();
     expect(reloadedState.challenges).toHaveLength(1);
     expect(reloadedState.userElo).toBe(1280);
+  });
+
+  it("limpa topico, dificuldade e busca quando o usuario remove os recortes", () => {
+    const initialState = createInitialChallengesState({
+      challenges: [],
+      hasMore: false,
+      totalCount: 0,
+      userElo: 1200,
+      initialError: null,
+    });
+
+    const filteredState = challengesReducer(
+      {
+        ...initialState,
+        topicFilter: "async-races",
+        filterDifficulty: "HARD",
+        statusFilter: "in_progress",
+        typeFilter: "HOOKS",
+        onlyUnsolved: true,
+        sortBy: "TITLE",
+        searchQuery: "fetch",
+      },
+      { type: "clearFilters" },
+    );
+
+    expect(filteredState.topicFilter).toBe("effects-lifecycle");
+    expect(filteredState.filterDifficulty).toBe("ALL");
+    expect(filteredState.statusFilter).toBe("ALL");
+    expect(filteredState.typeFilter).toBe("ALL");
+    expect(filteredState.onlyUnsolved).toBe(false);
+    expect(filteredState.sortBy).toBe("RECENT");
+    expect(filteredState.searchQuery).toBe("");
   });
 });

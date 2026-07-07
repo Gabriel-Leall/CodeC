@@ -1,11 +1,26 @@
-import type { Challenge } from "./ema-challenge-card-helpers";
 import { DEFAULT_USER_ELO } from "./constants";
+import {
+  matchesChallengeTopic,
+  type ChallengeTopicFilter,
+} from "./challenges-taxonomy";
+import {
+  getChallengeKind,
+  getStatusFromAttempts,
+  type Challenge,
+  type ChallengeKind,
+  type ChallengeStatus,
+  type Difficulty,
+} from "./ema-challenge-card-helpers";
 
-export type DifficultyFilter = "ALL" | "EASY" | "MEDIUM" | "HARD";
+export type DifficultyFilter = "ALL" | Difficulty;
+export type StatusFilter = "ALL" | ChallengeStatus;
+export type TypeFilter = "ALL" | ChallengeKind;
+export type SortBy = "RECENT" | "ELO_ASC" | "ELO_DESC" | "TITLE";
 
 export interface ChallengesInitialData {
   challenges: Challenge[];
   hasMore: boolean;
+  totalCount: number;
   userElo: number;
   initialError: string | null;
 }
@@ -15,9 +30,16 @@ export interface ChallengesState {
   loadingInitial: boolean;
   loadingMore: boolean;
   hasMore: boolean;
+  totalCount: number;
   userElo: number;
+  topicFilter: ChallengeTopicFilter;
   filterDifficulty: DifficultyFilter;
+  statusFilter: StatusFilter;
+  typeFilter: TypeFilter;
+  onlyUnsolved: boolean;
+  sortBy: SortBy;
   searchQuery: string;
+  page: number;
   initialError: string | null;
 }
 
@@ -25,29 +47,47 @@ export type ChallengesAction =
   | { type: "reloadStarted" }
   | {
       type: "reloadSucceeded";
-      payload: { challenges: Challenge[]; hasMore: boolean; userElo: number };
+      payload: {
+        challenges: Challenge[];
+        hasMore: boolean;
+        totalCount: number;
+        userElo: number;
+      };
     }
   | { type: "reloadFailed"; payload: string }
   | { type: "loadingMore"; payload: boolean }
-  | { type: "appendLoaded"; payload: { challenges: Challenge[]; hasMore: boolean } }
+  | {
+      type: "appendLoaded";
+      payload: { challenges: Challenge[]; hasMore: boolean; totalCount: number };
+    }
+  | { type: "setTopic"; payload: ChallengeTopicFilter }
   | { type: "setFilter"; payload: DifficultyFilter }
+  | { type: "setStatus"; payload: StatusFilter }
+  | { type: "setType"; payload: TypeFilter }
+  | { type: "setOnlyUnsolved"; payload: boolean }
+  | { type: "setSort"; payload: SortBy }
   | { type: "setSearch"; payload: string }
+  | { type: "setPage"; payload: number }
   | { type: "clearFilters" };
 
-export interface ChallengeRow {
-  type: "single" | "pair";
-  items: Challenge[];
-}
-
-export function createInitialChallengesState(initialData: ChallengesInitialData): ChallengesState {
+export function createInitialChallengesState(
+  initialData: ChallengesInitialData,
+): ChallengesState {
   return {
     challenges: initialData.challenges,
     loadingInitial: false,
     loadingMore: false,
     hasMore: initialData.hasMore,
+    totalCount: initialData.totalCount,
     userElo: initialData.userElo || DEFAULT_USER_ELO,
+    topicFilter: "effects-lifecycle",
     filterDifficulty: "ALL",
+    statusFilter: "ALL",
+    typeFilter: "ALL",
+    onlyUnsolved: false,
+    sortBy: "RECENT",
     searchQuery: "",
+    page: 1,
     initialError: initialData.initialError,
   };
 }
@@ -68,8 +108,10 @@ export function challengesReducer(
         ...state,
         challenges: action.payload.challenges,
         hasMore: action.payload.hasMore,
+        totalCount: action.payload.totalCount,
         userElo: action.payload.userElo,
         loadingInitial: false,
+        page: 1,
         initialError: null,
       };
     case "reloadFailed":
@@ -88,24 +130,64 @@ export function challengesReducer(
     case "appendLoaded":
       return {
         ...state,
-        challenges: [...state.challenges, ...action.payload.challenges],
+        challenges: mergeChallengesById(
+          state.challenges,
+          action.payload.challenges,
+        ),
         hasMore: action.payload.hasMore,
+        totalCount: action.payload.totalCount,
       };
+    case "setTopic":
+      return resetPage({
+        ...state,
+        topicFilter: action.payload,
+      });
     case "setFilter":
-      return {
+      return resetPage({
         ...state,
         filterDifficulty: action.payload,
-      };
+      });
+    case "setStatus":
+      return resetPage({
+        ...state,
+        statusFilter: action.payload,
+      });
+    case "setType":
+      return resetPage({
+        ...state,
+        typeFilter: action.payload,
+      });
+    case "setOnlyUnsolved":
+      return resetPage({
+        ...state,
+        onlyUnsolved: action.payload,
+      });
+    case "setSort":
+      return resetPage({
+        ...state,
+        sortBy: action.payload,
+      });
     case "setSearch":
-      return {
+      return resetPage({
         ...state,
         searchQuery: action.payload,
+      });
+    case "setPage":
+      return {
+        ...state,
+        page: Math.max(1, action.payload),
       };
     case "clearFilters":
       return {
         ...state,
+        topicFilter: "effects-lifecycle",
         filterDifficulty: "ALL",
+        statusFilter: "ALL",
+        typeFilter: "ALL",
+        onlyUnsolved: false,
+        sortBy: "RECENT",
         searchQuery: "",
+        page: 1,
       };
     default:
       return state;
@@ -116,8 +198,14 @@ export function matchesChallenge(
   challenge: Challenge,
   searchQuery: string,
   filterDifficulty: DifficultyFilter,
+  topicFilter: ChallengeTopicFilter,
+  statusFilter: StatusFilter = "ALL",
+  typeFilter: TypeFilter = "ALL",
+  onlyUnsolved = false,
 ) {
   const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+  const status = getStatusFromAttempts(challenge.attempts);
+  const type = getChallengeKind(challenge);
   const matchesSearch =
     normalizedQuery.length === 0 ||
     challenge.title.toLocaleLowerCase().includes(normalizedQuery) ||
@@ -125,16 +213,52 @@ export function matchesChallenge(
 
   const matchesDifficulty =
     filterDifficulty === "ALL" || challenge.difficulty === filterDifficulty;
+  const matchesStatus = statusFilter === "ALL" || status === statusFilter;
+  const matchesType = typeFilter === "ALL" || type === typeFilter;
+  const matchesUnsolved = !onlyUnsolved || status !== "resolved";
 
-  return matchesSearch && matchesDifficulty;
+  return (
+    matchesSearch &&
+    matchesDifficulty &&
+    matchesStatus &&
+    matchesType &&
+    matchesUnsolved &&
+    matchesChallengeTopic(challenge, topicFilter)
+  );
 }
 
 export function getVisibleChallenges(
   challenges: Challenge[],
   searchQuery: string,
   filterDifficulty: DifficultyFilter,
+  topicFilter: ChallengeTopicFilter,
+  statusFilter: StatusFilter = "ALL",
+  typeFilter: TypeFilter = "ALL",
+  onlyUnsolved = false,
+  sortBy: SortBy = "RECENT",
 ) {
-  return challenges.filter(challenge => matchesChallenge(challenge, searchQuery, filterDifficulty));
+  return challenges
+    .filter((challenge) =>
+      matchesChallenge(
+        challenge,
+        searchQuery,
+        filterDifficulty,
+        topicFilter,
+        statusFilter,
+        typeFilter,
+        onlyUnsolved,
+      ),
+    )
+    .toSorted((left, right) => sortChallenges(left, right, sortBy));
+}
+
+export function getPaginatedChallenges(
+  challenges: Challenge[],
+  page: number,
+  pageSize: number,
+) {
+  const start = (Math.max(1, page) - 1) * pageSize;
+  return challenges.slice(start, start + pageSize);
 }
 
 export function resolveActiveChallengeId(
@@ -146,7 +270,9 @@ export function resolveActiveChallengeId(
   }
 
   if (currentActiveChallengeId) {
-    const stillVisible = visibleChallenges.some(challenge => challenge.id === currentActiveChallengeId);
+    const stillVisible = visibleChallenges.some(
+      (challenge) => challenge.id === currentActiveChallengeId,
+    );
     if (stillVisible) {
       return currentActiveChallengeId;
     }
@@ -168,7 +294,9 @@ export function getActiveChallengeNavigation(
     };
   }
 
-  const activeIndex = visibleChallenges.findIndex(challenge => challenge.id === activeChallengeId);
+  const activeIndex = visibleChallenges.findIndex(
+    (challenge) => challenge.id === activeChallengeId,
+  );
   if (activeIndex === -1) {
     return {
       activeIndex: -1,
@@ -186,30 +314,35 @@ export function getActiveChallengeNavigation(
   };
 }
 
-export function buildChallengeRows(challenges: Challenge[]): ChallengeRow[] {
-  const sortedChallenges = challenges.toSorted(
-    (left, right) => left.recommendedElo - right.recommendedElo,
-  );
-  const rows: ChallengeRow[] = [];
-
-  let groupIndex = 0;
-  while (groupIndex < sortedChallenges.length) {
-    const current = sortedChallenges[groupIndex];
-    const next = sortedChallenges[groupIndex + 1];
-
-    if (
-      next &&
-      current.difficulty === next.difficulty &&
-      Math.abs(current.recommendedElo - next.recommendedElo) <= 100
-    ) {
-      rows.push({ type: "pair", items: [current, next] });
-      groupIndex += 2;
-      continue;
-    }
-
-    rows.push({ type: "single", items: [current] });
-    groupIndex += 1;
+function sortChallenges(left: Challenge, right: Challenge, sortBy: SortBy) {
+  if (sortBy === "ELO_DESC") {
+    return right.recommendedElo - left.recommendedElo;
   }
 
-  return rows;
+  if (sortBy === "TITLE") {
+    return left.title.localeCompare(right.title);
+  }
+
+  return left.recommendedElo - right.recommendedElo;
+}
+
+function resetPage(state: ChallengesState): ChallengesState {
+  return {
+    ...state,
+    page: 1,
+  };
+}
+
+function mergeChallengesById(current: Challenge[], incoming: Challenge[]) {
+  const merged = new Map<string, Challenge>();
+
+  for (const challenge of current) {
+    merged.set(challenge.id, challenge);
+  }
+
+  for (const challenge of incoming) {
+    merged.set(challenge.id, challenge);
+  }
+
+  return [...merged.values()];
 }
