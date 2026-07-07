@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@kodan/ui/lib/utils";
-import { motion } from "framer-motion";
 import { zenEase } from "../motion/presets";
+import { ZenMotionProvider } from "../motion/runtime";
+import { m } from "../motion/primitives";
 
 type DanProgressProps = {
   value: number;
@@ -21,12 +22,14 @@ export function DanProgress({ value, label = "Dan progress", className }: DanPro
       </div>
       <progress className="sr-only" value={progress} max={100} aria-label={label} />
       <div className="h-2 overflow-hidden bg-[color:color-mix(in_oklch,var(--zen-ink)_10%,transparent)]" aria-hidden="true">
-        <motion.div
-          className="h-full bg-[color:var(--zen-hanko)]"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.7, ease: zenEase }}
-        />
+        <ZenMotionProvider>
+          <m.div
+            className="h-full bg-[color:var(--zen-hanko)]"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.7, ease: zenEase }}
+          />
+        </ZenMotionProvider>
       </div>
     </div>
   );

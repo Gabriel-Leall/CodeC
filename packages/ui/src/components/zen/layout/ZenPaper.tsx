@@ -1,9 +1,11 @@
 "use client";
 
 import { cn } from "@kodan/ui/lib/utils";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import type { HTMLMotionProps } from "framer-motion";
 import type { ReactNode } from "react";
 import { zenFade } from "../motion/presets";
+import { ZenMotionProvider } from "../motion/runtime";
+import { m } from "../motion/primitives";
 
 type ZenPaperProps = Omit<HTMLMotionProps<"section">, "children"> & {
   children: ReactNode;
@@ -28,22 +30,24 @@ export function ZenPaper({
   ...props
 }: ZenPaperProps) {
   return (
-    <motion.section
-      variants={animated ? zenFade : undefined}
-      initial={animated ? "hidden" : undefined}
-      animate={animated ? "visible" : undefined}
-      exit={animated ? "exit" : undefined}
-      className={cn(
-        "zen-ink-edge relative overflow-hidden border text-sm/relaxed",
-        paddingClass[padding],
-        tone === "washi"
-          ? "zen-paper border-[color:var(--zen-border)] text-[color:var(--zen-ink)]"
-          : "border-[color:color-mix(in_oklch,var(--zen-washi)_24%,transparent)] bg-[color:var(--zen-ink)] text-[color:var(--zen-washi)]",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </motion.section>
+    <ZenMotionProvider>
+      <m.section
+        variants={animated ? zenFade : undefined}
+        initial={animated ? "hidden" : undefined}
+        animate={animated ? "visible" : undefined}
+        exit={animated ? "exit" : undefined}
+        className={cn(
+          "zen-ink-edge relative overflow-hidden border text-sm/relaxed",
+          paddingClass[padding],
+          tone === "washi"
+            ? "zen-paper border-[color:var(--zen-border)] text-[color:var(--zen-ink)]"
+            : "border-[color:color-mix(in_oklch,var(--zen-washi)_24%,transparent)] bg-[color:var(--zen-ink)] text-[color:var(--zen-washi)]",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </m.section>
+    </ZenMotionProvider>
   );
 }

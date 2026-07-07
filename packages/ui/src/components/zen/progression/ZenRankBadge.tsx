@@ -2,9 +2,10 @@
 
 import { ZenEnsoSvg } from "@kodan/ui/assets/zen/enso";
 import { cn } from "@kodan/ui/lib/utils";
-import { motion } from "framer-motion";
 import { zenEase } from "../motion/presets";
 import type { ZenRank } from "../zen-types";
+import { ZenMotionProvider } from "../motion/runtime";
+import { m } from "../motion/primitives";
 
 type ZenRankBadgeProps = {
   rank: ZenRank;
@@ -31,12 +32,14 @@ export function ZenRankBadge({ rank, className }: ZenRankBadgeProps) {
           </span>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden bg-[color:color-mix(in_oklch,var(--zen-ink)_10%,transparent)]">
-          <motion.div
-            className="h-full bg-[color:var(--zen-hanko)]"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.7, ease: zenEase }}
-          />
+          <ZenMotionProvider>
+            <m.div
+              className="h-full bg-[color:var(--zen-hanko)]"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.7, ease: zenEase }}
+            />
+          </ZenMotionProvider>
         </div>
       </div>
     </div>
