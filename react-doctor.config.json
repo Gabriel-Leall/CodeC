@@ -1,0 +1,73 @@
+{
+  "ignore": {
+    "overrides": [
+      {
+        "files": [
+          "src/app/dashboard/challenges/ema-challenge-card-helpers.ts",
+          "src/app/dashboard/challenges/ema-challenge-card.tsx",
+          "src/app/dashboard/dashboard.tsx",
+          "src/app/dashboard/train/*/train-arena-client.tsx",
+          "src/app/entry-gate.tsx",
+          "src/components/header.tsx",
+          "src/components/mode-toggle.tsx",
+          "src/components/nav-link.tsx",
+          "src/components/providers.tsx",
+          "src/components/theme-provider.tsx",
+          "src/components/user-menu.tsx",
+          "src/lib/local-user.ts",
+          "src/lib/rating.ts"
+        ],
+        "rules": [
+          "deslop/unused-file"
+        ]
+      },
+      {
+        "files": [
+          "src/app/zen/ZenPlaygroundClient.tsx"
+        ],
+        "rules": [
+          "deslop/unused-file",
+          "react-doctor/no-giant-component",
+          "react-doctor/prefer-useReducer"
+        ]
+      },
+      {
+        "files": [
+          "src/assets/zen/**/*.tsx",
+          "src/components/alert*.tsx",
+          "src/components/button.tsx",
+          "src/components/card.tsx",
+          "src/components/checkbox.tsx",
+          "src/components/dropdown-menu.tsx",
+          "src/components/hanko-stamp.tsx",
+          "src/components/input.tsx",
+          "src/components/label.tsx",
+          "src/components/skeleton.tsx",
+          "src/components/sonner.tsx",
+          "src/components/zen/**/*",
+          "src/index.ts",
+          "src/lib/utils.ts"
+        ],
+        "rules": [
+          "deslop/unused-file"
+        ]
+      },
+      {
+        "files": [
+          "src/components/label.tsx"
+        ],
+        "rules": [
+          "react-doctor/label-has-associated-control"
+        ]
+      },
+      {
+        "files": [
+          "src/components/zen/display/ZenAvatar.tsx"
+        ],
+        "rules": [
+          "react-doctor/nextjs-no-img-element"
+        ]
+      }
+    ]
+  }
+}
