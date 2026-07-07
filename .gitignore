@@ -43,6 +43,14 @@ lerna-debug.log*
 # Testing
 coverage
 .nyc_output
+test-results
+
+# Local agent/tool artifacts
+.agents
+.kilocode
+.kiro
+.playwright-cli
+skills-lock.json
 
 # Misc
 *.tgz
