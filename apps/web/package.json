@@ -21,9 +21,7 @@
     "next": "^16.2.0",
     "next-themes": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "sonner": "catalog:",
-    "zod": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@kodan/config": "workspace:*",
@@ -33,5 +31,41 @@
     "@types/react-dom": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
+  },
+  "reactDoctor": {
+    "ignore": {
+      "overrides": [
+        {
+          "files": [
+            "src/app/dashboard/challenges/ema-challenge-card-helpers.ts",
+            "src/app/dashboard/challenges/ema-challenge-card.tsx",
+            "src/app/dashboard/dashboard.tsx",
+            "src/app/dashboard/train/*/train-arena-client.tsx",
+            "src/app/entry-gate.tsx",
+            "src/components/header.tsx",
+            "src/components/mode-toggle.tsx",
+            "src/components/nav-link.tsx",
+            "src/components/providers.tsx",
+            "src/components/theme-provider.tsx",
+            "src/components/user-menu.tsx",
+            "src/lib/local-user.ts",
+            "src/lib/rating.ts"
+          ],
+          "rules": [
+            "deslop/unused-file"
+          ]
+        },
+        {
+          "files": [
+            "src/app/zen/ZenPlaygroundClient.tsx"
+          ],
+          "rules": [
+            "deslop/unused-file",
+            "react-doctor/no-giant-component",
+            "react-doctor/prefer-useReducer"
+          ]
+        }
+      ]
+    }
   }
 }

@@ -270,10 +270,20 @@ export async function getChallenge(id: string) {
       await ensureDefaultLocalUser();
     }
 
-    await ensureDefaultLocalUser();
+    const user = await ensureDefaultLocalUser();
 
     const challenge = await prisma.challenge.findUnique({
       where: { id },
+      include: {
+        attempts: {
+          where: {
+            userId: user.id,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
     });
 
     if (!challenge) {

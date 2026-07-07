@@ -1,11 +1,18 @@
 import Link from "next/link";
-import { ArrowRight, Crosshair, Sparkles } from "lucide-react";
+import { ArrowRight, Crosshair, History, Layers3 } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@kodan/ui/components/button";
+import { cn } from "@kodan/ui/lib/utils";
 import { eloToDanRank } from "@/lib/rating";
 import {
+  getChallengeTopicDescription,
+  getChallengeTopicKey,
+  getChallengeTopicLabel,
+} from "./challenges-taxonomy";
+import {
   type Challenge,
+  getChallengeProgress,
   getChallengeTags,
   getDifficultyColor,
   getDifficultyLabel,
@@ -32,105 +39,127 @@ export function ChallengesFocusPanel({
   onSelectPrevious: (() => void) | null;
   onSelectNext: (() => void) | null;
 }) {
+  const topicKey = getChallengeTopicKey(challenge);
+  const topicLabel = getChallengeTopicLabel(topicKey);
   const recommendedRank = eloToDanRank(challenge.recommendedElo);
   const userRank = eloToDanRank(userElo);
   const statusPresentation = getStatusPresentation(challenge.attempts);
-  const compatibility = getLevelCompatibility(challenge.recommendedElo, userElo);
+  const progress = getChallengeProgress(challenge.attempts);
+  const compatibility = getLevelCompatibility(
+    challenge.recommendedElo,
+    userElo,
+  );
   const tags = getChallengeTags(challenge.tags);
 
   return (
     <aside className="xl:sticky xl:top-24">
-      <div className="zen-paper relative overflow-hidden border border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] p-5 dark:border-border/80 dark:bg-card/90">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[color:color-mix(in_oklch,var(--zen-hanko)_32%,transparent)]" />
-        <div className="pointer-events-none absolute right-5 top-5 size-16 rounded-full border border-[color:var(--zen-border)]/45 opacity-45 dark:border-border/35" />
-
-        <div className="relative space-y-5">
-          <header className="space-y-3 border-b border-[color:var(--zen-border)] pb-4 dark:border-border/55">
+      <div className="rounded-[24px] border border-slate-200 bg-white/95 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.05)] dark:border-slate-800 dark:bg-slate-950/95">
+        <div className="space-y-5">
+          <header className="space-y-3 border-b border-slate-200 pb-4 dark:border-slate-800">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+              Item ativo
+            </p>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
-                  Desafio em foco
-                </p>
-                <h3 className="text-xl font-serif font-bold leading-tight text-[color:var(--zen-ink)] dark:text-foreground">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <span>React</span>
+                  <span>/</span>
+                  <span>{topicLabel}</span>
+                </div>
+                <h3 className="text-xl font-semibold leading-tight text-slate-950 dark:text-slate-50">
                   {challenge.title}
                 </h3>
               </div>
 
               <span
-                className={`inline-flex shrink-0 border px-2 py-1 text-[9px] font-mono uppercase tracking-[0.18em] ${statusPresentation.badgeClassName}`}
+                className={cn(
+                  "inline-flex rounded-full border px-2 py-1 text-[10px] font-medium",
+                  statusPresentation.badgeClassName,
+                )}
               >
                 {statusPresentation.label}
               </span>
             </div>
-
-            <p className="text-xs/relaxed font-mono text-[color:var(--zen-muted)] dark:text-muted-foreground">
-              {statusPresentation.note}. Este nó conversa com o seu rank atual e ajuda a orientar
-              qual leitura vale atacar agora.
+            <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
+              {getChallengeTopicDescription(topicKey)}
             </p>
-
-            <div className="flex flex-wrap items-center gap-2 text-[9px] font-mono uppercase tracking-[0.18em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
-              <span className="border border-[color:var(--zen-border)] px-2 py-1 dark:border-border/60">
-                Nó {String(activePosition).padStart(2, "0")} de {String(totalVisible).padStart(2, "0")}
-              </span>
-              <span className="border border-[color:var(--zen-border)] px-2 py-1 dark:border-border/60">
-                Faixa {recommendedRank.kyuDan}
-              </span>
-            </div>
           </header>
 
-          <div className="grid gap-2 sm:grid-cols-3 xl:grid-cols-1">
-            <FocusMetric
+          <div className="grid gap-3">
+            <StatCard
+              label="Posição"
+              value={`${activePosition}/${totalVisible}`}
+              note="ordem da lista visível"
+              icon={<Layers3 className="size-4" />}
+            />
+            <StatCard
               label="Dificuldade"
               value={getDifficultyLabel(challenge.difficulty)}
-              note="Tom da trilha"
+              note={`${challenge.recommendedElo} ELO recomendado`}
+              icon={<Crosshair className="size-4" />}
               badgeClassName={getDifficultyColor(challenge.difficulty)}
             />
-            <FocusMetric
-              label="ELO recomendado"
-              value={`${challenge.recommendedElo}`}
-              note={`${recommendedRank.kanji} · ${recommendedRank.kyuDan}`}
-            />
-            <FocusMetric
+            <StatCard
               label="Seu momento"
-              value={userRank.kanji}
+              value={userRank.kyuDan}
               note={`${userElo} ELO · ${userRank.description}`}
+              icon={<History className="size-4" />}
             />
           </div>
 
-          <div className="grid gap-3 border-y border-[color:var(--zen-border)] py-4 dark:border-border/55">
-            <InsightRow
-              icon={<Crosshair className="size-3.5" />}
-              label="Compatibilidade"
-              value={
-                compatibility ? compatibility.label : "Pede fôlego extra"
-              }
-              note={
-                compatibility
-                  ? "Bom ponto de ataque para evoluir sem quebrar o ritmo."
-                  : "Está um passo acima do seu ELO atual, útil para treinos de expansão."
-              }
-            />
-            <InsightRow
-              icon={<Sparkles className="size-3.5" />}
-              label="Histórico"
-              value={challenge.attempts.length > 0 ? `${challenge.attempts.length} registro(s)` : "Ainda intacto"}
-              note={
-                challenge.attempts.length > 0
-                  ? "A trilha já viu esse exercício, então vale comparar leitura e precisão."
-                  : "Bom momento para um primeiro diagnóstico a frio."
-              }
-            />
+          <div className="rounded-[20px] border border-slate-200 bg-slate-50/75 p-4 dark:border-slate-800 dark:bg-slate-900/70">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+                  Progresso
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-950 dark:text-slate-50">
+                  {progress.label}
+                </p>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {progress.percent}%
+              </p>
+            </div>
+
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-[width] duration-300",
+                  progress.barClassName,
+                )}
+                style={{ width: `${progress.percent}%` }}
+              />
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <span>
+                {recommendedRank.kanji} · {recommendedRank.kyuDan}
+              </span>
+              {compatibility ? (
+                <span
+                  className={cn(
+                    "inline-flex rounded-full border px-2 py-1 text-[10px] font-medium",
+                    compatibility.className,
+                  )}
+                >
+                  {compatibility.label}
+                </span>
+              ) : (
+                <span>Pede um salto acima do seu ELO atual.</span>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
-              Marcadores do problema
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+              Tags
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {tags.map(tag => (
+              {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="border border-[color:var(--zen-border)] bg-[color:color-mix(in_oklch,var(--zen-ink)_4%,transparent)] px-2 py-1 text-[9px] font-mono uppercase tracking-[0.16em] text-[color:var(--zen-muted)] dark:border-border/40 dark:bg-secondary/30 dark:text-muted-foreground"
+                  className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
                 >
                   {tag}
                 </span>
@@ -138,8 +167,8 @@ export function ChallengesFocusPanel({
             </div>
           </div>
 
-          <div className="space-y-3 border-t border-[color:var(--zen-border)] pt-4 dark:border-border/55">
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+          <div className="space-y-3 border-t border-slate-200 pt-4 dark:border-slate-800">
+            <div className="grid gap-2">
               <NavigationButton
                 directionLabel="Anterior"
                 challengeTitle={previousChallengeTitle}
@@ -154,16 +183,11 @@ export function ChallengesFocusPanel({
 
             <Link
               href={`/train/${challenge.id}`}
-              className="inline-flex h-10 w-full items-center justify-center gap-2 border border-[color:var(--zen-hanko)] bg-[color:var(--zen-hanko)] px-4 text-[10px] font-mono uppercase tracking-[0.2em] text-white transition-all hover:bg-[color:color-mix(in_oklch,var(--zen-hanko)_86%,black)] dark:border-primary/20 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
             >
               Abrir arena
-              <ArrowRight className="size-3.5" />
+              <ArrowRight className="size-4" />
             </Link>
-
-            <p className="mt-3 text-[10px] font-mono leading-relaxed text-[color:var(--zen-muted)] dark:text-muted-foreground">
-              Passe pela árvore para trocar o foco sem perder a trilha, depois entre na arena
-              quando o diagnóstico fizer sentido.
-            </p>
           </div>
         </div>
       </div>
@@ -171,66 +195,46 @@ export function ChallengesFocusPanel({
   );
 }
 
-function FocusMetric({
+function StatCard({
   label,
   value,
   note,
+  icon,
   badgeClassName,
 }: {
   label: string;
   value: string;
   note: string;
+  icon: ReactNode;
   badgeClassName?: string;
 }) {
   return (
-    <div className="border border-[color:var(--zen-border)] bg-[color:color-mix(in_oklch,var(--zen-ink)_2%,transparent)] p-3 dark:border-border/70 dark:bg-background/20">
-      <div className="text-[9px] font-mono uppercase tracking-[0.22em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
-        {label}
+    <div className="rounded-[18px] border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+            {label}
+          </p>
+          <p className="mt-1 text-sm font-semibold text-slate-950 dark:text-slate-50">
+            {value}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+            {note}
+          </p>
+        </div>
+        <div className="mt-0.5 text-slate-400 dark:text-slate-500">{icon}</div>
       </div>
-      <div className="mt-1 flex flex-wrap items-center gap-2">
-        <span className="text-sm font-semibold text-[color:var(--zen-ink)] dark:text-foreground">
-          {value}
-        </span>
-        {badgeClassName ? (
-          <span className={`inline-flex border px-1.5 py-0.5 text-[8px] font-mono uppercase tracking-[0.16em] ${badgeClassName}`}>
-            faixa
-          </span>
-        ) : null}
-      </div>
-      <div className="mt-1 text-[10px] font-mono leading-relaxed text-[color:var(--zen-muted)] dark:text-muted-foreground">
-        {note}
-      </div>
-    </div>
-  );
-}
 
-function InsightRow({
-  icon,
-  label,
-  value,
-  note,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  note: string;
-}) {
-  return (
-    <div className="flex items-start gap-3">
-      <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center border border-[color:var(--zen-border)] text-[color:var(--zen-muted)] dark:border-border/60 dark:text-muted-foreground">
-        {icon}
-      </div>
-      <div className="min-w-0 space-y-1">
-        <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
-          {label}
-        </div>
-        <div className="text-sm font-semibold text-[color:var(--zen-ink)] dark:text-foreground">
-          {value}
-        </div>
-        <p className="text-[10px] font-mono leading-relaxed text-[color:var(--zen-muted)] dark:text-muted-foreground">
-          {note}
-        </p>
-      </div>
+      {badgeClassName ? (
+        <span
+          className={cn(
+            "mt-3 inline-flex rounded-full border px-2 py-1 text-[10px] font-medium",
+            badgeClassName,
+          )}
+        >
+          faixa
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -249,14 +253,14 @@ function NavigationButton({
       type="button"
       variant="outline"
       disabled={!onClick}
-      className="h-auto min-h-14 items-start justify-start border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] px-3 py-2 text-left hover:bg-[color:color-mix(in_oklch,var(--zen-ink)_4%,transparent)] dark:border-border/70 dark:bg-card dark:hover:bg-secondary/40"
+      className="h-auto min-h-14 items-start justify-start rounded-xl border-slate-200 bg-white px-4 py-3 text-left hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900"
       onClick={onClick ?? undefined}
     >
       <span className="flex flex-col items-start gap-1">
-        <span className="text-[9px] font-mono uppercase tracking-[0.18em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
+        <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
           {directionLabel}
         </span>
-        <span className="line-clamp-2 text-[11px] font-mono leading-relaxed text-[color:var(--zen-ink)] dark:text-foreground">
+        <span className="line-clamp-2 text-sm leading-6 text-slate-900 dark:text-slate-100">
           {challengeTitle ?? "Fim desta direção"}
         </span>
       </span>

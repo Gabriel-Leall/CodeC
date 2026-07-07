@@ -1,26 +1,46 @@
 "use client";
 
-import { useReducer, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import {
+  useReducer,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import {
-  Loader2,
-  ChevronLeft,
-  HelpCircle,
-  Play,
-  ArrowUpRight,
   ArrowDownRight,
+  ArrowUpRight,
   CheckCircle2,
-  AlertCircle,
+  ChevronDown,
+  ChevronLeft,
+  Copy,
   Eye,
   EyeOff,
   FileCode,
+  HelpCircle,
+  Hourglass,
+  Info,
+  Lightbulb,
+  Loader2,
+  Menu,
+  PanelRightOpen,
+  Search,
+  SendHorizontal,
 } from "lucide-react";
 
 import { Button } from "@kodan/ui/components/button";
-import {
-  ZenToast,
-} from "@kodan/ui/components/zen";
+import { ZenToast } from "@kodan/ui/components/zen";
+import { cn } from "@kodan/ui/lib/utils";
 import { submitAttempt } from "../../actions";
+
+interface AttemptSummary {
+  id: string;
+  score: number;
+  eloChange: number;
+  createdAt: Date | string;
+}
 
 export interface Challenge {
   id: string;
@@ -31,6 +51,7 @@ export interface Challenge {
   question: string;
   solution: string;
   tags: string;
+  attempts?: AttemptSummary[];
 }
 
 interface Feedback {
@@ -59,10 +80,16 @@ type ZenToastState = {
   message: string;
 };
 
-function zenToastReducer(state: ZenToastState, action: { type: "show"; tone: ZenToastTone; title: string; message: string } | { type: "hide" }): ZenToastState {
+function zenToastReducer(
+  state: ZenToastState,
+  action:
+    | { type: "show"; tone: ZenToastTone; title: string; message: string }
+    | { type: "hide" },
+): ZenToastState {
   if (action.type === "hide") {
     return { ...state, open: false };
   }
+
   return {
     open: true,
     tone: action.tone,
@@ -71,7 +98,6 @@ function zenToastReducer(state: ZenToastState, action: { type: "show"; tone: Zen
   };
 }
 
-// Custom Zen-themed syntax highlighter for JSX / TypeScript
 function highlightCode(code: string) {
   const lines = code.split("\n");
   const lineOccurrence = new Map<string, number>();
@@ -83,28 +109,31 @@ function highlightCode(code: string) {
 
     if (line.trim().startsWith("//")) {
       return (
-        <span key={lineKey} className="text-muted-foreground/45 italic whitespace-pre">
+        <span
+          key={lineKey}
+          className="whitespace-pre italic text-[var(--challengers-faint)]"
+        >
           {line}
         </span>
       );
     }
-    
-    // JS/TS keywords, hooks, brackets/braces/punctuation, strings, JSX tags, numbers, comments
-    const tokenRegex = /(\/\/.*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(\b(?:const|let|var|function|export|default|import|from|return|if|else|try|catch|finally|type|interface|as|switch|case|break)\b)|(\b(?:useState|useEffect|useMemo|useCallback|useRef)\b)|(\b(?:true|false|null|undefined)\b)|(\b\d+\b)|(<[^>]+>)|([a-zA-Z_$][a-zA-Z0-9_$]*)|([^\s\w]+)/g;
-    
+
+    const tokenRegex =
+      /(\/\/.*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(\b(?:const|let|var|function|export|default|import|from|return|if|else|try|catch|finally|type|interface|as|switch|case|break|async|await|new)\b)|(\b(?:useState|useEffect|useMemo|useCallback|useRef|useReducer)\b)|(\b(?:true|false|null|undefined)\b)|(\b\d+\b)|(<[^>]+>)|([a-zA-Z_$][a-zA-Z0-9_$]*)|([^\s\w]+)/g;
+
     let match;
-    const elements: React.ReactNode[] = [];
+    const elements: ReactNode[] = [];
     let lastIndex = 0;
-    
+
     tokenRegex.lastIndex = 0;
-    
+
     while ((match = tokenRegex.exec(line)) !== null) {
       const matchIndex = match.index;
-      
+
       if (matchIndex > lastIndex) {
         elements.push(line.substring(lastIndex, matchIndex));
       }
-      
+
       const [
         full,
         comment,
@@ -114,74 +143,79 @@ function highlightCode(code: string) {
         booleanNull,
         number,
         jsx,
-        identifier,
-        punctuation
+        _identifier,
+        punctuation,
       ] = match;
-      
+
       const key = `${lineKey}-${matchIndex}`;
-      
+
       if (comment) {
         elements.push(
-          <span key={key} className="text-muted-foreground/45 italic">
+          <span key={key} className="italic text-[var(--challengers-faint)]">
             {comment}
-          </span>
+          </span>,
         );
       } else if (string) {
         elements.push(
-          <span key={key} className="text-[#bd5338] dark:text-[#e27e65] font-medium">
+          <span
+            key={key}
+            className="font-medium text-[oklch(46%_0.13_154)] dark:text-[oklch(78%_0.11_154)]"
+          >
             {string}
-          </span>
+          </span>,
         );
       } else if (keyword) {
         elements.push(
-          <span key={key} className="text-[#2d5a27] dark:text-[#8ebf80] font-bold">
+          <span key={key} className="font-semibold text-[var(--challengers-blue)]">
             {keyword}
-          </span>
+          </span>,
         );
       } else if (hook) {
         elements.push(
-          <span key={key} className="text-[#2c6b6b] dark:text-[#5fb3b3] font-semibold">
+          <span
+            key={key}
+            className="font-semibold text-[oklch(45%_0.11_286)] dark:text-[oklch(76%_0.1_286)]"
+          >
             {hook}
-          </span>
+          </span>,
         );
       } else if (booleanNull || number) {
         elements.push(
-          <span key={key} className="text-amber-600 dark:text-amber-400">
+          <span key={key} className="text-[var(--challengers-warning)]">
             {full}
-          </span>
+          </span>,
         );
       } else if (jsx) {
         elements.push(
-          <span key={key} className="text-sky-700 dark:text-sky-400">
+          <span key={key} className="text-[var(--challengers-blue-strong)]">
             {jsx}
-          </span>
+          </span>,
         );
       } else if (punctuation) {
         elements.push(
-          <span key={key} className="text-muted-foreground/60">
+          <span key={key} className="text-[var(--challengers-muted)]">
             {punctuation}
-          </span>
+          </span>,
         );
       } else {
         elements.push(full);
       }
-      
+
       lastIndex = tokenRegex.lastIndex;
     }
-    
+
     if (lastIndex < line.length) {
       elements.push(line.substring(lastIndex));
     }
-    
+
     return (
-      <div key={lineKey} className="min-h-[1.25rem] whitespace-pre">
+      <div key={lineKey} className="min-h-[1.45rem] whitespace-pre">
         {elements.length > 0 ? elements : " "}
       </div>
     );
   });
 }
 
-// Parses standard diagnostic questions to extract mysterious prompt and details
 function parseQuestion(questionText: string) {
   const splitKeywords = [
     "Na sua resposta, cubra:",
@@ -189,41 +223,194 @@ function parseQuestion(questionText: string) {
     "Na resposta, cubra:",
     "Na resposta cubra:",
     "Para responder, cubra:",
-    "Pontos a cobrir:"
+    "Pontos a cobrir:",
   ];
-  
+
   let splitIndex = -1;
-  
-  for (const kw of splitKeywords) {
-    const idx = questionText.indexOf(kw);
-    if (idx !== -1) {
-      splitIndex = idx;
+
+  for (const keyword of splitKeywords) {
+    const index = questionText.indexOf(keyword);
+    if (index !== -1) {
+      splitIndex = index;
       break;
     }
   }
-  
+
   if (splitIndex !== -1) {
     const mainPrompt = questionText.substring(0, splitIndex).trim();
     const hintText = questionText.substring(splitIndex).trim();
+
     return {
-      mainPrompt: mainPrompt || "Este componente apresenta comportamento incorreto em produção. Diagnose o bug e explique a correção.",
-      hintText: hintText
+      mainPrompt:
+        mainPrompt ||
+        "Este componente apresenta comportamento incorreto em produção. Diagnose o bug e explique a correção.",
+      hintText,
     };
   }
-  
-  const listIdx = questionText.search(/\b1\)/);
-  if (listIdx !== -1) {
-    const mainPrompt = questionText.substring(0, listIdx).trim();
-    const hintText = "Na sua resposta, cubra:\n" + questionText.substring(listIdx).trim();
+
+  const listIndex = questionText.search(/\b1\)/);
+  if (listIndex !== -1) {
+    const mainPrompt = questionText.substring(0, listIndex).trim();
+    const hintText =
+      "Na sua resposta, cubra:\n" + questionText.substring(listIndex).trim();
+
     return {
-      mainPrompt: mainPrompt || "Este componente apresenta comportamento incorreto em produção. Diagnose o bug e explique a correção.",
-      hintText: hintText
+      mainPrompt:
+        mainPrompt ||
+        "Este componente apresenta comportamento incorreto em produção. Diagnose o bug e explique a correção.",
+      hintText,
     };
   }
-  
+
   return {
-    mainPrompt: "Este componente apresenta comportamento incorreto em produção. Diagnose o bug e explique a correção.",
-    hintText: questionText
+    mainPrompt:
+      "Este componente apresenta comportamento incorreto em produção. Diagnose o bug e explique a correção.",
+    hintText: questionText,
+  };
+}
+
+function getDifficultyLabel(difficulty: string) {
+  switch (difficulty) {
+    case "EASY":
+      return "EASY";
+    case "MEDIUM":
+      return "MEDIUM";
+    case "HARD":
+      return "HARD";
+    default:
+      return difficulty;
+  }
+}
+
+function getDifficultyClassName(difficulty: string) {
+  switch (difficulty) {
+    case "EASY":
+      return "challengers-difficulty-easy";
+    case "MEDIUM":
+      return "challengers-difficulty-medium";
+    case "HARD":
+      return "challengers-difficulty-hard";
+    default:
+      return "challengers-badge";
+  }
+}
+
+function getEstimatedTime(difficulty: string) {
+  switch (difficulty) {
+    case "EASY":
+      return "10-15 min";
+    case "HARD":
+      return "25-35 min";
+    default:
+      return "15-20 min";
+  }
+}
+
+function getPossibleElo(difficulty: string) {
+  switch (difficulty) {
+    case "EASY":
+      return "+12 possível";
+    case "HARD":
+      return "+30 possível";
+    default:
+      return "+20 possível";
+  }
+}
+
+function getRankLabel(elo: number) {
+  if (elo >= 2200) {
+    return "SENSEI";
+  }
+  if (elo >= 1800) {
+    return "SAMURAI";
+  }
+  if (elo >= 1100) {
+    return "RONIN";
+  }
+  return "CADETE";
+}
+
+function getTags(tags: string) {
+  return tags.split(",").flatMap((tag) => {
+    const trimmed = tag.trim();
+    return trimmed ? [trimmed] : [];
+  });
+}
+
+function inferChallengeType(tags: string[]) {
+  const joined = tags.join(" ").toLowerCase();
+
+  if (joined.includes("effect") || joined.includes("lifecycle")) {
+    return "Effects";
+  }
+  if (joined.includes("async") || joined.includes("race")) {
+    return "Async UI";
+  }
+  if (joined.includes("state")) {
+    return "State";
+  }
+  if (joined.includes("render") || joined.includes("memo")) {
+    return "Rendering";
+  }
+  if (joined.includes("typescript") || joined.includes("types")) {
+    return "Types";
+  }
+
+  return "Diagnostics";
+}
+
+function getChallengeSubtitle(type: string) {
+  switch (type) {
+    case "Effects":
+      return "Domine efeitos colaterais e o ciclo de vida dos componentes.";
+    case "Async UI":
+      return "Treine leitura de corridas, cancelamento e respostas fora de ordem.";
+    case "State":
+      return "Pratique transições de estado, imutabilidade e atualizações derivadas.";
+    case "Rendering":
+      return "Analise renderizações, memoização e contratos entre componentes.";
+    case "Types":
+      return "Fortaleça inferência, narrowing e contratos de tipos em TypeScript.";
+    default:
+      return "Leia o código, isole o bug e proponha uma correção defensável.";
+  }
+}
+
+function getChallengeNumber(challenge: Challenge) {
+  const matches = `${challenge.id} ${challenge.title}`.match(/\d+/g);
+  if (matches && matches.length > 0) {
+    return matches[matches.length - 1].padStart(3, "0").slice(-3);
+  }
+
+  const hash =
+    Array.from(challenge.id).reduce(
+      (total, char) => (total + char.charCodeAt(0)) % 997,
+      0,
+    ) + 1;
+
+  return String(hash).padStart(3, "0");
+}
+
+function getLevelCompatibility(recommendedElo: number, userElo: number) {
+  const delta = recommendedElo - userElo;
+
+  if (delta <= 150) {
+    return {
+      label: "Nível compatível",
+      className: "challengers-status-resolved",
+    };
+  }
+
+  if (delta > 200) {
+    return {
+      label: "Acima do seu ELO",
+      className: "challengers-status-in-progress",
+    };
+  }
+
+  return {
+    label: "Boa progressão",
+    className: "challengers-status-not-started",
   };
 }
 
@@ -235,8 +422,16 @@ interface TrainArenaClientProps {
 
 // react-doctor-disable-next-line react-doctor/prefer-useReducer
 // react-doctor-disable-next-line react-doctor/no-giant-component
-export default function TrainArenaClient({ id, initialChallenge, initialUserElo }: TrainArenaClientProps) {
+export default function TrainArenaClient({
+  id,
+  initialChallenge,
+  initialUserElo,
+}: TrainArenaClientProps) {
   const [userAnswer, setUserAnswer] = useState("");
+  const [notes, setNotes] = useState("");
+  const [supportTab, setSupportTab] = useState<"statement" | "notes">(
+    "statement",
+  );
   const [submitting, setSubmitting] = useState(false);
   const [answerLocked, setAnswerLocked] = useState(false);
   const [result, setResult] = useState<AttemptResult | null>(null);
@@ -247,54 +442,92 @@ export default function TrainArenaClient({ id, initialChallenge, initialUserElo 
     title: "Aviso",
     message: "",
   });
-  
-  // Hint states
+
   const usedHintRef = useRef(false);
   const [showHintConfirm, setShowHintConfirm] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
 
+  const showZenToast = (tone: ZenToastTone, title: string, message: string) => {
+    dispatchZenToast({ type: "hide" });
+    window.setTimeout(
+      () => dispatchZenToast({ type: "show", tone, title, message }),
+      20,
+    );
+    window.setTimeout(() => dispatchZenToast({ type: "hide" }), 3200);
+  };
+
   if (!initialChallenge) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3">
-        <p className="text-xs text-muted-foreground font-mono">
-          Desafio não encontrado.
-        </p>
-        <Link href="/challenges">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-none font-mono uppercase text-xs"
-          >
-            Voltar aos desafios
-          </Button>
-        </Link>
-      </div>
+      <main
+        data-challengers-screen="true"
+        className="h-full min-h-0 bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
+      >
+        <div className="h-full min-h-0 lg:grid lg:grid-cols-[64px_minmax(0,1fr)]">
+          <ArenaSidebar />
+          <section className="flex h-full min-h-0 flex-col overflow-hidden">
+            <ArenaTopbar userElo={initialUserElo} />
+            <div className="flex flex-1 items-center justify-center px-4">
+              <div className="challengers-panel max-w-md rounded-[10px] border px-8 py-9 text-center">
+                <h1 className="font-serif text-xl font-bold text-[var(--challengers-ink)]">
+                  Desafio não encontrado
+                </h1>
+                <p className="mt-3 text-sm leading-6 text-[var(--challengers-muted)]">
+                  O item solicitado não está disponível no catálogo atual.
+                </p>
+                <Link href="/challenges" className="mt-6 inline-flex">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+                  >
+                    <ChevronLeft className="size-3.5" />
+                    Voltar aos desafios
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     );
   }
 
   const challenge = initialChallenge;
-  const userElo = initialUserElo;
+  const userElo = result?.newElo ?? initialUserElo;
+  const tags = getTags(challenge.tags);
+  const challengeType = inferChallengeType(tags);
+  const parsedQuestion = parseQuestion(challenge.question);
   const lines = challenge.code.split("\n");
   const answerLength = userAnswer.trim().length;
+  const wordCount =
+    userAnswer.trim().length === 0
+      ? 0
+      : userAnswer.trim().split(/\s+/).length;
+  const attemptCount = challenge.attempts?.length ?? 0;
   const canSubmit =
     !submitting && !answerLocked && answerLength >= MIN_ANSWER_LENGTH;
+  const compatibility = getLevelCompatibility(
+    challenge.recommendedElo,
+    initialUserElo,
+  );
+  const hasStartedAnalysis =
+    answerLength > 0 || notes.trim().length > 0 || hintRevealed || submitting;
 
-  const showZenToast = (tone: ZenToastTone, title: string, message: string) => {
-    dispatchZenToast({ type: "hide" });
-    window.setTimeout(() => dispatchZenToast({ type: "show", tone, title, message }), 20);
-    window.setTimeout(() => dispatchZenToast({ type: "hide" }), 3200);
-  };
-
-  const handleSubmit = async (e?: FormEvent) => {
-    if (e) {
-      e.preventDefault();
+  const handleSubmit = async (event?: FormEvent) => {
+    if (event) {
+      event.preventDefault();
     }
+
     if (submitting || answerLocked) {
       return;
     }
 
     if (answerLength < MIN_ANSWER_LENGTH) {
-      showZenToast("warning", "Diagnóstico incompleto", `Escreva pelo menos ${MIN_ANSWER_LENGTH} caracteres para enviar.`);
+      showZenToast(
+        "warning",
+        "Diagnóstico incompleto",
+        `Escreva pelo menos ${MIN_ANSWER_LENGTH} caracteres para enviar.`,
+      );
       return;
     }
 
@@ -302,420 +535,913 @@ export default function TrainArenaClient({ id, initialChallenge, initialUserElo 
     setSubmitting(true);
 
     try {
-      const res = await submitAttempt(id, userAnswer, usedHintRef.current);
-      if (res.success && res.data) {
-        setResult(res.data as AttemptResult);
-        showZenToast("success", "Diagnóstico avaliado", "Sua resposta foi processada com sucesso.");
+      const response = await submitAttempt(id, userAnswer, usedHintRef.current);
+      if (response.success && response.data) {
+        setResult(response.data as AttemptResult);
+        showZenToast(
+          "success",
+          "Diagnóstico avaliado",
+          "Sua resposta foi processada com sucesso.",
+        );
         setSubmitting(false);
-      } else {
-        setAnswerLocked(false);
-        showZenToast("error", "Falha na avaliação", res.error || "Erro ao avaliar resposta");
-        setSubmitting(false);
+        return;
       }
+
+      setAnswerLocked(false);
+      showZenToast(
+        "error",
+        "Falha na avaliação",
+        response.error || "Erro ao avaliar resposta",
+      );
+      setSubmitting(false);
     } catch {
       setAnswerLocked(false);
-      showZenToast("error", "Erro de envio", "Erro ao enviar resposta para correção");
+      showZenToast(
+        "error",
+        "Erro de envio",
+        "Erro ao enviar resposta para correção",
+      );
       setSubmitting(false);
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      handleSubmit();
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      void handleSubmit();
     }
   };
 
-  const getDifficultyLabel = (diff: string) => {
-    switch (diff) {
-      case "EASY":
-        return "Fácil";
-      case "MEDIUM":
-        return "Médio";
-      case "HARD":
-        return "Difícil";
-      default:
-        return diff;
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(challenge.code);
+      showZenToast("info", "Código copiado", "O snippet foi enviado para a área de transferência.");
+    } catch {
+      showZenToast("error", "Falha ao copiar", "Não foi possível copiar o código agora.");
     }
   };
-
-  const getLevelCompatibility = (recommendedElo: number) => {
-    const delta = recommendedElo - userElo;
-    if (delta <= 150) {
-        return {
-          label: "Nível Compatível",
-          className:
-          "inline-flex items-center border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:border-[#86a697]/45 dark:bg-[#86a697]/10 dark:text-[#86a697]",
-        };
-    }
-
-    if (delta > 200) {
-      return {
-        label: "Desafio Avançado para o seu Rating",
-        className:
-          "inline-flex items-center gap-1 border px-2 py-0.5 text-[10px] font-mono uppercase font-bold border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      };
-    }
-
-    return null;
-  };
-
-  const compatibility = getLevelCompatibility(challenge.recommendedElo);
-
-  const parsedQ = parseQuestion(challenge.question);
 
   return (
-    <div className="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-5 lg:px-6 py-4 flex flex-col gap-4 overflow-hidden h-full min-h-0 bg-background/50 dark:bg-[#0d0d0d] animate-in fade-in duration-300">
-      <div className="flex items-center gap-2 border-b border-border dark:border-[#373c38] pb-3 shrink-0">
-        <Link href="/challenges">
-          <Button variant="ghost" size="xs" className="h-7 text-muted-foreground">
-            <ChevronLeft className="size-3.5 mr-1" />
-            Voltar aos Desafios
-          </Button>
-        </Link>
-        <span className="text-3xs text-muted-foreground dark:text-[#bdc0ba] font-mono">/</span>
-        <span className="text-3xs text-muted-foreground dark:text-[#bdc0ba] font-mono font-bold truncate">
-          {challenge.title}
-        </span>
-      </div>
-      <div className="flex-1 flex flex-col lg:flex-row gap-5 min-h-0 overflow-hidden">
-        {/* Left Column (64% width, h-full): The Code Editor */}
-        <div className="lg:w-[64%] w-full flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0d0d0d] h-full min-h-0 overflow-hidden">
-          {/* File Tab Header (IDE style) */}
-          <div className="border-b border-border dark:border-[#373c38] flex items-center justify-between shrink-0 bg-muted/10 dark:bg-[#131313] h-9">
-            <div className="flex items-center h-full">
-              {/* Active Tab */}
-              <div className="h-full border-r border-border dark:border-[#373c38] bg-card dark:bg-[#0d0d0d] px-4 flex items-center gap-2 text-xs font-mono font-medium text-foreground dark:text-[#faf9f6] relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary">
-                <FileCode className="size-3.5 text-primary/70" />
-                <span>EasyCase1.tsx</span>
-              </div>
-              {/* Inactive Tab Spacer */}
-              <div className="h-full flex items-center px-3 text-muted-foreground/30 dark:text-[#bdc0ba]/30 select-none">
-                <span className="text-3xs font-mono font-bold">...</span>
-              </div>
-            </div>
-            <div className="px-3 shrink-0">
-              <span className="text-4xs font-mono border border-border dark:border-[#373c38] px-1.5 py-0.5 uppercase font-bold text-foreground dark:text-[#faf9f6]">
-                {getDifficultyLabel(challenge.difficulty)}
-              </span>
-            </div>
-          </div>
+    <main
+      data-challengers-screen="true"
+      className="h-full min-h-0 bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
+    >
+      <div className="h-full min-h-0 lg:grid lg:grid-cols-[64px_minmax(0,1fr)]">
+        <ArenaSidebar />
+        <section className="flex h-full min-h-0 flex-col overflow-hidden">
+          <ArenaTopbar userElo={userElo} />
 
-          <div className="flex-1 flex font-mono text-[11px] leading-relaxed overflow-y-auto select-text bg-muted/5 dark:bg-[#111111] min-h-0">
-            <div className="py-4 pl-3 pr-2 text-right text-muted-foreground/35 dark:text-[#bdc0ba]/35 border-r border-border dark:border-[#373c38] select-none bg-muted/10 dark:bg-[#131313] font-semibold w-10 shrink-0">
-              {lines.map((_, i) => (
-                <div key={i}>{i + 1}</div>
-              ))}
-            </div>
-            <pre className="py-4 px-3 overflow-x-auto flex-1 text-foreground dark:text-[#faf9f6] leading-5 font-mono">
-              {highlightCode(challenge.code)}
-            </pre>
-          </div>
-        </div>
+          <div className="min-h-0 flex-1 overflow-auto">
+            <div className="mx-auto flex min-h-full max-w-[1500px] flex-col gap-4 px-4 py-4 lg:px-5 xl:px-6">
+              <ChallengeOverview
+                challenge={challenge}
+                challengeNumber={getChallengeNumber(challenge)}
+                challengeType={challengeType}
+                attemptCount={attemptCount}
+                compatibility={compatibility}
+              />
 
-        {/* Right Column (36% width, h-full) */}
-        <div className="lg:w-[36%] w-full h-full min-h-0 grid grid-rows-[4fr_6fr] gap-4 overflow-hidden">
-          {/* Top Section (40% height): Pergunta de Diagnóstico (permanently visible) */}
-          <div className="row-span-1 border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
-            <div className="flex items-center justify-between shrink-0 pb-1.5 border-b border-border/40 dark:border-[#373c38]">
-              <h3 className="text-3xs font-mono font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                <HelpCircle className="size-3.5 text-primary/70" />
-                Pergunta de Diagnóstico
-              </h3>
-              {compatibility ? (
-                <span className={`${compatibility.className} shrink-0`}>
-                  {compatibility.label.includes("Avançado") ? (
-                    <AlertCircle className="size-3 mr-0.5" />
-                  ) : null}
-                  {compatibility.label}
-                </span>
-              ) : null}
-            </div>
-            
-            <div className="flex-1 overflow-y-auto text-xs text-foreground dark:text-[#faf9f6] leading-relaxed flex flex-col gap-3 font-mono">
-              <p className="whitespace-pre-wrap">{parsedQ.mainPrompt}</p>
-              
-              {/* Hint System */}
-              {!hintRevealed ? (
-                <div className="pt-2">
-                  {!showHintConfirm ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="xs"
-                      onClick={() => setShowHintConfirm(true)}
-                      className="h-7 text-3xs font-mono uppercase tracking-wider rounded-none border border-amber-500/30 hover:border-amber-500/60 bg-amber-500/5 hover:bg-amber-500/10 text-amber-700 dark:text-amber-400"
-                    >
-                      Pedir Dica
-                    </Button>
+              <ChallengeSteps
+                hasStartedAnalysis={hasStartedAnalysis}
+                hasResult={Boolean(result)}
+              />
+
+              <div className="grid flex-1 gap-5 xl:min-h-[640px] xl:grid-cols-[minmax(0,1.08fr)_minmax(390px,0.92fr)]">
+                <CodePanel
+                  code={challenge.code}
+                  lineCount={lines.length}
+                  difficulty={challenge.difficulty}
+                  onCopyCode={handleCopyCode}
+                />
+
+                <div className="grid min-h-[680px] gap-4 xl:min-h-0 xl:grid-rows-[minmax(280px,0.9fr)_minmax(300px,1.1fr)]">
+                  <StatementPanel
+                    activeTab={supportTab}
+                    notes={notes}
+                    parsedQuestion={parsedQuestion}
+                    hintRevealed={hintRevealed}
+                    showHintConfirm={showHintConfirm}
+                    onTabChange={setSupportTab}
+                    onNotesChange={setNotes}
+                    onAskHint={() => setShowHintConfirm(true)}
+                    onCancelHint={() => setShowHintConfirm(false)}
+                    onRevealHint={() => {
+                      usedHintRef.current = true;
+                      setHintRevealed(true);
+                      setShowHintConfirm(false);
+                    }}
+                  />
+
+                  {submitting && !result ? (
+                    <AnalysisLoadingPanel />
+                  ) : !result ? (
+                    <DiagnosisPanel
+                      answer={userAnswer}
+                      answerLength={answerLength}
+                      wordCount={wordCount}
+                      canSubmit={canSubmit}
+                      submitting={submitting}
+                      answerLocked={answerLocked}
+                      onAnswerChange={setUserAnswer}
+                      onClear={() => setUserAnswer("")}
+                      onKeyDown={handleKeyDown}
+                      onSubmit={handleSubmit}
+                    />
                   ) : (
-                    <div className="p-3 border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/8 flex flex-col gap-2 rounded-none animate-in fade-in slide-in-from-top-1 duration-150">
-                      <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold leading-normal">
-                        Pedir uma dica limitará seu ganho máximo para +7 ELO neste desafio. Revelar dica?
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          size="xs"
-                          onClick={() => {
-                            usedHintRef.current = true;
-                            setHintRevealed(true);
-                            setShowHintConfirm(false);
-                          }}
-                          className="h-6 text-[10px] px-2 rounded-none bg-amber-600 hover:bg-amber-700 text-white font-mono uppercase"
-                        >
-                          Sim, revelar
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="xs"
-                          onClick={() => setShowHintConfirm(false)}
-                          className="h-6 text-[10px] px-2 rounded-none text-muted-foreground font-mono uppercase"
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    </div>
+                    <FeedbackPanel
+                      result={result}
+                      userAnswer={userAnswer}
+                      showComparison={showComparison}
+                      onToggleComparison={() =>
+                        setShowComparison((current) => !current)
+                      }
+                      onRetry={() => {
+                        setResult(null);
+                        setUserAnswer("");
+                        setAnswerLocked(false);
+                        setShowComparison(false);
+                      }}
+                    />
                   )}
                 </div>
-              ) : (
-                 <div className="mt-2 p-3 border border-border dark:border-[#373c38] bg-muted/20 dark:bg-[#151515] rounded-none animate-in fade-in duration-200">
-                  <div className="flex items-center gap-1.5 text-3xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1.5">
-                    <AlertCircle className="size-3" />
-                    <span>Dica Ativada (Ganho de ELO limitado a +7)</span>
-                  </div>
-                  <p className="whitespace-pre-wrap text-2xs text-muted-foreground leading-normal">
-                    {parsedQ.hintText}
-                  </p>
-                </div>
-              )}
+              </div>
             </div>
           </div>
-
-          {/* Bottom Section (60% height): Interactive Input Area / Loading / Feedback */}
-          <div className="row-span-1 min-h-0 flex flex-col overflow-hidden">
-            {submitting && !result ? (
-               <div className="flex-1 flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-5 items-center justify-center text-center gap-3 h-full">
-                <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                <p className="text-xs font-medium text-foreground">
-                  Analisando sua resposta com base na rubrica sênior…
-                </p>
-                <p className="text-3xs text-muted-foreground">
-                  Evite recarregar a página durante o processamento.
-                </p>
-              </div>
-            ) : !result ? (
-               <form
-                 onSubmit={handleSubmit}
-                 className="flex-1 flex flex-col border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-4 gap-3 justify-between min-h-0"
-               >
-                <div className="gap-2 flex-1 flex flex-col min-h-0">
-                  <div className="shrink-0">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider">
-                      Seu Diagnóstico Técnico
-                    </h3>
-                    <p className="text-3xs text-muted-foreground dark:text-[#bdc0ba] mt-0.5">
-                      Escreva detalhadamente o erro de lógica e como consertá-lo.
-                    </p>
-                  </div>
-
-                  <div className="flex-1 min-h-0 flex flex-col">
-                    <textarea
-                      placeholder="Explique o bug aqui…"
-                      aria-label="Resposta do diagnóstico técnico"
-                      className="w-full flex-1 rounded-none border border-border/50 dark:border-[#373c38] bg-muted/30 dark:bg-[#121212] hover:bg-muted/45 dark:hover:bg-[#171717] focus:bg-muted/60 dark:focus:bg-[#1b1b1b] p-3 text-xs text-foreground dark:text-[#faf9f6] outline-none placeholder:text-muted-foreground/50 dark:placeholder:text-[#bdc0ba]/45 focus:border-primary dark:focus:border-[#86a697] focus:ring-0 font-mono resize-none leading-relaxed transition-colors duration-150 min-h-0"
-                      value={userAnswer}
-                      onChange={e => setUserAnswer(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      readOnly={answerLocked}
-                      disabled={submitting}
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-border dark:border-[#373c38] shrink-0 flex flex-col gap-1.5">
-                  <Button
-                    type="submit"
-                    disabled={!canSubmit}
-                    className="w-full h-9 rounded-none font-mono uppercase text-xs dark:border-[#86a697] dark:bg-[#2d4a3d] dark:text-[#faf9f6] dark:hover:bg-[#365847]"
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="size-3.5 animate-spin mr-1.5" />
-                        Analisando Resposta…
-                      </>
-                    ) : (
-                      <>
-                        <Play className="size-3 mr-1.5 fill-current" />
-                        Enviar Diagnóstico
-                      </>
-                    )}
-                  </Button>
-                  <div className="flex justify-between items-center text-[10px] text-muted-foreground dark:text-[#bdc0ba] font-mono px-1">
-                    <span>
-                      {answerLength}/{MIN_ANSWER_LENGTH} caracteres mínimos
-                    </span>
-                    <span>
-                      Ctrl + Enter para enviar
-                    </span>
-                  </div>
-                </div>
-              </form>
-            ) : (
-               <div className="flex-1 border border-border dark:border-[#373c38] bg-card dark:bg-[#0f0f0f] p-4 gap-4 flex flex-col justify-between overflow-y-auto min-h-0">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center bg-muted/30 dark:bg-[#151515] border border-border dark:border-[#373c38] p-3 shrink-0">
-                    <div>
-                      <span className="text-4xs font-mono uppercase text-muted-foreground dark:text-[#bdc0ba]">
-                        Avaliação Final
-                      </span>
-                      <div className="text-lg font-mono font-semibold text-foreground mt-0.5">
-                        {result.score.toFixed(1)}/10
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-4xs font-mono uppercase text-muted-foreground dark:text-[#bdc0ba]">
-                        Variação Rating
-                      </span>
-                      <div className="mt-0.5">
-                        {result.eloChange > 0 ? (
-                          <span className="text-emerald-500 font-semibold font-mono text-sm inline-flex items-center gap-0.5">
-                            <ArrowUpRight className="size-4" />+{result.eloChange} ELO
-                          </span>
-                        ) : result.eloChange < 0 ? (
-                          <span className="text-rose-500 font-semibold font-mono text-sm inline-flex items-center gap-0.5">
-                            <ArrowDownRight className="size-4" />
-                            {result.eloChange} ELO
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground font-semibold font-mono text-xs inline-flex items-center gap-1">
-                            <AlertCircle className="size-3.5" />
-                            Sem alteração (re-tentativa)
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground dark:text-[#bdc0ba] flex items-center gap-1.5">
-                      <CheckCircle2 className="size-3 text-emerald-500" />
-                      Feedback do Tech Lead
-                    </h4>
-                    <p className="text-xs text-foreground dark:text-[#faf9f6] italic leading-relaxed bg-muted/10 dark:bg-[#141414] p-2.5 border border-border/60 dark:border-[#373c38]">
-                      "{result.feedback.summary}"
-                    </p>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground dark:text-[#bdc0ba]">
-                      Pontos Fortes
-                    </h4>
-                    <ul className="space-y-1 pl-1">
-                      {result.feedback.strengths.map(str => (
-                        <li
-                          key={str}
-                          className="text-2xs text-foreground flex items-start gap-1.5 leading-relaxed"
-                        >
-                          <span className="text-emerald-500 font-semibold shrink-0">•</span>
-                          <span>{str}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <h4 className="text-3xs font-mono font-semibold uppercase tracking-wider text-muted-foreground dark:text-[#bdc0ba]">
-                      Pontos Cegos
-                    </h4>
-                    <ul className="space-y-1 pl-1">
-                      {result.feedback.blindspots.map(blind => (
-                        <li
-                          key={blind}
-                          className="text-2xs text-foreground flex items-start gap-1.5 leading-relaxed"
-                        >
-                          <span className="text-rose-500 font-semibold shrink-0">•</span>
-                          <span>{blind}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="pt-2 border-t border-border/40 dark:border-[#373c38]">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="xs"
-                      onClick={() => setShowComparison(!showComparison)}
-                      className="w-full flex justify-between items-center h-8 rounded-none font-mono text-[10px]"
-                    >
-                      <span>
-                        {showComparison
-                          ? "Ocultar Solução Sênior"
-                          : "Comparar com Solução Sênior"}
-                      </span>
-                      {showComparison ? (
-                        <EyeOff className="size-3.5" />
-                      ) : (
-                        <Eye className="size-3.5" />
-                      )}
-                    </Button>
-
-                    {showComparison && (
-                       <div className="mt-3 p-3 border border-border dark:border-[#373c38] bg-background/50 dark:bg-[#121212] space-y-3 animate-in slide-in-from-top-1 duration-150 text-2xs leading-relaxed max-h-48 overflow-y-auto">
-                        <div className="space-y-1">
-                           <span className="font-semibold text-muted-foreground dark:text-[#bdc0ba] font-mono">
-                            Sua Resposta:
-                          </span>
-                           <p className="font-mono text-muted-foreground dark:text-[#bdc0ba] whitespace-pre-wrap italic">
-                            "{userAnswer}"
-                          </p>
-                        </div>
-                         <div className="border-t border-border/40 dark:border-[#373c38] my-2" />
-                        <div className="space-y-1">
-                           <span className="font-semibold text-primary dark:text-[#86a697] font-mono">
-                            Solução de Referência:
-                          </span>
-                          <div className="prose dark:prose-invert max-w-none text-foreground whitespace-pre-wrap">
-                            {result.feedback.seniorSolution}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                 <div className="pt-4 border-t border-border dark:border-[#373c38] flex gap-2 shrink-0">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setResult(null);
-                      setUserAnswer("");
-                      setAnswerLocked(false);
-                      setShowComparison(false);
-                    }}
-                    className="flex-1 h-9 rounded-none font-mono uppercase text-xs"
-                  >
-                    Tentar Novamente
-                  </Button>
-                  <Link href="/challenges" className="flex-1">
-                    <Button className="w-full h-9 rounded-none font-mono uppercase text-xs">
-                      Concluir Arena
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        </section>
       </div>
+
       <div className="fixed bottom-4 right-4 z-[80]">
         <ZenToast open={zenToast.open} tone={zenToast.tone} title={zenToast.title}>
           {zenToast.message}
         </ZenToast>
       </div>
+    </main>
+  );
+}
+
+function ArenaSidebar() {
+  return (
+    <aside className="hidden h-full min-h-0 flex-col items-center justify-between border-r border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] py-5 lg:flex">
+      <div className="flex flex-col items-center gap-5">
+        <Link
+          href="/challenges"
+          aria-label="Abrir catálogo de desafios"
+          className="challengers-icon-button inline-flex size-9 items-center justify-center rounded-[9px] border"
+        >
+          <Menu className="size-4" />
+        </Link>
+      </div>
+
+      <Link
+        href="/challenges"
+        aria-label="Voltar ao catálogo de desafios"
+        className="inline-flex size-8 items-center justify-center rounded-[7px] border border-[color:var(--challengers-blue-border)] bg-[var(--challengers-blue-soft)] font-mono text-base font-semibold text-[var(--challengers-blue)]"
+      >
+        K
+      </Link>
+    </aside>
+  );
+}
+
+function ArenaTopbar({ userElo }: { userElo: number }) {
+  return (
+    <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] px-4 py-3 lg:flex lg:h-[72px] lg:flex-row lg:items-center lg:justify-between lg:gap-5 lg:px-6">
+      <div className="min-w-0">
+        <Link
+          href="/challenges"
+          className="inline-flex min-w-0 items-center gap-3 text-[var(--challengers-ink)]"
+        >
+          <span className="inline-flex size-10 items-center justify-center rounded-[8px] border border-[color:var(--challengers-blue-border)] bg-[var(--challengers-blue-soft)] font-mono text-xl font-semibold text-[var(--challengers-blue)]">
+            K
+          </span>
+          <span className="truncate font-serif text-2xl font-bold tracking-[0.04em]">
+            KODAN
+          </span>
+        </Link>
+      </div>
+
+      <Link
+        href="/challenges"
+        className="challengers-control relative col-span-2 row-start-2 flex h-11 min-w-0 flex-1 items-center rounded-[9px] border px-4 text-sm text-[var(--challengers-muted)] lg:col-span-1 lg:row-auto lg:max-w-[520px]"
+      >
+        <Search className="mr-3 size-4 shrink-0" />
+        <span className="truncate">Buscar desafios, tópicos, conceitos...</span>
+        <span className="ml-auto hidden size-6 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--challengers-border)] text-[0.72rem] sm:inline-flex">
+          /
+        </span>
+      </Link>
+
+      <div className="col-start-2 row-start-1 flex shrink-0 items-center justify-end gap-2 lg:col-auto lg:row-auto lg:gap-4">
+        <div className="hidden items-center gap-4 sm:flex">
+          <span className="inline-flex size-10 items-center justify-center rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] font-serif text-lg font-bold text-[var(--challengers-ink)]">
+            圭
+          </span>
+          <div className="border-r border-[color:var(--challengers-border)] pr-5">
+            <p className="text-[0.66rem] uppercase tracking-[0.16em] text-[var(--challengers-muted)]">
+              Rank
+            </p>
+            <p className="font-serif text-base font-bold leading-tight">
+              {getRankLabel(userElo)}
+            </p>
+          </div>
+          <div>
+            <p className="text-[0.66rem] uppercase tracking-[0.16em] text-[var(--challengers-muted)]">
+              Elo
+            </p>
+            <p className="text-base font-semibold leading-tight text-[var(--challengers-blue)]">
+              {userElo}
+            </p>
+          </div>
+        </div>
+
+        <Link
+          href="/challenges"
+          className="challengers-icon-button inline-flex size-9 items-center justify-center rounded-[9px] border lg:hidden"
+          aria-label="Abrir catálogo"
+        >
+          <Menu className="size-4" />
+        </Link>
+
+        <Link
+          href="/profile"
+          className="challengers-icon-button inline-flex h-9 items-center gap-2 rounded-[999px] border px-2.5"
+        >
+          <span className="inline-flex size-7 items-center justify-center rounded-full bg-[var(--challengers-ink)] text-[0.78rem] font-semibold text-[oklch(99%_0.003_248)]">
+            N
+          </span>
+          <ChevronDown className="size-3.5 text-[var(--challengers-muted)]" />
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+function ChallengeOverview({
+  challenge,
+  challengeNumber,
+  challengeType,
+  attemptCount,
+  compatibility,
+}: {
+  challenge: Challenge;
+  challengeNumber: string;
+  challengeType: string;
+  attemptCount: number;
+  compatibility: { label: string; className: string };
+}) {
+  return (
+    <section className="grid gap-4 border-b border-[color:var(--challengers-border)] pb-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+      <div className="flex min-w-0 items-start gap-4">
+        <span className="mt-1 hidden text-[var(--challengers-muted)] sm:inline-flex">
+          <Hourglass className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="font-mono text-base font-semibold tabular-nums text-[var(--challengers-ink)]">
+              {challengeNumber}
+            </span>
+            <h1 className="min-w-0 font-serif text-xl font-bold leading-tight text-[var(--challengers-ink)] sm:text-2xl">
+              {challenge.title}
+            </h1>
+            <span
+              className={cn(
+                "inline-flex rounded-[6px] border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.06em]",
+                getDifficultyClassName(challenge.difficulty),
+              )}
+            >
+              {getDifficultyLabel(challenge.difficulty)}
+            </span>
+            <span
+              className={cn(
+                "inline-flex rounded-[6px] border px-2 py-0.5 text-[0.68rem] font-medium",
+                compatibility.className,
+              )}
+            >
+              {compatibility.label}
+            </span>
+          </div>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--challengers-muted)]">
+            {getChallengeSubtitle(challengeType)}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 overflow-hidden rounded-[10px] border border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] sm:grid-cols-4 xl:min-w-[600px]">
+        <ChallengeMetric label="Tipo" value={challengeType} />
+        <ChallengeMetric label="Tempo" value={getEstimatedTime(challenge.difficulty)} />
+        <ChallengeMetric label="Tentativas" value={String(attemptCount)} />
+        <ChallengeMetric label="ELO" value={getPossibleElo(challenge.difficulty)} />
+      </div>
+    </section>
+  );
+}
+
+function ChallengeMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-r border-t border-[color:var(--challengers-border)] px-4 py-3 first:border-t-0 even:border-r-0 sm:border-t-0 sm:even:border-r sm:last:border-r-0">
+      <p className="text-[0.72rem] text-[var(--challengers-muted)]">{label}</p>
+      <p className="mt-1 font-serif text-base font-semibold leading-tight text-[var(--challengers-ink)]">
+        {value}
+      </p>
     </div>
+  );
+}
+
+function ChallengeSteps({
+  hasStartedAnalysis,
+  hasResult,
+}: {
+  hasStartedAnalysis: boolean;
+  hasResult: boolean;
+}) {
+  const steps = [
+    {
+      label: "Leitura do código",
+      state: "done",
+    },
+    {
+      label: "Análise das dependências",
+      state: hasResult ? "done" : hasStartedAnalysis ? "active" : "idle",
+    },
+    {
+      label: "Correção e solução",
+      state: hasResult ? "active" : "idle",
+    },
+  ] as const;
+
+  return (
+    <nav
+      aria-label="Progresso do desafio"
+      className="flex flex-wrap items-center gap-x-4 gap-y-3 px-0.5 text-[0.78rem] text-[var(--challengers-muted)]"
+    >
+      {steps.map((step, index) => (
+        <div key={step.label} className="flex min-w-0 items-center gap-3">
+          <span
+            className={cn(
+              "inline-flex size-4 items-center justify-center rounded-full border",
+              step.state === "done" &&
+                "border-[color:var(--challengers-blue)] bg-[var(--challengers-blue)] text-[oklch(99%_0.003_248)]",
+              step.state === "active" &&
+                "border-[color:var(--challengers-blue)] bg-[var(--challengers-blue-soft)] text-[var(--challengers-blue)]",
+              step.state === "idle" &&
+                "border-[color:var(--challengers-border-strong)] bg-[var(--challengers-surface)] text-[var(--challengers-muted)]",
+            )}
+          >
+            {step.state === "done" ? (
+              <CheckCircle2 className="size-3" />
+            ) : step.state === "active" ? (
+              <span className="size-2 rounded-full bg-current" />
+            ) : null}
+          </span>
+          <span
+            className={cn(
+              "whitespace-nowrap",
+              step.state !== "idle" && "text-[var(--challengers-ink)]",
+            )}
+          >
+            {step.label}
+          </span>
+          {index < steps.length - 1 ? (
+            <span className="hidden h-px w-20 bg-[var(--challengers-border-strong)] sm:block" />
+          ) : null}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function CodePanel({
+  code,
+  lineCount,
+  difficulty,
+  onCopyCode,
+}: {
+  code: string;
+  lineCount: number;
+  difficulty: string;
+  onCopyCode: () => void;
+}) {
+  return (
+    <section className="challengers-panel flex min-h-[560px] flex-col overflow-hidden rounded-[10px] border xl:min-h-0">
+      <div className="flex h-12 shrink-0 items-center justify-between border-b border-[color:var(--challengers-border)] bg-[var(--challengers-panel)]">
+        <div className="flex h-full items-center">
+          <div className="relative flex h-full items-center gap-2 border-r border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] px-4 text-sm font-medium text-[var(--challengers-blue)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[var(--challengers-blue)]">
+            <FileCode className="size-4" />
+            <span>App.tsx</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-3">
+          <span className="hidden rounded-[7px] border border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] px-2.5 py-1 text-[0.72rem] font-medium text-[var(--challengers-blue)] sm:inline-flex">
+            React + TypeScript
+            <ChevronDown className="ml-1.5 size-3.5" />
+          </span>
+          <button
+            type="button"
+            aria-label="Copiar código"
+            className="challengers-icon-button inline-flex size-8 items-center justify-center rounded-[8px] border"
+            onClick={onCopyCode}
+          >
+            <Copy className="size-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-auto bg-[var(--challengers-surface)] font-mono text-[0.82rem] leading-6">
+        <div className="flex min-w-max">
+          <div className="select-none border-r border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] px-3 py-4 text-right text-[0.72rem] font-medium leading-6 text-[var(--challengers-faint)]">
+            {Array.from({ length: lineCount }, (_, index) => (
+              <div key={index} className="h-[1.45rem] min-w-5 tabular-nums">
+                {index + 1}
+              </div>
+            ))}
+          </div>
+          <pre className="flex-1 overflow-visible px-4 py-4 text-[var(--challengers-ink)]">
+            {highlightCode(code)}
+          </pre>
+        </div>
+      </div>
+
+      <div className="flex h-9 shrink-0 items-center justify-between border-t border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] px-4 text-[0.72rem] text-[var(--challengers-muted)]">
+        <span>{lineCount} linhas</span>
+        <span>{getDifficultyLabel(difficulty)}</span>
+      </div>
+    </section>
+  );
+}
+
+function StatementPanel({
+  activeTab,
+  notes,
+  parsedQuestion,
+  hintRevealed,
+  showHintConfirm,
+  onTabChange,
+  onNotesChange,
+  onAskHint,
+  onCancelHint,
+  onRevealHint,
+}: {
+  activeTab: "statement" | "notes";
+  notes: string;
+  parsedQuestion: { mainPrompt: string; hintText: string };
+  hintRevealed: boolean;
+  showHintConfirm: boolean;
+  onTabChange: (tab: "statement" | "notes") => void;
+  onNotesChange: (notes: string) => void;
+  onAskHint: () => void;
+  onCancelHint: () => void;
+  onRevealHint: () => void;
+}) {
+  return (
+    <section className="challengers-panel flex min-h-0 flex-col overflow-hidden rounded-[10px] border">
+      <div className="flex h-12 shrink-0 items-center justify-between border-b border-[color:var(--challengers-border)] px-4">
+        <div className="flex h-full items-center gap-6">
+          <TabButton
+            active={activeTab === "statement"}
+            onClick={() => onTabChange("statement")}
+          >
+            Enunciado
+          </TabButton>
+          <TabButton
+            active={activeTab === "notes"}
+            onClick={() => onTabChange("notes")}
+          >
+            Minhas Anotações
+          </TabButton>
+        </div>
+        <div className="hidden items-center gap-3 text-[0.72rem] text-[var(--challengers-muted)] sm:flex">
+          <span>Markdown</span>
+          <Info className="size-3.5" />
+          <PanelRightOpen className="size-3.5" />
+        </div>
+      </div>
+
+      {activeTab === "statement" ? (
+        <div className="min-h-0 flex-1 overflow-auto px-6 py-5">
+          <div className="max-w-[70ch] space-y-5">
+            <div>
+              <div className="mb-3 flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.12em] text-[var(--challengers-blue)]">
+                <HelpCircle className="size-4" />
+                Diagnóstico
+              </div>
+              <h2 className="font-serif text-xl font-bold leading-tight text-[var(--challengers-ink)]">
+                O que está errado neste componente?
+              </h2>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--challengers-ink)]">
+                {parsedQuestion.mainPrompt}
+              </p>
+            </div>
+
+            <HintCallout
+              hintText={parsedQuestion.hintText}
+              revealed={hintRevealed}
+              confirming={showHintConfirm}
+              onAskHint={onAskHint}
+              onCancelHint={onCancelHint}
+              onRevealHint={onRevealHint}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="min-h-0 flex-1 p-4">
+          <textarea
+            value={notes}
+            aria-label="Anotações do desafio"
+            placeholder="Registre hipóteses, dependências suspeitas e pontos para validar..."
+            className="challengers-control h-full min-h-[220px] w-full resize-none rounded-[9px] border px-4 py-3 text-sm leading-6 outline-none placeholder:text-[var(--challengers-faint)]"
+            onChange={(event) => onNotesChange(event.target.value)}
+          />
+        </div>
+      )}
+    </section>
+  );
+}
+
+function TabButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "relative h-full text-sm font-medium transition-colors",
+        active
+          ? "text-[var(--challengers-blue)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[var(--challengers-blue)]"
+          : "text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]",
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+function HintCallout({
+  hintText,
+  revealed,
+  confirming,
+  onAskHint,
+  onCancelHint,
+  onRevealHint,
+}: {
+  hintText: string;
+  revealed: boolean;
+  confirming: boolean;
+  onAskHint: () => void;
+  onCancelHint: () => void;
+  onRevealHint: () => void;
+}) {
+  return (
+    <div className="rounded-[9px] border border-[color:var(--challengers-blue-border)] bg-[var(--challengers-blue-soft)] px-4 py-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-2 font-semibold text-[var(--challengers-blue)]">
+          <Lightbulb className="size-4 shrink-0" />
+          <span>Dica</span>
+        </div>
+        {!revealed && !confirming ? (
+          <button
+            type="button"
+            className="text-[0.78rem] font-medium text-[var(--challengers-blue)] hover:text-[var(--challengers-blue-strong)]"
+            onClick={onAskHint}
+          >
+            Revelar
+          </button>
+        ) : null}
+      </div>
+
+      {revealed ? (
+        <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--challengers-ink)]">
+          {hintText}
+        </p>
+      ) : confirming ? (
+        <div className="mt-3 space-y-3">
+          <p className="text-sm leading-6 text-[var(--challengers-ink)]">
+            Revelar uma dica limita o ganho máximo deste desafio para +7 ELO.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-[8px] border-[color:var(--challengers-blue)] bg-[var(--challengers-blue)] text-[oklch(99%_0.003_248)] hover:bg-[var(--challengers-blue-strong)]"
+              onClick={onRevealHint}
+            >
+              Revelar dica
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+              onClick={onCancelHint}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-3 text-sm leading-6 text-[var(--challengers-ink)]">
+          Use se estiver travado na relação entre dependências, ciclo de vida e
+          ordem das respostas.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function DiagnosisPanel({
+  answer,
+  answerLength,
+  wordCount,
+  canSubmit,
+  submitting,
+  answerLocked,
+  onAnswerChange,
+  onClear,
+  onKeyDown,
+  onSubmit,
+}: {
+  answer: string;
+  answerLength: number;
+  wordCount: number;
+  canSubmit: boolean;
+  submitting: boolean;
+  answerLocked: boolean;
+  onAnswerChange: (answer: string) => void;
+  onClear: () => void;
+  onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onSubmit: (event?: FormEvent) => void;
+}) {
+  return (
+    <form
+      className="challengers-panel flex min-h-0 flex-col overflow-hidden rounded-[10px] border"
+      onSubmit={onSubmit}
+    >
+      <div className="flex shrink-0 items-start justify-between gap-4 px-6 py-5">
+        <div className="min-w-0">
+          <h2 className="font-serif text-lg font-bold leading-tight text-[var(--challengers-ink)]">
+            Seu diagnóstico
+          </h2>
+          <p className="mt-2 text-sm text-[var(--challengers-muted)]">
+            Explique o problema e mostre como corrigir o código.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3 text-[0.78rem] text-[var(--challengers-muted)]">
+          <span className="hidden sm:inline">Markdown suportado</span>
+          <Info className="hidden size-3.5 sm:inline" />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={answerLocked || submitting || answer.length === 0}
+            className="rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+            onClick={onClear}
+          >
+            Limpar
+          </Button>
+        </div>
+      </div>
+
+      <div className="min-h-0 flex-1 px-6">
+        <textarea
+          value={answer}
+          aria-label="Resposta do diagnóstico técnico"
+          placeholder="Escreva seu diagnóstico aqui..."
+          readOnly={answerLocked}
+          disabled={submitting}
+          className="challengers-control h-full min-h-[150px] w-full resize-none rounded-[9px] border px-4 py-4 text-sm leading-7 outline-none placeholder:text-[var(--challengers-faint)]"
+          onChange={(event) => onAnswerChange(event.target.value)}
+          onKeyDown={onKeyDown}
+        />
+      </div>
+
+      <div className="mx-6 flex h-11 shrink-0 items-center justify-between border-x border-b border-[color:var(--challengers-border)] px-4 text-[0.76rem] text-[var(--challengers-muted)]">
+        <span>{wordCount} palavras</span>
+        <span className={answerLength < MIN_ANSWER_LENGTH ? "text-[var(--challengers-warning)]" : undefined}>
+          {answerLength}/{MIN_ANSWER_LENGTH} caracteres mínimos
+        </span>
+        <span className="hidden sm:inline">Ctrl + Enter para enviar</span>
+      </div>
+
+      <div className="shrink-0 px-6 pb-6 pt-4">
+        <Button
+          type="submit"
+          disabled={!canSubmit}
+          className="h-11 w-full rounded-[9px] border-[color:var(--challengers-blue)] bg-[var(--challengers-blue)] text-sm font-semibold text-[oklch(99%_0.003_248)] hover:bg-[var(--challengers-blue-strong)]"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Analisando resposta
+            </>
+          ) : (
+            <>
+              <SendHorizontal className="size-4" />
+              Enviar Diagnóstico
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function AnalysisLoadingPanel() {
+  return (
+    <section className="challengers-panel flex min-h-0 flex-col items-center justify-center rounded-[10px] border px-6 py-8 text-center">
+      <Loader2 className="size-7 animate-spin text-[var(--challengers-blue)]" />
+      <h2 className="mt-4 font-serif text-lg font-bold text-[var(--challengers-ink)]">
+        Analisando sua resposta
+      </h2>
+      <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--challengers-muted)]">
+        O Tech Lead está cruzando seu diagnóstico com a solução de referência.
+      </p>
+    </section>
+  );
+}
+
+function FeedbackPanel({
+  result,
+  userAnswer,
+  showComparison,
+  onToggleComparison,
+  onRetry,
+}: {
+  result: AttemptResult;
+  userAnswer: string;
+  showComparison: boolean;
+  onToggleComparison: () => void;
+  onRetry: () => void;
+}) {
+  return (
+    <section className="challengers-panel flex min-h-0 flex-col overflow-hidden rounded-[10px] border">
+      <div className="min-h-0 flex-1 overflow-auto px-6 py-5">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FeedbackMetric
+            label="Avaliação final"
+            value={`${result.score.toFixed(1)}/10`}
+          />
+          <FeedbackMetric
+            label="Variação ELO"
+            value={
+              result.eloChange > 0
+                ? `+${result.eloChange} ELO`
+                : result.eloChange < 0
+                  ? `${result.eloChange} ELO`
+                  : "Sem alteração"
+            }
+            tone={
+              result.eloChange > 0
+                ? "positive"
+                : result.eloChange < 0
+                  ? "negative"
+                  : "neutral"
+            }
+          />
+        </div>
+
+        <div className="mt-5 space-y-5">
+          <section>
+            <h3 className="flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.12em] text-[var(--challengers-muted)]">
+              <CheckCircle2 className="size-4 text-[var(--challengers-success)]" />
+              Feedback do Tech Lead
+            </h3>
+            <p className="mt-3 rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] px-4 py-3 text-sm italic leading-7 text-[var(--challengers-ink)]">
+              "{result.feedback.summary}"
+            </p>
+          </section>
+
+          <FeedbackList
+            title="Pontos fortes"
+            items={result.feedback.strengths}
+            tone="positive"
+          />
+          <FeedbackList
+            title="Pontos cegos"
+            items={result.feedback.blindspots}
+            tone="negative"
+          />
+
+          <section className="border-t border-[color:var(--challengers-border)] pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="flex h-9 w-full justify-between rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+              onClick={onToggleComparison}
+            >
+              <span>
+                {showComparison
+                  ? "Ocultar solução sênior"
+                  : "Comparar com solução sênior"}
+              </span>
+              {showComparison ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </Button>
+
+            {showComparison ? (
+              <div className="mt-3 max-h-56 overflow-y-auto rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] p-4 text-sm leading-6">
+                <p className="font-semibold text-[var(--challengers-muted)]">
+                  Sua resposta
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-[var(--challengers-muted)]">
+                  {userAnswer}
+                </p>
+                <div className="my-4 h-px bg-[var(--challengers-border)]" />
+                <p className="font-semibold text-[var(--challengers-blue)]">
+                  Solução de referência
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-[var(--challengers-ink)]">
+                  {result.feedback.seniorSolution}
+                </p>
+              </div>
+            ) : null}
+          </section>
+        </div>
+      </div>
+
+      <div className="flex shrink-0 gap-2 border-t border-[color:var(--challengers-border)] px-6 py-4">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 flex-1 rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+          onClick={onRetry}
+        >
+          Tentar novamente
+        </Button>
+        <Link href="/challenges" className="flex-1">
+          <Button className="h-10 w-full rounded-[8px] border-[color:var(--challengers-blue)] bg-[var(--challengers-blue)] text-[oklch(99%_0.003_248)] hover:bg-[var(--challengers-blue-strong)]">
+            Concluir arena
+          </Button>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function FeedbackMetric({
+  label,
+  value,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  tone?: "positive" | "negative" | "neutral";
+}) {
+  return (
+    <div className="rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] px-4 py-3">
+      <p className="text-[0.72rem] uppercase tracking-[0.12em] text-[var(--challengers-muted)]">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "mt-1 flex items-center gap-1.5 text-lg font-semibold",
+          tone === "positive" && "text-[var(--challengers-success)]",
+          tone === "negative" && "text-[var(--challengers-danger)]",
+          tone === "neutral" && "text-[var(--challengers-ink)]",
+        )}
+      >
+        {tone === "positive" ? <ArrowUpRight className="size-4" /> : null}
+        {tone === "negative" ? <ArrowDownRight className="size-4" /> : null}
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function FeedbackList({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: "positive" | "negative";
+}) {
+  return (
+    <section>
+      <h3 className="text-[0.76rem] font-semibold uppercase tracking-[0.12em] text-[var(--challengers-muted)]">
+        {title}
+      </h3>
+      <ul className="mt-2 space-y-2">
+        {items.map((item) => (
+          <li key={item} className="flex gap-2 text-sm leading-6 text-[var(--challengers-ink)]">
+            <span
+              className={cn(
+                "mt-2 size-1.5 shrink-0 rounded-full",
+                tone === "positive"
+                  ? "bg-[var(--challengers-success)]"
+                  : "bg-[var(--challengers-danger)]",
+              )}
+            />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
