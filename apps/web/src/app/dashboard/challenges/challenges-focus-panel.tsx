@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Crosshair, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { Button } from "@kodan/ui/components/button";
 import { eloToDanRank } from "@/lib/rating";
 import {
   type Challenge,
@@ -15,9 +16,21 @@ import {
 export function ChallengesFocusPanel({
   challenge,
   userElo,
+  activePosition,
+  totalVisible,
+  previousChallengeTitle,
+  nextChallengeTitle,
+  onSelectPrevious,
+  onSelectNext,
 }: {
   challenge: Challenge;
   userElo: number;
+  activePosition: number;
+  totalVisible: number;
+  previousChallengeTitle: string | null;
+  nextChallengeTitle: string | null;
+  onSelectPrevious: (() => void) | null;
+  onSelectNext: (() => void) | null;
 }) {
   const recommendedRank = eloToDanRank(challenge.recommendedElo);
   const userRank = eloToDanRank(userElo);
@@ -33,7 +46,7 @@ export function ChallengesFocusPanel({
 
         <div className="relative space-y-5">
           <header className="space-y-3 border-b border-[color:var(--zen-border)] pb-4 dark:border-border/55">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
                   Desafio em foco
@@ -54,6 +67,15 @@ export function ChallengesFocusPanel({
               {statusPresentation.note}. Este nó conversa com o seu rank atual e ajuda a orientar
               qual leitura vale atacar agora.
             </p>
+
+            <div className="flex flex-wrap items-center gap-2 text-[9px] font-mono uppercase tracking-[0.18em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
+              <span className="border border-[color:var(--zen-border)] px-2 py-1 dark:border-border/60">
+                Nó {String(activePosition).padStart(2, "0")} de {String(totalVisible).padStart(2, "0")}
+              </span>
+              <span className="border border-[color:var(--zen-border)] px-2 py-1 dark:border-border/60">
+                Faixa {recommendedRank.kyuDan}
+              </span>
+            </div>
           </header>
 
           <div className="grid gap-2 sm:grid-cols-3 xl:grid-cols-1">
@@ -116,7 +138,20 @@ export function ChallengesFocusPanel({
             </div>
           </div>
 
-          <div className="border-t border-[color:var(--zen-border)] pt-4 dark:border-border/55">
+          <div className="space-y-3 border-t border-[color:var(--zen-border)] pt-4 dark:border-border/55">
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+              <NavigationButton
+                directionLabel="Anterior"
+                challengeTitle={previousChallengeTitle}
+                onClick={onSelectPrevious}
+              />
+              <NavigationButton
+                directionLabel="Próximo"
+                challengeTitle={nextChallengeTitle}
+                onClick={onSelectNext}
+              />
+            </div>
+
             <Link
               href={`/train/${challenge.id}`}
               className="inline-flex h-10 w-full items-center justify-center gap-2 border border-[color:var(--zen-hanko)] bg-[color:var(--zen-hanko)] px-4 text-[10px] font-mono uppercase tracking-[0.2em] text-white transition-all hover:bg-[color:color-mix(in_oklch,var(--zen-hanko)_86%,black)] dark:border-primary/20 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
@@ -197,5 +232,34 @@ function InsightRow({
         </p>
       </div>
     </div>
+  );
+}
+
+function NavigationButton({
+  directionLabel,
+  challengeTitle,
+  onClick,
+}: {
+  directionLabel: string;
+  challengeTitle: string | null;
+  onClick: (() => void) | null;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      disabled={!onClick}
+      className="h-auto min-h-14 items-start justify-start border-[color:var(--zen-border)] bg-[color:var(--zen-washi)] px-3 py-2 text-left hover:bg-[color:color-mix(in_oklch,var(--zen-ink)_4%,transparent)] dark:border-border/70 dark:bg-card dark:hover:bg-secondary/40"
+      onClick={onClick ?? undefined}
+    >
+      <span className="flex flex-col items-start gap-1">
+        <span className="text-[9px] font-mono uppercase tracking-[0.18em] text-[color:var(--zen-muted)] dark:text-muted-foreground">
+          {directionLabel}
+        </span>
+        <span className="line-clamp-2 text-[11px] font-mono leading-relaxed text-[color:var(--zen-ink)] dark:text-foreground">
+          {challengeTitle ?? "Fim desta direção"}
+        </span>
+      </span>
+    </Button>
   );
 }

@@ -155,6 +155,37 @@ export function resolveActiveChallengeId(
   return visibleChallenges[0]!.id;
 }
 
+export function getActiveChallengeNavigation(
+  visibleChallenges: Challenge[],
+  activeChallengeId: string | null,
+) {
+  if (visibleChallenges.length === 0 || !activeChallengeId) {
+    return {
+      activeIndex: -1,
+      total: visibleChallenges.length,
+      previousChallengeId: null,
+      nextChallengeId: null,
+    };
+  }
+
+  const activeIndex = visibleChallenges.findIndex(challenge => challenge.id === activeChallengeId);
+  if (activeIndex === -1) {
+    return {
+      activeIndex: -1,
+      total: visibleChallenges.length,
+      previousChallengeId: null,
+      nextChallengeId: null,
+    };
+  }
+
+  return {
+    activeIndex,
+    total: visibleChallenges.length,
+    previousChallengeId: visibleChallenges[activeIndex - 1]?.id ?? null,
+    nextChallengeId: visibleChallenges[activeIndex + 1]?.id ?? null,
+  };
+}
+
 export function buildChallengeRows(challenges: Challenge[]): ChallengeRow[] {
   const sortedChallenges = challenges.toSorted(
     (left, right) => left.recommendedElo - right.recommendedElo,

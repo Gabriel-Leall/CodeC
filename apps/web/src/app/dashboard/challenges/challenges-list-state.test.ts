@@ -4,6 +4,7 @@ import {
   buildChallengeRows,
   challengesReducer,
   createInitialChallengesState,
+  getActiveChallengeNavigation,
   getVisibleChallenges,
   matchesChallenge,
   resolveActiveChallengeId,
@@ -87,6 +88,28 @@ describe("challenges-list-state", () => {
     expect(resolveActiveChallengeId(visibleChallenges, null)).toBe("1");
     expect(resolveActiveChallengeId(visibleChallenges, "fora-da-lista")).toBe("1");
     expect(resolveActiveChallengeId([], "2")).toBeNull();
+  });
+
+  it("calcula a navegação do desafio ativo dentro da lista visível", () => {
+    const visibleChallenges = [
+      makeChallenge({ id: "1", recommendedElo: 900 }),
+      makeChallenge({ id: "2", recommendedElo: 1050 }),
+      makeChallenge({ id: "3", recommendedElo: 1200 }),
+    ];
+
+    expect(getActiveChallengeNavigation(visibleChallenges, "2")).toEqual({
+      activeIndex: 1,
+      total: 3,
+      previousChallengeId: "1",
+      nextChallengeId: "3",
+    });
+
+    expect(getActiveChallengeNavigation(visibleChallenges, "fora")).toEqual({
+      activeIndex: -1,
+      total: 3,
+      previousChallengeId: null,
+      nextChallengeId: null,
+    });
   });
 
   it("limpa o erro inicial quando um recarregamento funciona", () => {

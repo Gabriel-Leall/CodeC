@@ -11,6 +11,7 @@ import { CHALLENGES_PAGE_SIZE } from "./constants";
 import {
   challengesReducer,
   createInitialChallengesState,
+  getActiveChallengeNavigation,
   getVisibleChallenges,
   resolveActiveChallengeId,
   type ChallengesInitialData,
@@ -131,6 +132,14 @@ export default function ChallengesPageClient({
   const activeCardId = resolveActiveChallengeId(visibleChallenges, focusedCardId);
   const activeChallenge =
     visibleChallenges.find(challenge => challenge.id === activeCardId) ?? visibleChallenges[0] ?? null;
+  const activeChallengeNavigation = getActiveChallengeNavigation(visibleChallenges, activeCardId);
+  const previousChallenge =
+    visibleChallenges.find(
+      challenge => challenge.id === activeChallengeNavigation.previousChallengeId,
+    ) ?? null;
+  const nextChallenge =
+    visibleChallenges.find(challenge => challenge.id === activeChallengeNavigation.nextChallengeId) ??
+    null;
 
   return (
     <div className="mx-auto w-full max-w-[1380px] px-4 py-6 md:px-6 lg:px-8">
@@ -212,7 +221,18 @@ export default function ChallengesPageClient({
 
                 {activeChallenge ? (
                   <div className="min-w-0">
-                    <ChallengesFocusPanel challenge={activeChallenge} userElo={state.userElo} />
+                    <ChallengesFocusPanel
+                      challenge={activeChallenge}
+                      userElo={state.userElo}
+                      activePosition={activeChallengeNavigation.activeIndex + 1}
+                      totalVisible={activeChallengeNavigation.total}
+                      previousChallengeTitle={previousChallenge?.title ?? null}
+                      nextChallengeTitle={nextChallenge?.title ?? null}
+                      onSelectPrevious={
+                        previousChallenge ? () => setFocusedCardId(previousChallenge.id) : null
+                      }
+                      onSelectNext={nextChallenge ? () => setFocusedCardId(nextChallenge.id) : null}
+                    />
                   </div>
                 ) : null}
               </div>
