@@ -213,7 +213,7 @@ body:has([data-challengers-screen="true"]) header[data-app-header="true"] {
   --profile-border-strong: #d9d3c7;
   --profile-text-primary: #1b2230;
   --profile-text-secondary: #5f6b7d;
-  --profile-text-muted: #68758a;
+  --profile-text-muted: #5f6b7d;
   --profile-accent-blue: #2563eb;
   --profile-accent-blue-soft: #e9f1ff;
   --profile-success: #247246;
