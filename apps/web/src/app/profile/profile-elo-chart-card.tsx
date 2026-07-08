@@ -25,7 +25,7 @@ export function ProfileEloChartCard({ points }: { points: EloPoint[] }) {
         </span>
       }
     >
-      <div className="h-[250px]">
+      <div className="h-[185px]">
         <ReactECharts
           option={option}
           style={{ width: "100%", height: "100%" }}

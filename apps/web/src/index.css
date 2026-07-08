@@ -8,6 +8,10 @@ body:has([data-challengers-screen="true"]) header[data-app-header="true"] {
   display: none;
 }
 
+body:has([data-profile-screen="true"]) header[data-app-header="true"] {
+  display: none;
+}
+
 [data-challengers-screen="true"] {
   --challengers-page: oklch(99% 0.003 248);
   --challengers-surface: oklch(99.8% 0.001 248);
@@ -221,6 +225,11 @@ body:has([data-challengers-screen="true"]) header[data-app-header="true"] {
   --profile-danger: #b33434;
   --profile-shadow-sm: 0 6px 18px rgba(16, 24, 40, 0.04);
   --profile-shadow-md: 0 10px 28px rgba(16, 24, 40, 0.05);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+[data-profile-screen="true"] .font-serif {
+  font-family: Georgia, "Times New Roman", serif;
 }
 
 .dark [data-profile-screen="true"] {

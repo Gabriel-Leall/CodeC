@@ -9,16 +9,16 @@ import type { ProfileViewModel } from "./profile-types";
 
 export function ProfileContent({ profile }: { profile: ProfileViewModel }) {
   return (
-    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5">
+    <div className="mx-auto flex w-full max-w-[1184px] flex-col gap-3">
       <ProfileHero user={profile.user} />
       <ProfileStatsRow stats={profile.stats} />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+      <div className="grid gap-3 xl:grid-cols-2">
         <ProfileEloChartCard points={profile.eloSeries} />
         <ProfileTopicMasteryCard topics={profile.topicMastery} />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-3 xl:grid-cols-2">
         <ProfileRecentSessionsCard sessions={profile.recentSessions} />
         <ProfileRecommendationsCard recommendations={profile.recommendations} />
       </div>

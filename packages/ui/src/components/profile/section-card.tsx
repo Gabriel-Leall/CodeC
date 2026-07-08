@@ -23,7 +23,7 @@ export function SectionCard({
       )}
     >
       {title || action ? (
-        <div className="flex items-center justify-between gap-4 px-5 pb-3 pt-4">
+        <div className="flex items-center justify-between gap-4 px-5 pb-1.5 pt-3">
           {title ? (
             <h2 className="font-serif text-[1.05rem] font-semibold leading-tight">
               {title}
@@ -34,9 +34,9 @@ export function SectionCard({
           {action}
         </div>
       ) : null}
-      <div className="px-5 pb-5">{children}</div>
+      <div className="px-5 pb-3">{children}</div>
       {footer ? (
-        <div className="border-t border-[color:var(--profile-border)] px-5 py-3">
+        <div className="border-t border-[color:var(--profile-border)] px-5 py-2">
           {footer}
         </div>
       ) : null}

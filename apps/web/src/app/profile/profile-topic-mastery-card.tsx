@@ -22,7 +22,7 @@ export function ProfileTopicMasteryCard({
         </Link>
       }
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2">
         <div className="text-[0.68rem] uppercase tracking-[0.12em] text-[var(--profile-text-muted)]">
           Tópico
         </div>
