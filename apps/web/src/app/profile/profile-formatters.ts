@@ -1,3 +1,5 @@
+import type { ProfileDifficulty, ProfileSessionStatus } from "./profile-types";
+
 const PT_BR_INTEGER = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 0,
 });
@@ -14,7 +16,7 @@ export function formatSignedElo(value: number | null) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
-export function formatDifficultyLabel(difficulty: string) {
+export function formatDifficultyLabel(difficulty: ProfileDifficulty) {
   if (difficulty === "EASY") {
     return "Fácil";
   }
@@ -27,10 +29,10 @@ export function formatDifficultyLabel(difficulty: string) {
     return "Difícil";
   }
 
-  return difficulty;
+  throw new Error(`Unsupported profile difficulty: ${difficulty}`);
 }
 
-export function formatSessionStatusLabel(status: string) {
+export function formatSessionStatusLabel(status: ProfileSessionStatus) {
   if (status === "resolved") {
     return "Resolvido";
   }
@@ -39,5 +41,9 @@ export function formatSessionStatusLabel(status: string) {
     return "Em progresso";
   }
 
-  return "Não iniciado";
+  if (status === "not_started") {
+    return "Não iniciado";
+  }
+
+  throw new Error(`Unsupported profile session status: ${status}`);
 }
