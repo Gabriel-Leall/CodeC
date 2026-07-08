@@ -10,6 +10,8 @@
     "./assets/zen/*": "./src/assets/zen/*.tsx",
     "./assets/zen/vector/*": "./src/assets/zen/vector/*.tsx",
     "./lib/*": "./src/lib/*.ts",
+    "./components/profile": "./src/components/profile/index.ts",
+    "./components/profile/*": "./src/components/profile/*.tsx",
     "./components/zen": "./src/components/zen/index.ts",
     "./components/zen/*": "./src/components/zen/*.tsx",
     "./components/zen/feedback": "./src/components/zen/feedback/index.tsx",
