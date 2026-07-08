@@ -205,6 +205,63 @@ body:has([data-challengers-screen="true"]) header[data-app-header="true"] {
   color: var(--challengers-blue);
 }
 
+[data-profile-screen="true"] {
+  --profile-bg: #f8f7f3;
+  --profile-surface: #fcfbf8;
+  --profile-surface-elevated: #fefefc;
+  --profile-border: #e7e2d8;
+  --profile-border-strong: #d9d3c7;
+  --profile-text-primary: #1b2230;
+  --profile-text-secondary: #5f6b7d;
+  --profile-text-muted: #8691a3;
+  --profile-accent-blue: #2563eb;
+  --profile-accent-blue-soft: #e9f1ff;
+  --profile-success: #2e8b57;
+  --profile-warning: #e08a1e;
+  --profile-danger: #d04848;
+  --profile-shadow-sm: 0 6px 18px rgba(16, 24, 40, 0.04);
+  --profile-shadow-md: 0 10px 28px rgba(16, 24, 40, 0.05);
+}
+
+.dark [data-profile-screen="true"] {
+  --profile-bg: #111111;
+  --profile-surface: #161616;
+  --profile-surface-elevated: #1b1b1b;
+  --profile-border: #222222;
+  --profile-border-strong: #2b2b2b;
+  --profile-text-primary: #f6f3ed;
+  --profile-text-secondary: rgba(246, 243, 237, 0.74);
+  --profile-text-muted: rgba(246, 243, 237, 0.56);
+  --profile-accent-blue: #5a8dbf;
+  --profile-accent-blue-soft: rgba(90, 141, 191, 0.16);
+  --profile-success: #6fbf73;
+  --profile-warning: #f1a64b;
+  --profile-danger: #e36b6b;
+  --profile-shadow-sm: none;
+  --profile-shadow-md: none;
+}
+
+[data-profile-screen="true"] .profile-panel {
+  background: var(--profile-surface);
+  border-color: var(--profile-border);
+  box-shadow: var(--profile-shadow-sm);
+}
+
+.dark [data-profile-screen="true"] .profile-panel {
+  box-shadow: none;
+}
+
+[data-profile-screen="true"] .profile-control:focus-visible,
+[data-profile-screen="true"] a:focus-visible,
+[data-profile-screen="true"] button:focus-visible {
+  outline: 2px solid var(--profile-accent-blue);
+  outline-offset: 2px;
+}
+
+[data-profile-screen="true"] .profile-table-row:hover {
+  background: color-mix(in srgb, var(--profile-accent-blue-soft) 55%, transparent);
+}
+
 @keyframes dojo-shake {
   0%,
   100% {
