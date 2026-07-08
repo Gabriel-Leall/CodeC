@@ -35,6 +35,7 @@ export function DataTable<TItem extends { id: string }>({
               <th
                 key={column.key}
                 className={cn("pb-2 font-medium", column.className)}
+                scope="col"
               >
                 {column.header}
               </th>

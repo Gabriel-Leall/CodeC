@@ -6,7 +6,7 @@ export function ProgressBar({
   className,
 }: {
   value: number;
-  label?: string;
+  label: string;
   className?: string;
 }) {
   const safeValue = Math.max(0, Math.min(100, Math.round(value)));
