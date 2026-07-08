@@ -17,12 +17,12 @@ export function ProfileEloChartCard({ points }: { points: EloPoint[] }) {
     <SectionCard
       title="Evolução do ELO"
       action={
-        <button
-          type="button"
-          className="profile-control rounded-[7px] border border-[color:var(--profile-border)] bg-[var(--profile-surface-elevated)] px-3 py-1.5 text-xs text-[var(--profile-text-primary)]"
+        <span
+          className="rounded-[7px] border border-[color:var(--profile-border)] bg-[var(--profile-surface-elevated)] px-3 py-1.5 text-xs text-[var(--profile-text-primary)]"
+          aria-label="Período exibido: últimos 30 dias"
         >
           Últimos 30 dias
-        </button>
+        </span>
       }
     >
       <div className="h-[250px]">

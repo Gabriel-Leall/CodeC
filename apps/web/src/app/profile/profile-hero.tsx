@@ -25,7 +25,7 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
             {user.tagline}
           </p>
 
-          <dl className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[var(--profile-text-muted)]">
+          <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[var(--profile-text-muted)]">
             <ProfileMetaItem
               icon={<CalendarDays className="size-4" aria-hidden="true" />}
               value={user.memberSinceLabel}
@@ -38,7 +38,7 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
               icon={<Globe2 className="size-4" aria-hidden="true" />}
               value={user.timezoneLabel}
             />
-          </dl>
+          </ul>
         </div>
       </div>
 
@@ -91,9 +91,9 @@ function ProfileAvatar({ name }: { name: string }) {
 
 function ProfileMetaItem({ icon, value }: { icon: ReactNode; value: string }) {
   return (
-    <div className="flex items-center gap-1.5">
+    <li className="flex items-center gap-1.5">
       {icon}
       <span>{value}</span>
-    </div>
+    </li>
   );
 }

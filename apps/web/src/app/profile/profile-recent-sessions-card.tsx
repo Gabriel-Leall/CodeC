@@ -48,10 +48,10 @@ export function ProfileRecentSessionsCard({
       title="Sessões de diagnóstico recentes"
       footer={
         <Link
-          href="/profile"
+          href="/challenges"
           className="profile-focusable inline-flex items-center gap-2 rounded-[4px] text-sm font-medium text-[var(--profile-accent-blue)]"
         >
-          Ver histórico completo
+          Continuar treinando
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       }
