@@ -10,17 +10,28 @@ import { formatDifficultyLabel } from "./profile-formatters";
 import type { RecommendedChallengeItem } from "./profile-types";
 
 const COLUMNS: DataTableColumn<RecommendedChallengeItem>[] = [
-  { key: "challenge", header: "Desafio", render: (item) => item.challenge },
-  { key: "topic", header: "Tópico", render: (item) => item.topic },
+  {
+    key: "challenge",
+    header: "Desafio",
+    className: "w-[36%] break-words",
+    render: (item) => item.challenge,
+  },
+  {
+    key: "topic",
+    header: "Tópico",
+    className: "w-[28%] break-words",
+    render: (item) => item.topic,
+  },
   {
     key: "difficulty",
     header: "Dificuldade",
+    className: "w-[19%]",
     render: (item) => formatDifficultyLabel(item.difficulty),
   },
   {
     key: "possible-elo",
     header: "ELO possível",
-    className: "text-right",
+    className: "w-[17%] whitespace-nowrap text-right",
     render: (item) => `+${item.possibleElo}`,
   },
 ];

@@ -23,7 +23,7 @@ export function ProfileAchievementsCard({
       }
     >
       {achievements.length > 0 ? (
-        <div className="grid gap-5 lg:grid-cols-4">
+        <div className="grid gap-6 lg:grid-cols-4">
           {achievements.slice(0, 4).map((achievement) => (
             <AchievementRow key={achievement.id} achievement={achievement} />
           ))}
@@ -39,16 +39,16 @@ export function ProfileAchievementsCard({
 
 function AchievementRow({ achievement }: { achievement: AchievementItem }) {
   return (
-    <article className="flex min-w-0 items-start gap-4">
+    <article className="flex min-w-0 items-start gap-[18px]">
       <AchievementBadge tone={achievement.tone}>{getAchievementIcon(achievement)}</AchievementBadge>
       <div className="min-w-0">
-        <h3 className="font-serif text-sm font-semibold text-[var(--profile-text-primary)]">
+        <h3 className="font-serif text-sm font-semibold leading-5 text-[var(--profile-text-primary)]">
           {achievement.title}
         </h3>
-        <p className="mt-1 text-xs leading-5 text-[var(--profile-text-secondary)]">
+        <p className="mt-1.5 text-xs leading-5 text-[var(--profile-text-secondary)]">
           {achievement.description}
         </p>
-        <p className="mt-0.5 text-xs text-[var(--profile-text-muted)]">
+        <p className="mt-1 text-xs leading-5 text-[var(--profile-text-muted)]">
           {achievement.unlockedAtLabel}
         </p>
       </div>

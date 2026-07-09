@@ -27,14 +27,17 @@ export function DataTable<TItem extends { id: string }>({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[560px] text-left text-[0.82rem]">
+    <div className="min-w-0 overflow-hidden">
+      <table className="w-full table-fixed text-left text-sm">
         <thead>
           <tr className="border-b border-[color:var(--profile-border)] text-[0.68rem] uppercase tracking-[0.12em] text-[var(--profile-text-muted)]">
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={cn("pb-1.5 font-medium", column.className)}
+                className={cn(
+                    "px-2 pb-3 font-medium first:pl-0 last:pr-0",
+                  column.className,
+                )}
                 scope="col"
               >
                 {column.header}
@@ -46,7 +49,13 @@ export function DataTable<TItem extends { id: string }>({
           {items.map((item) => (
             <tr key={item.id} className="profile-table-row transition-colors">
               {columns.map((column) => (
-                <td key={column.key} className={cn("py-1.5", column.className)}>
+                <td
+                  key={column.key}
+                  className={cn(
+                    "px-2 py-2.5 align-top leading-6 first:pl-0 last:pr-0",
+                    column.className,
+                  )}
+                >
                   {column.render(item)}
                 </td>
               ))}

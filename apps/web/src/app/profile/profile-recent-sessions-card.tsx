@@ -14,16 +14,28 @@ import {
 import type { RecentSessionItem } from "./profile-types";
 
 const COLUMNS: DataTableColumn<RecentSessionItem>[] = [
-  { key: "date", header: "Data", render: (item) => item.dateLabel },
-  { key: "challenge", header: "Desafio", render: (item) => item.challenge },
+  {
+    key: "date",
+    header: "Data",
+    className: "w-[17%] whitespace-nowrap",
+    render: (item) => item.dateLabel,
+  },
+  {
+    key: "challenge",
+    header: "Desafio",
+    className: "w-[32%] break-words",
+    render: (item) => item.challenge,
+  },
   {
     key: "difficulty",
     header: "Dificuldade",
+    className: "w-[18%]",
     render: (item) => formatDifficultyLabel(item.difficulty),
   },
   {
     key: "result",
     header: "Resultado",
+    className: "w-[21%]",
     render: (item) => (
       <span className={getStatusClassName(item.result)}>
         {formatSessionStatusLabel(item.result)}
@@ -33,7 +45,7 @@ const COLUMNS: DataTableColumn<RecentSessionItem>[] = [
   {
     key: "elo",
     header: "ELO",
-    className: "text-right",
+    className: "w-[12%] whitespace-nowrap text-right",
     render: (item) => formatSignedElo(item.eloChange),
   },
 ];
