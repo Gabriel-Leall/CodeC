@@ -30,7 +30,7 @@ const COLUMNS: DataTableColumn<RecommendedChallengeItem>[] = [
   },
   {
     key: "possible-elo",
-    header: "ELO possível",
+    header: "ELO",
     className: "w-[17%] whitespace-nowrap text-right",
     render: (item) => `+${item.possibleElo}`,
   },
