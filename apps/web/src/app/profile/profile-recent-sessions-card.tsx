@@ -18,19 +18,26 @@ const COLUMNS: DataTableColumn<RecentSessionItem>[] = [
     key: "date",
     header: "Data",
     className: "w-[14%] whitespace-nowrap",
-    render: (item) => item.dateLabel,
+    render: (item) => (item.placeholder ? "" : item.dateLabel),
   },
   {
     key: "challenge",
     header: "Desafio",
     className: "w-[39%] break-words",
-    render: (item) => item.challenge,
+    render: (item) =>
+      item.placeholder ? (
+        <span className="text-[var(--profile-text-muted)] opacity-60">
+          {item.challenge}
+        </span>
+      ) : (
+        item.challenge
+      ),
   },
   {
     key: "difficulty",
     header: "Dif.",
     className: "w-[13%]",
-    render: (item) => formatDifficultyLabel(item.difficulty),
+    render: (item) => (item.placeholder ? "" : formatDifficultyLabel(item.difficulty)),
   },
   {
     key: "result",
@@ -38,7 +45,7 @@ const COLUMNS: DataTableColumn<RecentSessionItem>[] = [
     className: "w-[22%]",
     render: (item) => (
       <span className={getStatusClassName(item.result)}>
-        {formatSessionStatusLabel(item.result)}
+        {item.placeholder ? "" : formatSessionStatusLabel(item.result)}
       </span>
     ),
   },
@@ -46,7 +53,7 @@ const COLUMNS: DataTableColumn<RecentSessionItem>[] = [
     key: "elo",
     header: "ELO",
     className: "w-[12%] whitespace-nowrap text-right",
-    render: (item) => formatSignedElo(item.eloChange),
+    render: (item) => (item.placeholder ? "" : formatSignedElo(item.eloChange)),
   },
 ];
 
@@ -55,6 +62,8 @@ export function ProfileRecentSessionsCard({
 }: {
   sessions: RecentSessionItem[];
 }) {
+  const rows = fillSessionPlaceholders(sessions);
+
   return (
     <SectionCard
       title="Sessões de diagnóstico recentes"
@@ -70,11 +79,29 @@ export function ProfileRecentSessionsCard({
     >
       <DataTable
         columns={COLUMNS}
-        items={sessions}
+        items={rows}
         emptyMessage="Nenhuma sessão recente registrada."
       />
     </SectionCard>
   );
+}
+
+function fillSessionPlaceholders(sessions: RecentSessionItem[]) {
+  const rows = sessions.slice(0, 5);
+  const missingRows = Math.max(0, 5 - rows.length);
+
+  return [
+    ...rows,
+    ...Array.from({ length: missingRows }, (_, index) => ({
+      id: `session-placeholder-${index}`,
+      dateLabel: "",
+      challenge: "Sua próxima sessão de treino aparecerá aqui...",
+      difficulty: "EASY" as const,
+      result: "not_started" as const,
+      eloChange: null,
+      placeholder: true,
+    })),
+  ];
 }
 
 function getStatusClassName(status: RecentSessionItem["result"]) {

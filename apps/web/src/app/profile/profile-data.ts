@@ -31,6 +31,33 @@ const PT_BR_MONTHS = [
   "nov",
   "dez",
 ] as const;
+const PROFILE_TOPIC_UNLOCKS = [
+  {
+    topicId: "effects-lifecycle",
+    label: "Effects & Lifecycle",
+    unlockHint: "Faça 1 desafio de Effects para liberar",
+  },
+  {
+    topicId: "state-rendering",
+    label: "State & Rendering",
+    unlockHint: "Faça 1 desafio de State para liberar",
+  },
+  {
+    topicId: "async-races",
+    label: "Async UI & Races",
+    unlockHint: "Faça 1 desafio de Async para liberar",
+  },
+  {
+    topicId: "forms-validation",
+    label: "Forms & Validation",
+    unlockHint: "Faça 1 desafio de Forms para liberar",
+  },
+  {
+    topicId: "component-patterns",
+    label: "Component Patterns",
+    unlockHint: "Faça 1 desafio de Components para liberar",
+  },
+] as const;
 
 type ProfileUserRecord = {
   id: string;
@@ -224,7 +251,7 @@ function buildTopicMastery(attempts: ProfileAttemptRecord[]): TopicMasteryItem[]
     });
   }
 
-  const mastered = [...topicStats.entries()]
+  const unlocked = [...topicStats.entries()]
     .map(([topicId, stats]) => ({
       topicId,
       label: stats.label,
@@ -232,22 +259,18 @@ function buildTopicMastery(attempts: ProfileAttemptRecord[]): TopicMasteryItem[]
     }))
     .sort((left, right) => right.proficiency - left.proficiency)
     .slice(0, 5);
-
-  if (mastered.length > 0) {
-    return mastered;
-  }
-
-  return [
-    "Effects & Lifecycle",
-    "State & Rendering",
-    "Async UI & Races",
-    "Forms & Validation",
-    "Component Patterns",
-  ].map((label, index) => ({
-    topicId: label.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-"),
-    label,
+  const unlockedTopicIds = new Set(unlocked.map((topic) => topic.topicId));
+  const locked = PROFILE_TOPIC_UNLOCKS.filter(
+    (topic) => !unlockedTopicIds.has(topic.topicId),
+  ).map((topic) => ({
+    topicId: topic.topicId,
+    label: topic.label,
     proficiency: 0,
+    locked: true,
+    unlockHint: topic.unlockHint,
   }));
+
+  return [...unlocked, ...locked].slice(0, 5);
 }
 
 function buildAchievements({

@@ -33,6 +33,8 @@ export interface TopicMasteryItem {
   topicId: string;
   label: string;
   proficiency: number;
+  locked?: boolean;
+  unlockHint?: string;
 }
 
 export interface RecentSessionItem {
@@ -42,6 +44,7 @@ export interface RecentSessionItem {
   difficulty: ProfileDifficulty;
   result: ProfileSessionStatus;
   eloChange: number | null;
+  placeholder?: boolean;
 }
 
 export interface RecommendedChallengeItem {

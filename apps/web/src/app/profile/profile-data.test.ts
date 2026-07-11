@@ -64,6 +64,7 @@ describe("profile-data", () => {
     expect(viewModel.stats.find((stat) => stat.id === "resolved")?.value).toBe("2");
     expect(viewModel.stats.find((stat) => stat.id === "streak")?.value).toBe("2 dias");
     expect(viewModel.topicMastery[0]?.label).toBe("Async UI & Races");
+    expect(viewModel.topicMastery.some((topic) => topic.locked)).toBe(true);
     expect(viewModel.recentSessions).toHaveLength(2);
     expect(viewModel.recommendations).toHaveLength(1);
     expect(viewModel.recommendations[0]?.topic).toBe("Async UI & Races");
