@@ -15,6 +15,7 @@ export function ProfileEloChartCard({ points }: { points: EloPoint[] }) {
 
   return (
     <SectionCard
+      className="h-full"
       title="Evolução do ELO"
       action={
         <span
@@ -25,7 +26,7 @@ export function ProfileEloChartCard({ points }: { points: EloPoint[] }) {
         </span>
       }
     >
-      <div className="h-[185px]">
+      <div className="h-[260px]">
         <ReactECharts
           option={option}
           style={{ width: "100%", height: "100%" }}
