@@ -40,8 +40,10 @@ export function ProfileEloChartCard({ points }: { points: EloPoint[] }) {
 
 function createEloChartOption(points: EloPoint[], isDark: boolean): EChartsOption {
   const values = points.map((point) => point.elo);
-  const min = Math.min(...values, 1000);
-  const max = Math.max(...values, 2000);
+  const maxValue = Math.max(...values, 2000);
+  const axisMin = 800;
+  const axisInterval = 300;
+  const axisMax = axisMin + Math.ceil((maxValue - axisMin) / axisInterval) * axisInterval;
   const accent = isDark ? "#5a8dbf" : "#2563eb";
 
   return {
@@ -71,9 +73,9 @@ function createEloChartOption(points: EloPoint[], isDark: boolean): EChartsOptio
     },
     yAxis: {
       type: "value",
-      min: Math.max(0, Math.floor((min - 120) / 100) * 100),
-      max: Math.ceil((max + 120) / 100) * 100,
-      splitNumber: 4,
+      min: axisMin,
+      max: axisMax,
+      interval: axisInterval,
       axisLabel: {
         color: isDark ? "rgba(246,243,237,.56)" : "#5f6b7d",
         fontSize: 11,
