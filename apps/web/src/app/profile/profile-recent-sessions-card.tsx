@@ -17,25 +17,25 @@ const COLUMNS: DataTableColumn<RecentSessionItem>[] = [
   {
     key: "date",
     header: "Data",
-    className: "w-[17%] whitespace-nowrap",
+    className: "w-[14%] whitespace-nowrap",
     render: (item) => item.dateLabel,
   },
   {
     key: "challenge",
     header: "Desafio",
-    className: "w-[32%] break-words",
+    className: "w-[39%] break-words",
     render: (item) => item.challenge,
   },
   {
     key: "difficulty",
-    header: "Dificuldade",
-    className: "w-[18%]",
+    header: "Dif.",
+    className: "w-[13%]",
     render: (item) => formatDifficultyLabel(item.difficulty),
   },
   {
     key: "result",
     header: "Resultado",
-    className: "w-[21%]",
+    className: "w-[22%]",
     render: (item) => (
       <span className={getStatusClassName(item.result)}>
         {formatSessionStatusLabel(item.result)}

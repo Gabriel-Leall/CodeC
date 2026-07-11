@@ -448,7 +448,7 @@ function formatShortDate(date: Date) {
 
 function formatSessionDate(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
-  return `${day} ${PT_BR_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
+  return `${day} ${PT_BR_MONTHS[date.getMonth()]}`;
 }
 
 function toDateKey(date: Date) {
