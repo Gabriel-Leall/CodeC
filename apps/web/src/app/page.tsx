@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import EntryGate from "./entry-gate";
 
 export const metadata: Metadata = {
-  title: "CodeClash",
+  title: "Kodan",
   description: "Entre no dojo e avance pelos desafios de React e TypeScript.",
 };
 

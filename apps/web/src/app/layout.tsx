@@ -18,7 +18,7 @@ const courierPrime = Courier_Prime({
 });
 
 export const metadata: Metadata = {
-  title: "Kodan - Code Comprehension Trainer",
+  title: "Kodan",
   description: "Treine sua mente para ler, interpretar e diagnosticar problemas complexos em código React.",
 };
 

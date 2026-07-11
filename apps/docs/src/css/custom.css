@@ -1,0 +1,113 @@
+:root {
+  --kodan-page: #f6f1e7;
+  --kodan-surface: #fffaf1;
+  --kodan-surface-muted: #eee7da;
+  --kodan-ink: #1e1f1c;
+  --kodan-muted: #5f6259;
+  --kodan-border: #d8cfbf;
+  --kodan-code: #252a3b;
+
+  --ifm-color-primary: #1f3d2f;
+  --ifm-color-primary-dark: #1a3328;
+  --ifm-color-primary-darker: #152a20;
+  --ifm-color-primary-darkest: #102019;
+  --ifm-color-primary-light: #2a523f;
+  --ifm-color-primary-lighter: #35664f;
+  --ifm-color-primary-lightest: #477f65;
+  --ifm-background-color: var(--kodan-page);
+  --ifm-background-surface-color: var(--kodan-surface);
+  --ifm-navbar-background-color: var(--kodan-surface);
+  --ifm-footer-background-color: var(--kodan-page);
+  --ifm-font-color-base: var(--kodan-ink);
+  --ifm-heading-color: var(--kodan-ink);
+  --ifm-toc-border-color: var(--kodan-border);
+  --ifm-menu-color-background-active: var(--kodan-surface-muted);
+  --ifm-code-background: #ebe2d1;
+  --ifm-font-family-base: "JetBrains Mono", "Fira Code", monospace;
+  --ifm-heading-font-family: "Courier Prime", Courier, Georgia, serif;
+  --ifm-code-font-size: 95%;
+  --prism-background-color: var(--kodan-code);
+}
+
+[data-theme="dark"] {
+  --kodan-page: #181916;
+  --kodan-surface: #20221e;
+  --kodan-surface-muted: #2b2d28;
+  --kodan-ink: #f5f2eb;
+  --kodan-muted: #b9b3a8;
+  --kodan-border: #3a3c36;
+  --kodan-code: #282d40;
+
+  --ifm-background-color: var(--kodan-page);
+  --ifm-background-surface-color: var(--kodan-surface);
+  --ifm-navbar-background-color: var(--kodan-surface);
+  --ifm-footer-background-color: var(--kodan-page);
+  --ifm-font-color-base: var(--kodan-ink);
+  --ifm-heading-color: var(--kodan-ink);
+  --ifm-toc-border-color: var(--kodan-border);
+  --ifm-menu-color-background-active: var(--kodan-surface-muted);
+  --ifm-color-primary: #77a887;
+  --ifm-code-background: #303126;
+  --prism-background-color: var(--kodan-code);
+}
+
+html,
+body,
+#__docusaurus {
+  min-height: 100%;
+  background: var(--kodan-page);
+}
+
+.main-wrapper,
+[class*="docPage"],
+[class*="docMainContainer"],
+[class*="docItemContainer"],
+.theme-doc-markdown {
+  background: var(--kodan-page);
+}
+
+.theme-doc-markdown {
+  color: var(--kodan-ink);
+}
+
+.theme-doc-sidebar-container,
+[class*="tableOfContents"] {
+  background: var(--kodan-page);
+}
+
+.navbar,
+.theme-doc-sidebar-container,
+.card {
+  box-shadow: none;
+}
+
+.navbar {
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+}
+
+.menu__link {
+  border-radius: 4px;
+}
+
+.menu__link--active {
+  color: var(--kodan-ink);
+  font-weight: 700;
+}
+
+.theme-code-block {
+  border: 1px solid var(--kodan-border);
+  box-shadow: none;
+}
+
+.theme-code-block pre {
+  background: var(--kodan-code) !important;
+}
+
+.table-of-contents__link {
+  color: var(--kodan-muted);
+}
+
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+}

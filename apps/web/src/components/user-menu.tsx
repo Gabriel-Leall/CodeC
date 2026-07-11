@@ -15,7 +15,7 @@ function getInitials(name: string) {
 }
 
 export default async function UserMenu() {
-  let userName = "Treinador CCT";
+  let userName = "Treinador Kodan";
   let userImage: string | null = null;
 
   try {
@@ -26,7 +26,7 @@ export default async function UserMenu() {
     // fallback para render inicial se o banco ainda não estiver pronto
   }
 
-  const initials = getInitials(userName) || "TC";
+  const initials = getInitials(userName) || "TK";
 
   return (
     <Link

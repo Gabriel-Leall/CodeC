@@ -12,7 +12,7 @@ describe("profile-data", () => {
       now: new Date("2026-07-11T12:00:00.000Z"),
       user: {
         id: "user-1",
-        name: "Treinador CCT",
+        name: "Treinador Kodan",
         bio: "Leio React como um tabuleiro.",
         image: null,
         elo: 1378,
@@ -57,7 +57,7 @@ describe("profile-data", () => {
       ],
     });
 
-    expect(viewModel.user.name).toBe("Treinador CCT");
+    expect(viewModel.user.name).toBe("Treinador Kodan");
     expect(viewModel.user.rank).toBe("KYU");
     expect(viewModel.user.elo).toBe(1378);
     expect(viewModel.stats).toHaveLength(5);
