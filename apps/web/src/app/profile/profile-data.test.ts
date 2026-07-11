@@ -67,7 +67,11 @@ describe("profile-data", () => {
     expect(viewModel.recentSessions).toHaveLength(2);
     expect(viewModel.recommendations).toHaveLength(1);
     expect(viewModel.recommendations[0]?.topic).toBe("Async UI & Races");
-    expect(viewModel.achievements).toHaveLength(4);
+    expect(viewModel.achievements.map((achievement) => achievement.id)).toEqual([
+      "first-diagnosis",
+      "advanced",
+      "effects",
+    ]);
   });
 
   it("keeps proficiency values inside progress bar bounds", () => {

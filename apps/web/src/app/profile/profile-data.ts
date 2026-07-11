@@ -259,46 +259,76 @@ function buildAchievements({
   resolvedCount: number;
   streak: number;
 }): AchievementItem[] {
-  const latestAttemptDate = attempts[0]?.createdAt ?? new Date();
-  const hardResolvedCount = attempts.filter(
-    (attempt) => attempt.score >= 5 && attempt.challenge.difficulty === "HARD",
-  ).length;
-  const effectsResolvedCount = attempts.filter(
-    (attempt) =>
-      attempt.score >= 5 &&
-      getPrimaryTopic(attempt.challenge).id === "effects-lifecycle",
-  ).length;
+  const resolvedAttempts = attempts.filter((attempt) => attempt.score >= 5);
+  const firstResolvedAttempt = getOldestAttempt(resolvedAttempts);
+  const firstHardResolvedAttempt = getOldestAttempt(
+    resolvedAttempts.filter((attempt) => attempt.challenge.difficulty === "HARD"),
+  );
+  const firstEffectsResolvedAttempt = getOldestAttempt(
+    resolvedAttempts.filter(
+      (attempt) => getPrimaryTopic(attempt.challenge).id === "effects-lifecycle",
+    ),
+  );
+  const latestAttempt = attempts[0] ?? null;
+  const achievements: AchievementItem[] = [];
 
-  return [
-    {
+  if (firstResolvedAttempt) {
+    achievements.push({
+      id: "first-diagnosis",
+      title: "Primeiro Diagnóstico",
+      description: "Resolveu o primeiro desafio",
+      unlockedAtLabel: getAchievementDateLabel(firstResolvedAttempt.createdAt),
+      tone: "green",
+    });
+  }
+
+  if (streak >= 3 && latestAttempt) {
+    achievements.push({
       id: "focus",
       title: "Foco Sustentado",
       description: `Sequência atual de ${streak} dias`,
-      unlockedAtLabel: getAchievementDateLabel(latestAttemptDate),
+      unlockedAtLabel: getAchievementDateLabel(latestAttempt.createdAt),
       tone: "blue",
-    },
-    {
+    });
+  }
+
+  if (firstHardResolvedAttempt) {
+    achievements.push({
+      id: "advanced",
+      title: "React Avançado",
+      description: "Resolveu um desafio difícil",
+      unlockedAtLabel: getAchievementDateLabel(firstHardResolvedAttempt.createdAt),
+      tone: "orange",
+    });
+  }
+
+  if (firstEffectsResolvedAttempt) {
+    achievements.push({
+      id: "effects",
+      title: "Mestre em Effects",
+      description: "Resolveu um desafio de Effects",
+      unlockedAtLabel: getAchievementDateLabel(firstEffectsResolvedAttempt.createdAt),
+      tone: "indigo",
+    });
+  }
+
+  if (resolvedCount >= 10 && latestAttempt) {
+    achievements.push({
       id: "diagnostic",
       title: "Diagnóstico Afiado",
       description: `${resolvedCount} desafios resolvidos`,
-      unlockedAtLabel: getAchievementDateLabel(latestAttemptDate),
+      unlockedAtLabel: getAchievementDateLabel(latestAttempt.createdAt),
       tone: "green",
-    },
-    {
-      id: "advanced",
-      title: "React Avançado",
-      description: `${hardResolvedCount} desafios difíceis resolvidos`,
-      unlockedAtLabel: getAchievementDateLabel(latestAttemptDate),
-      tone: "orange",
-    },
-    {
-      id: "effects",
-      title: "Mestre em Effects",
-      description: `${effectsResolvedCount} desafios de Effects resolvidos`,
-      unlockedAtLabel: getAchievementDateLabel(latestAttemptDate),
-      tone: "indigo",
-    },
-  ];
+    });
+  }
+
+  return achievements.slice(0, 4);
+}
+
+function getOldestAttempt(attempts: ProfileAttemptRecord[]) {
+  return attempts.toSorted(
+    (left, right) => left.createdAt.getTime() - right.createdAt.getTime(),
+  )[0];
 }
 
 function getSessionStatus(attempt: ProfileAttemptRecord): ProfileSessionStatus {
