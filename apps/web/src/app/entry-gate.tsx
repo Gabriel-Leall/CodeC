@@ -106,6 +106,7 @@ export default function EntryGate() {
                 </label>
                 <input
                   id="gate-answer"
+                  aria-label="Onde está o erro?"
                   value={answer}
                   onChange={event => setAnswer(event.target.value)}
                   placeholder="Digite sua correção aqui..."

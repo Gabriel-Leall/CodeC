@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-26T00:42:00Z",
+  "title": "Design System: CodeC",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Tournament Board Green",
+        "canonical": "oklch(29.67% 0.0464 153.25)",
+        "tonalRamp": [
+          "#09120e",
+          "#102119",
+          "#1f3d2f",
+          "#325c47",
+          "#4c7c63",
+          "#6e9d84",
+          "#9ebfae",
+          "#d7e6df"
+        ]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Vintage Crimson",
+        "canonical": "oklch(38.07% 0.177 34.61)",
+        "tonalRamp": [
+          "#2e0b04",
+          "#55160b",
+          "#8c2d19",
+          "#b44a34",
+          "#d46d58",
+          "#eb9684",
+          "#f7c4b8",
+          "#fae9e6"
+        ]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Warm Parchment",
+        "canonical": "oklch(96.08% 0.0097 86.13)",
+        "tonalRamp": [
+          "#1a1917",
+          "#3d3b37",
+          "#63605a",
+          "#8c8880",
+          "#b3aea4",
+          "#dcd7cb",
+          "#f5f2eb",
+          "#faf9f7"
+        ]
+      },
+      "neutral-fg": {
+        "role": "neutral",
+        "displayName": "Dark Charcoal Ink",
+        "canonical": "oklch(20.44% 0.0076 96.54)",
+        "tonalRamp": [
+          "#080807",
+          "#1e1f1c",
+          "#333530",
+          "#4a4d46",
+          "#63675e",
+          "#82877a",
+          "#a6aa9e",
+          "#cfd2c9"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Slab",
+        "purpose": "Hero titles and ASCII headers only."
+      },
+      "headline": {
+        "displayName": "Headline Slab",
+        "purpose": "Primary section titles."
+      },
+      "body": {
+        "displayName": "Monospace Body",
+        "purpose": "Descriptions, code blocks, and instructions."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tactile-offset",
+        "value": "2px 2px 0px 0px #1e1f1c",
+        "purpose": "Flat offset depth for buttons and cards."
+      }
+    ],
+    "motion": [
+      {
+        "name": "tactile-press",
+        "value": "transform 0.05s ease, box-shadow 0.05s ease",
+        "purpose": "Snappy feedback mimicking mechanical keys."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main tactical action button.",
+      "html": "<button class=\"ds-btn-primary\">SUBMIT DIAGNOSIS</button>",
+      "css": ".ds-btn-primary { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: #f5f2eb; background-color: #1f3d2f; border: 1.5px solid #1e1f1c; border-radius: 0px; padding: 8px 16px; cursor: pointer; box-shadow: 2px 2px 0px 0px #1e1f1c; transition: transform 0.05s ease, box-shadow 0.05s ease; } .ds-btn-primary:hover { background-color: #152a20; } .ds-btn-primary:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px 0px #1e1f1c; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Standard navigation or toggle actions.",
+      "html": "<button class=\"ds-btn-secondary\">ABANDON MATCH</button>",
+      "css": ".ds-btn-secondary { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: #1e1f1c; background-color: #f5f2eb; border: 1.5px solid #1e1f1c; border-radius: 0px; padding: 8px 16px; cursor: pointer; box-shadow: 2px 2px 0px 0px #1e1f1c; transition: transform 0.05s ease, box-shadow 0.05s ease; } .ds-btn-secondary:hover { background-color: #eae4d7; } .ds-btn-secondary:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px 0px #1e1f1c; }"
+    },
+    {
+      "name": "Tactile Card",
+      "kind": "card",
+      "description": "Standard content panel with a board structure.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">OPPONENT</h3><p class=\"ds-card-text\">Diagnose stale closure inside the useEffect dependency hook.</p></div>",
+      "css": ".ds-card { background-color: #f5f2eb; border: 1.5px solid #1e1f1c; border-radius: 0px; padding: 16px; box-shadow: 3px 3px 0px 0px #1e1f1c; } .ds-card-title { font-family: 'Courier Prime', Georgia, serif; font-size: 16px; font-weight: 700; margin: 0 0 8px 0; color: #1e1f1c; border-bottom: 1.5px solid #dcd7cb; padding-bottom: 4px; } .ds-card-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.5; margin: 0; color: #1e1f1c; }"
+    },
+    {
+      "name": "Code Board Editor",
+      "kind": "custom",
+      "description": "The high-focus terminal container for code reading.",
+      "html": "<div class=\"ds-editor\"><div class=\"ds-editor-header\"><span class=\"ds-editor-dot\"></span><span class=\"ds-editor-title\">StaleClosure.tsx</span></div><pre class=\"ds-editor-code\"><code>const [count, setCount] = useState(0);\nuseEffect(() => {\n  const id = setInterval(() => {\n    console.log(count); // stale closure!\n  }, 1000);\n  return () => clearInterval(id);\n}, []);</code></pre></div>",
+      "css": ".ds-editor { background-color: #1e1f1c; border: 1.5px solid #1e1f1c; border-radius: 0px; width: 100%; box-shadow: 3px 3px 0px 0px #dcd7cb; } .ds-editor-header { display: flex; align-items: center; background-color: #2b2c28; padding: 6px 12px; border-bottom: 1.5px solid #1e1f1c; } .ds-editor-dot { width: 6px; height: 6px; background-color: #8c2d19; border-radius: 50%; margin-right: 8px; } .ds-editor-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #dcd7cb; } .ds-editor-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #f5f2eb; padding: 12px; margin: 0; overflow-x: auto; }"
+    },
+    {
+      "name": "ELO Rating Badge",
+      "kind": "chip",
+      "description": "Tactical stats display.",
+      "html": "<div class=\"ds-elo-badge\"><span class=\"ds-elo-label\">ELO</span><span class=\"ds-elo-value\">1420</span></div>",
+      "css": ".ds-elo-badge { display: inline-flex; align-items: center; border: 1.5px solid #1e1f1c; border-radius: 0px; overflow: hidden; background-color: #f5f2eb; } .ds-elo-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; background-color: #d97706; color: #1e1f1c; padding: 4px 8px; border-right: 1.5px solid #1e1f1c; } .ds-elo-value { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #1e1f1c; padding: 4px 8px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Grandmaster's Study",
+    "overview": "The CodeC design system is inspired by the quiet focus of a vintage chess tournament hall. It bridges the academic discipline of a classical study with the raw logic of an early terminal environment. We prioritize visual silence around the code editor/board to maximize cognitive bandwidth, using warm parchment backgrounds, dark charcoal text, and a flat, border-based grid layout.",
+    "keyCharacteristics": [
+      "Tactile Board Grid: Solid 1px or 2px borders establish structure and division, echoing chess boards and retro textbooks.",
+      "High Focus Area: Minimal decorative noise near the code panels to prevent eye strain and maintain concentration.",
+      "Scholarly Palette: Natural pigments (forest green, vintage crimson, warm paper, walnut charcoal) evoke a classic, offline atmosphere."
+    ],
+    "rules": [
+      {
+        "name": "The 10% Accent Rule",
+        "body": "The primary board green accent is used on ≤10% of any given screen. It represents tactical emphasis (active ELO, submit buttons) rather than decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Pure-Black Rule",
+        "body": "absolute black (#000000) and pure white (#ffffff) are forbidden. Every neutral is tinted toward charcoal or cream to preserve the offline, paper-like feeling.",
+        "section": "colors"
+      },
+      {
+        "name": "The Monospace Standard Rule",
+        "body": "All code, variables, ELO values, timer stats, and diagnostic labels must use JetBrains Mono (or a clean monospace fallback) to ensure strict alignment and technical readability.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-Grid Rule",
+        "body": "No soft, blurred box shadows or ambient drop-shadows may be used. Depth is established through nested borders, solid block offsets, or flat background fills.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use JetBrains Mono for all code and technical data to ensure clear character recognition.",
+      "Do use warm parchment (#f5f2eb) as the light background to reduce glare.",
+      "Do use flat, solid 1px or 2px borders to structure panels and containers.",
+      "Do use OKLCH color tints to adapt secondary UI states to theme changes smoothly."
+    ],
+    "donts": [
+      "Don't use standard SaaS light-blue primary buttons or soft rounded corners.",
+      "Don't use blurred drop shadows or soft gradients to indicate elevation.",
+      "Don't use neon gradients or flashing animations.",
+      "Don't use Inter, Geist, or other generic geometric sans-serif fonts for primary text.",
+      "Don't use side-stripe borders (e.g. border-left-4 as an accent) on callouts or alert cards."
+    ]
+  }
+}

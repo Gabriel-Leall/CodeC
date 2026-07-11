@@ -4,11 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./globals.css": "./src/styles/globals.css",
     "./styles/*": "./src/styles/*.css",
     "./assets/zen/*": "./src/assets/zen/*.tsx",
     "./assets/zen/vector/*": "./src/assets/zen/vector/*.tsx",
     "./lib/*": "./src/lib/*.ts",
+    "./components/profile": "./src/components/profile/index.ts",
+    "./components/profile/*": "./src/components/profile/*.tsx",
     "./components/zen": "./src/components/zen/index.ts",
     "./components/zen/*": "./src/components/zen/*.tsx",
     "./components/zen/feedback": "./src/components/zen/feedback/index.tsx",
@@ -17,7 +20,7 @@
     "./components/zen/display": "./src/components/zen/display/index.ts",
     "./components/zen/navigation": "./src/components/zen/navigation/index.ts",
     "./components/zen/progression": "./src/components/zen/progression/index.ts",
-    "./components/zen/motion/*": "./src/components/zen/motion/*.ts",
+    "./components/zen/motion/*": "./src/components/zen/motion/*",
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.ts",
     "./postcss.config": "./postcss.config.mjs"
@@ -50,5 +53,36 @@
     "@types/react-dom": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
+  },
+  "reactDoctor": {
+    "ignore": {
+      "overrides": [
+        {
+          "files": [
+            "src/**/*.ts",
+            "src/**/*.tsx"
+          ],
+          "rules": [
+            "deslop/unused-file"
+          ]
+        },
+        {
+          "files": [
+            "src/components/label.tsx"
+          ],
+          "rules": [
+            "react-doctor/label-has-associated-control"
+          ]
+        },
+        {
+          "files": [
+            "src/components/zen/display/ZenAvatar.tsx"
+          ],
+          "rules": [
+            "react-doctor/nextjs-no-img-element"
+          ]
+        }
+      ]
+    }
   }
 }

@@ -2,8 +2,9 @@
 
 import { HankoMarkSvg } from "@kodan/ui/assets/zen/sumi-strokes";
 import { cn } from "@kodan/ui/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
 import { useState, type ChangeEvent, type ComponentProps, type ReactNode } from "react";
+import { ZenMotionProvider } from "../motion/runtime";
+import { AnimatePresence, m } from "../motion/primitives";
 
 type ZenCheckboxProps = Omit<ComponentProps<"input">, "type"> & {
   label: ReactNode;
@@ -45,19 +46,21 @@ export function ZenCheckbox({
           {...props}
         />
         <span className="absolute inset-0 transition-colors peer-checked:bg-[color:color-mix(in_oklch,var(--zen-hanko)_12%,transparent)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[color:var(--zen-hanko)]" />
-        <AnimatePresence initial={false}>
-          {isChecked ? (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.75, rotate: -5 }}
-              animate={{ opacity: 1, scale: 1, rotate: -2 }}
-              exit={{ opacity: 0, scale: 0.75 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className="relative z-10 text-[color:var(--zen-hanko)]"
-            >
-              <HankoMarkSvg className="size-4" />
-            </motion.span>
-          ) : null}
-        </AnimatePresence>
+        <ZenMotionProvider>
+          <AnimatePresence initial={false}>
+            {isChecked ? (
+              <m.span
+                initial={{ opacity: 0, scale: 0.75, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: -2 }}
+                exit={{ opacity: 0, scale: 0.75 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="relative z-10 text-[color:var(--zen-hanko)]"
+              >
+                <HankoMarkSvg className="size-4" />
+              </m.span>
+            ) : null}
+          </AnimatePresence>
+        </ZenMotionProvider>
       </span>
       <span className="min-w-0">
         <span className="block text-xs font-semibold">{label}</span>
