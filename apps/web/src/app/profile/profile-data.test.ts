@@ -1,22 +1,72 @@
 import { describe, expect, it } from "bun:test";
 
 import {
-  buildStaticProfileViewModel,
+  buildProfileViewModel,
   clampProficiency,
   getProfileRankLabel,
 } from "./profile-data";
 
 describe("profile-data", () => {
-  it("builds the study dossier contract from the visual spec", () => {
-    const viewModel = buildStaticProfileViewModel();
+  it("builds the study dossier contract from user activity", () => {
+    const viewModel = buildProfileViewModel({
+      now: new Date("2026-07-11T12:00:00.000Z"),
+      user: {
+        id: "user-1",
+        name: "Treinador CCT",
+        bio: "Leio React como um tabuleiro.",
+        image: null,
+        elo: 1378,
+        createdAt: new Date("2026-01-15T12:00:00.000Z"),
+      },
+      attempts: [
+        {
+          id: "attempt-2",
+          score: 9,
+          eloChange: 14,
+          createdAt: new Date("2026-07-11T10:00:00.000Z"),
+          challenge: {
+            id: "challenge-2",
+            title: "Race conditions em fetch",
+            difficulty: "HARD",
+            recommendedElo: 1500,
+            tags: "react,race-condition,fetch",
+          },
+        },
+        {
+          id: "attempt-1",
+          score: 6,
+          eloChange: 5,
+          createdAt: new Date("2026-07-10T10:00:00.000Z"),
+          challenge: {
+            id: "challenge-1",
+            title: "Dependências do useEffect",
+            difficulty: "MEDIUM",
+            recommendedElo: 1300,
+            tags: "react,useEffect,hooks",
+          },
+        },
+      ],
+      recommendations: [
+        {
+          id: "recommended-1",
+          title: "Validação assíncrona",
+          difficulty: "MEDIUM",
+          recommendedElo: 1400,
+          tags: "forms,validation,async",
+        },
+      ],
+    });
 
-    expect(viewModel.user.name).toBe("Nakamura");
-    expect(viewModel.user.rank).toBe("RONIN");
-    expect(viewModel.user.elo).toBe(1687);
+    expect(viewModel.user.name).toBe("Treinador CCT");
+    expect(viewModel.user.rank).toBe("KYU");
+    expect(viewModel.user.elo).toBe(1378);
     expect(viewModel.stats).toHaveLength(5);
-    expect(viewModel.topicMastery).toHaveLength(5);
-    expect(viewModel.recentSessions).toHaveLength(5);
-    expect(viewModel.recommendations).toHaveLength(5);
+    expect(viewModel.stats.find((stat) => stat.id === "resolved")?.value).toBe("2");
+    expect(viewModel.stats.find((stat) => stat.id === "streak")?.value).toBe("2 dias");
+    expect(viewModel.topicMastery[0]?.label).toBe("Async UI & Races");
+    expect(viewModel.recentSessions).toHaveLength(2);
+    expect(viewModel.recommendations).toHaveLength(1);
+    expect(viewModel.recommendations[0]?.topic).toBe("Async UI & Races");
     expect(viewModel.achievements).toHaveLength(4);
   });
 

@@ -5,6 +5,7 @@ export type AchievementTone = "blue" | "green" | "orange" | "indigo";
 export interface ProfileUserSummary {
   id: string;
   name: string;
+  bio: string;
   image: string | null;
   planLabel: string;
   tagline: string;

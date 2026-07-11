@@ -12,7 +12,7 @@ export function ProfileShell({ profile }: { profile: ProfileViewModel }) {
       <div className="grid h-full min-h-0 grid-rows-[72px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)]">
         <ProfileSidebar />
         <div className="min-w-0 lg:col-start-2">
-          <ProfileTopHeader userElo={profile.user.elo} />
+          <ProfileTopHeader user={profile.user} />
         </div>
         <section className="min-h-0 overflow-auto px-4 py-4 sm:px-6 lg:col-start-2 lg:px-6 lg:py-5">
           <ProfileContent profile={profile} />

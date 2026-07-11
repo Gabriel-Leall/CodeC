@@ -161,7 +161,11 @@ function isValidProfileImage(input: string) {
   return /^data:image\/(png|jpe?g|webp|gif);base64,[a-zA-Z0-9+/=]+$/.test(input);
 }
 
-export async function updateLocalUserProfile(params: { name: string; image?: string | null }) {
+export async function updateLocalUserProfile(params: {
+  name: string;
+  bio?: string;
+  image?: string | null;
+}) {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -172,6 +176,8 @@ export async function updateLocalUserProfile(params: { name: string; image?: str
 
     const user = await ensureDefaultLocalUser();
     const name = params.name.trim().slice(0, 60);
+    const bio =
+      typeof params.bio === "string" ? params.bio.trim().slice(0, 180) : undefined;
 
     if (name.length < 2) {
       return { success: false, error: "Nome precisa ter pelo menos 2 caracteres" };
@@ -194,6 +200,7 @@ export async function updateLocalUserProfile(params: { name: string; image?: str
       where: { id: user.id },
       data: {
         name,
+        ...(bio !== undefined ? { bio } : {}),
         ...(image !== undefined ? { image } : {}),
       },
     });

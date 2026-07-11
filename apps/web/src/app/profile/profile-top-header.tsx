@@ -1,7 +1,11 @@
 import { ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 
-export function ProfileTopHeader({ userElo }: { userElo: number }) {
+import type { ProfileUserSummary } from "./profile-types";
+
+export function ProfileTopHeader({ user }: { user: ProfileUserSummary }) {
+  const initials = getInitials(user.name);
+
   return (
     <header className="flex h-[72px] min-w-0 items-center justify-between gap-4 border-b border-[color:var(--profile-border)] bg-[var(--profile-surface)] px-4 sm:px-6 lg:px-7">
       <Link
@@ -39,7 +43,7 @@ export function ProfileTopHeader({ userElo }: { userElo: number }) {
               Rank
             </p>
             <p className="text-base font-medium leading-tight text-[var(--profile-text-primary)]">
-              Ronin
+              {user.rank}
             </p>
           </div>
           <div>
@@ -47,22 +51,33 @@ export function ProfileTopHeader({ userElo }: { userElo: number }) {
               Elo
             </p>
             <p className="text-base font-medium leading-tight text-[var(--profile-accent-blue)]">
-              {userElo}
+              {user.elo}
             </p>
           </div>
         </div>
 
         <div
           className="inline-flex items-center gap-2 rounded-full text-[var(--profile-text-primary)]"
-          aria-label="Usuário atual: Nakamura"
+          aria-label={`Usuário atual: ${user.name}`}
         >
           <span className="inline-flex size-9 items-center justify-center rounded-full bg-[var(--profile-text-primary)] text-sm font-semibold text-[var(--profile-surface)]">
-            N
+            {initials}
           </span>
           <ChevronDown className="hidden size-4 sm:block" aria-hidden="true" />
         </div>
       </div>
     </header>
+  );
+}
+
+function getInitials(name: string) {
+  return (
+    name
+      .split(" ")
+      .flatMap((part) => (part.trim()[0] ? [part.trim()[0]!] : []))
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "K"
   );
 }
 
