@@ -34,9 +34,9 @@ export function ZenRankBadge({ rank, className }: ZenRankBadgeProps) {
         <div className="mt-2 h-1.5 overflow-hidden bg-[color:color-mix(in_oklch,var(--zen-ink)_10%,transparent)]">
           <ZenMotionProvider>
             <m.div
-              className="h-full bg-[color:var(--zen-hanko)]"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              className="h-full origin-left bg-[color:var(--zen-hanko)]"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: progress / 100 }}
               transition={{ duration: 0.7, ease: zenEase }}
             />
           </ZenMotionProvider>

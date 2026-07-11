@@ -56,6 +56,12 @@ const INITIAL_TECH_ELO = 1000;
 const MIN_ELO = 100;
 const ELO_FORMATTER = new Intl.NumberFormat("pt-BR");
 const TECH_ELO_FORMATTER = new Intl.NumberFormat("pt-BR", { useGrouping: false });
+const ATTEMPT_DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: "America/Sao_Paulo",
+  year: "numeric",
+});
 type ZenToastTone = "success" | "error" | "warning" | "info";
 type ZenToastState = {
   open: boolean;
@@ -751,7 +757,7 @@ function RecentActivitiesCard({
                     )}
                   </td>
                   <td className="py-2.5 px-2 text-right text-muted-foreground">
-                    {attempt.createdAt.toLocaleDateString("pt-BR")}
+                    {ATTEMPT_DATE_FORMATTER.format(attempt.createdAt)}
                   </td>
                 </tr>
               ))}

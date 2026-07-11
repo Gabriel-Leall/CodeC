@@ -4,7 +4,7 @@ const PT_BR_INTEGER = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 0,
 });
 
-export function formatInteger(value: number) {
+function formatInteger(value: number) {
   return PT_BR_INTEGER.format(value);
 }
 

@@ -117,7 +117,7 @@ export function ChallengesMobileShell({
   );
 }
 
-export function KodanLogo({ compact = false }: { compact?: boolean }) {
+function KodanLogo({ compact = false }: { compact?: boolean }) {
   return (
     <Link
       href="/"
@@ -199,7 +199,7 @@ function ProfileLink() {
   );
 }
 
-export function ChallengeSearchInput({
+function ChallengeSearchInput({
   value,
   compact = false,
   withFilterIcon = false,
@@ -241,7 +241,7 @@ export function ChallengeSearchInput({
   );
 }
 
-export function RankBadge({ userElo }: { userElo: number }) {
+function RankBadge({ userElo }: { userElo: number }) {
   return (
     <div className="flex shrink-0 items-center gap-4">
       <RankSeal />

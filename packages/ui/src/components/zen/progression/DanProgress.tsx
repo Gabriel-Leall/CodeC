@@ -24,9 +24,9 @@ export function DanProgress({ value, label = "Dan progress", className }: DanPro
       <div className="h-2 overflow-hidden bg-[color:color-mix(in_oklch,var(--zen-ink)_10%,transparent)]" aria-hidden="true">
         <ZenMotionProvider>
           <m.div
-            className="h-full bg-[color:var(--zen-hanko)]"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
+            className="h-full origin-left bg-[color:var(--zen-hanko)]"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: progress / 100 }}
             transition={{ duration: 0.7, ease: zenEase }}
           />
         </ZenMotionProvider>

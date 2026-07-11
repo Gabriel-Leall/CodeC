@@ -235,7 +235,7 @@ export function getChallengeProgress(
   };
 }
 
-export function getLevelCompatibility(recommendedElo: number, userElo: number) {
+function getLevelCompatibility(recommendedElo: number, userElo: number) {
   const delta = recommendedElo - userElo;
   if (delta <= 150) {
     return {

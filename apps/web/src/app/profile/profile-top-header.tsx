@@ -81,7 +81,7 @@ function getInitials(name: string) {
   );
 }
 
-export function RankSeal({ compact = false }: { compact?: boolean }) {
+function RankSeal({ compact = false }: { compact?: boolean }) {
   return (
     <span
       className={`inline-flex items-center justify-center rounded-[10px] border border-[color:var(--profile-border-strong)] bg-[var(--profile-surface-elevated)] font-semibold text-[var(--profile-text-primary)] ${

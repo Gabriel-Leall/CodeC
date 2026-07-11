@@ -17,6 +17,10 @@ const PT_BR_SHORT_DATE = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "short",
 });
+const PT_BR_MONTH_YEAR = new Intl.DateTimeFormat("pt-BR", {
+  month: "2-digit",
+  year: "numeric",
+});
 const PT_BR_MONTHS = [
   "jan",
   "fev",
@@ -113,11 +117,7 @@ export function buildProfileViewModel({
   recommendations,
   now = new Date(),
 }: ProfileViewModelInput): ProfileViewModel {
-  const uniqueResolvedChallengeIds = new Set(
-    attempts
-      .filter((attempt) => attempt.score >= 5)
-      .map((attempt) => attempt.challenge.id),
-  );
+  const uniqueResolvedChallengeIds = getResolvedChallengeIds(attempts);
   const firstAttempts = getFirstAttemptsByChallenge(attempts);
   const accuracy = attempts.length
     ? Math.round(
@@ -211,6 +211,18 @@ function getFirstAttemptsByChallenge(attempts: ProfileAttemptRecord[]) {
   });
 }
 
+function getResolvedChallengeIds(attempts: ProfileAttemptRecord[]) {
+  const ids = new Set<string>();
+
+  for (const attempt of attempts) {
+    if (attempt.score >= 5) {
+      ids.add(attempt.challenge.id);
+    }
+  }
+
+  return ids;
+}
+
 function buildEloSeries(
   firstAttempts: ProfileAttemptRecord[],
   currentElo: number,
@@ -251,26 +263,47 @@ function buildTopicMastery(attempts: ProfileAttemptRecord[]): TopicMasteryItem[]
     });
   }
 
-  const unlocked = [...topicStats.entries()]
-    .map(([topicId, stats]) => ({
+  const unlocked = getUnlockedTopicMastery(topicStats);
+  const unlockedTopicIds = new Set(unlocked.map((topic) => topic.topicId));
+  const locked = getLockedTopicMastery(unlockedTopicIds);
+
+  return [...unlocked, ...locked].slice(0, 5);
+}
+
+function getLockedTopicMastery(unlockedTopicIds: Set<string>) {
+  const locked: TopicMasteryItem[] = [];
+
+  for (const topic of PROFILE_TOPIC_UNLOCKS) {
+    if (!unlockedTopicIds.has(topic.topicId)) {
+      locked.push({
+        topicId: topic.topicId,
+        label: topic.label,
+        proficiency: 0,
+        locked: true,
+        unlockHint: topic.unlockHint,
+      });
+    }
+  }
+
+  return locked;
+}
+
+function getUnlockedTopicMastery(
+  topicStats: Map<string, { label: string; attempts: number; score: number }>,
+) {
+  const topics: TopicMasteryItem[] = [];
+
+  for (const [topicId, stats] of topicStats) {
+    topics.push({
       topicId,
       label: stats.label,
       proficiency: clampProficiency((stats.score / (stats.attempts * 10)) * 100),
-    }))
+    });
+  }
+
+  return topics
     .sort((left, right) => right.proficiency - left.proficiency)
     .slice(0, 5);
-  const unlockedTopicIds = new Set(unlocked.map((topic) => topic.topicId));
-  const locked = PROFILE_TOPIC_UNLOCKS.filter(
-    (topic) => !unlockedTopicIds.has(topic.topicId),
-  ).map((topic) => ({
-    topicId: topic.topicId,
-    label: topic.label,
-    proficiency: 0,
-    locked: true,
-    unlockHint: topic.unlockHint,
-  }));
-
-  return [...unlocked, ...locked].slice(0, 5);
 }
 
 function buildAchievements({
@@ -489,10 +522,7 @@ function getAchievementDateLabel(date: Date) {
 }
 
 function formatMonthYear(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    month: "2-digit",
-    year: "numeric",
-  }).format(date);
+  return PT_BR_MONTH_YEAR.format(date);
 }
 
 function formatShortDate(date: Date) {
