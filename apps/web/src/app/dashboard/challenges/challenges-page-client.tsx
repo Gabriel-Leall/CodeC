@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { ZenToast } from "@kodan/ui/components/zen";
 import { getChallenges } from "../actions";
-import {
-  ChallengesDocsSidebar,
-  ChallengesNavigationDrawer,
-} from "./challenges-docs-sidebar";
+import { ChallengesDocsSidebar } from "./challenges-docs-sidebar";
+import { ChallengesNavigationDrawer } from "./challenges-navigation-drawer";
 import { ChallengesExplorerPanel } from "./challenges-explorer-list";
 import {
   CHALLENGES_INITIAL_LOAD_SIZE,
