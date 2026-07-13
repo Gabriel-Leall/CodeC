@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Courier_Prime } from "next/font/google";
 
 import "../index.css";
-import Header from "../components/header";
+import { AppShell } from "../components/app-shell";
 import Providers from "../components/providers";
 import { ensureDefaultLocalUser } from "../lib/local-user";
 
@@ -37,10 +37,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${jetbrainsMono.variable} ${courierPrime.variable} antialiased`}>
         <Providers>
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
-            {children}
-          </div>
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>

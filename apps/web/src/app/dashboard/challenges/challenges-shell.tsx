@@ -35,21 +35,16 @@ const TOP_LINKS = [
 export function ChallengesDesktopShell({
   userElo,
   searchQuery,
-  sidebar,
   children,
   onSearchChange,
 }: {
   userElo: number;
   searchQuery: string;
-  sidebar: ReactNode;
   children: ReactNode;
   onSearchChange: (query: string) => void;
 }) {
   return (
-    <section className="challengers-shell hidden h-full min-h-0 overflow-hidden lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:grid-rows-[76px_minmax(0,1fr)]">
-      <div className="flex items-center border-b border-r border-[color:var(--challengers-border)] px-7">
-        <KodanLogo />
-      </div>
+    <section className="challengers-shell hidden h-full min-h-0 overflow-hidden lg:flex lg:flex-col">
       <header className="flex min-w-0 items-center justify-between gap-4 border-b border-[color:var(--challengers-border)] px-5 xl:px-7">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <ChallengeSearchInput
@@ -57,7 +52,6 @@ export function ChallengesDesktopShell({
             className="min-w-[220px] max-w-[520px] flex-1"
             onChange={onSearchChange}
           />
-          <DesktopRouteNav />
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <RankBadge userElo={userElo} />
@@ -65,8 +59,7 @@ export function ChallengesDesktopShell({
           <ProfileLink />
         </div>
       </header>
-      {sidebar}
-      <div className="min-w-0 overflow-auto">{children}</div>
+      <div className="min-w-0 flex-1 overflow-auto">{children}</div>
     </section>
   );
 }

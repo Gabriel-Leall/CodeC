@@ -10,7 +10,9 @@ import {
   Circle,
   CircleCheck,
   CircleDashed,
+  Filter,
   Hourglass,
+  SlidersHorizontal,
   Zap,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -198,64 +200,36 @@ function ChallengeFilters({
   onClearFilters: () => void;
 }) {
   return (
-    <div className="mt-5 hidden flex-col gap-3 md:flex md:flex-row md:items-center md:justify-between">
-      <div className="flex flex-wrap items-center gap-2">
-        <FilterSelect
-          label="Filtrar por dificuldade"
-          value={filterDifficulty}
-          onChange={(value) => onFilterChange(value as DifficultyFilter)}
-          options={[
-            { value: "ALL", label: "Dificuldade: Todos" },
-            { value: "EASY", label: "Easy" },
-            { value: "MEDIUM", label: "Medium" },
-            { value: "HARD", label: "Hard" },
-          ]}
-        />
-        <FilterSelect
-          label="Filtrar por status"
-          value={statusFilter}
-          onChange={(value) => onStatusChange(value as StatusFilter)}
-          options={STATUS_OPTIONS}
-        />
-        <FilterSelect
-          label="Filtrar por tipo"
-          value={typeFilter}
-          onChange={(value) => onTypeChange(value as TypeFilter)}
-          options={[
-            { value: "ALL", label: "Tipo: Todos" },
-            ...TYPE_OPTIONS.map((type) => ({ value: type, label: type })),
-          ]}
-        />
-        <label className="flex h-10 items-center gap-2 rounded-[8px] px-2 text-[0.78rem] text-[var(--challengers-ink)]">
-          <input
-            type="checkbox"
-            checked={onlyUnsolved}
-            className="challengers-checkbox size-4 rounded-[3px]"
-            onChange={(event) => onOnlyUnsolvedChange(event.target.checked)}
-          />
-          Apenas não resolvidos
-        </label>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {hasActiveFilters ? (
-          <button
-            type="button"
-            className="challengers-control h-10 rounded-[8px] border px-3 text-[0.78rem]"
-            onClick={onClearFilters}
-          >
-            Limpar
-          </button>
-        ) : null}
-        <FilterSelect
-          label="Ordenar desafios"
-          value={sortBy}
-          onChange={(value) => onSortChange(value as SortBy)}
-          options={SORT_OPTIONS}
-        />
-      </div>
+    <div className="mt-5 flex items-center justify-between gap-3 border-y border-[color:var(--challengers-border)] py-3">
+      <details className="group relative">
+        <summary className="challengers-control flex h-10 cursor-pointer list-none items-center gap-2 rounded-[8px] border px-3 text-[0.78rem] font-medium marker:hidden hover:border-[color:var(--challengers-blue-border)] hover:text-[var(--challengers-blue)]">
+          <SlidersHorizontal className="size-3.5" />
+          Filtros
+          {hasActiveFilters ? <span className="rounded-full bg-[var(--challengers-blue-soft)] px-1.5 py-0.5 text-[0.65rem] text-[var(--challengers-blue)]">ativos</span> : null}
+        </summary>
+        <div className="challengers-panel absolute left-0 top-[calc(100%+8px)] z-30 grid w-[min(44rem,calc(100vw-2rem))] grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-[color:var(--challengers-border-strong)] bg-[var(--challengers-border)] shadow-[var(--challengers-shadow-soft)] md:grid-cols-4">
+          <FilterGroup title="Dificuldade">
+            <FilterSelect label="Dificuldade" value={filterDifficulty} onChange={(value) => onFilterChange(value as DifficultyFilter)} options={[{ value: "ALL", label: "Todos" }, { value: "EASY", label: "Easy" }, { value: "MEDIUM", label: "Medium" }, { value: "HARD", label: "Hard" }]} />
+          </FilterGroup>
+          <FilterGroup title="Status">
+            <FilterSelect label="Status" value={statusFilter} onChange={(value) => onStatusChange(value as StatusFilter)} options={STATUS_OPTIONS} />
+            <label className="mt-3 flex items-center gap-2 text-[0.72rem] text-[var(--challengers-muted)]"><input type="checkbox" checked={onlyUnsolved} className="challengers-checkbox size-4 rounded-[3px]" onChange={(event) => onOnlyUnsolvedChange(event.target.checked)} />Apenas não resolvidos</label>
+          </FilterGroup>
+          <FilterGroup title="Tipo">
+            <FilterSelect label="Tipo" value={typeFilter} onChange={(value) => onTypeChange(value as TypeFilter)} options={[{ value: "ALL", label: "Todos" }, ...TYPE_OPTIONS.map((type) => ({ value: type, label: type }))]} />
+          </FilterGroup>
+          <FilterGroup title="Ordenação">
+            <FilterSelect label="Ordenar" value={sortBy} onChange={(value) => onSortChange(value as SortBy)} options={SORT_OPTIONS} />
+          </FilterGroup>
+        </div>
+      </details>
+      {hasActiveFilters ? <button type="button" className="flex h-10 items-center gap-2 text-[0.78rem] text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]" onClick={onClearFilters}><Filter className="size-3.5" />Limpar filtros</button> : <span className="text-[0.75rem] text-[var(--challengers-muted)]">Use filtros para refinar o catálogo.</span>}
     </div>
   );
+}
+
+function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
+  return <fieldset className="min-w-0 bg-[var(--challengers-surface)] p-3"><legend className="sr-only">{title}</legend><p className="mb-2 text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[var(--challengers-muted)]">{title}</p>{children}</fieldset>;
 }
 
 function FilterSelect({
@@ -274,7 +248,7 @@ function FilterSelect({
       <span className="sr-only">{label}</span>
       <select
         value={value}
-        className="challengers-control h-10 min-w-[136px] rounded-[8px] border px-3 text-[0.78rem] outline-none"
+        className="challengers-control h-9 w-full min-w-0 rounded-[6px] border px-2 text-[0.72rem] outline-none"
         onChange={(event) => onChange(event.target.value)}
       >
         {options.map((option) => (

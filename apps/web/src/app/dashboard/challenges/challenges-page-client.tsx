@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 import { ZenToast } from "@kodan/ui/components/zen";
 import { getChallenges } from "../actions";
-import { ChallengesDocsSidebar } from "./challenges-docs-sidebar";
 import { ChallengesNavigationDrawer } from "./challenges-navigation-drawer";
 import { ChallengesExplorerPanel } from "./challenges-explorer-list";
 import {
@@ -195,17 +194,6 @@ export default function ChallengesPageClient({
     router.push(`/train/${challengeId}`);
   };
 
-  const sidebar = (
-    <ChallengesDocsSidebar
-      challenges={state.challenges}
-      topicFilter={state.topicFilter}
-      filterDifficulty={state.filterDifficulty}
-      onTopicChange={(topic) => dispatch({ type: "setTopic", payload: topic })}
-      onDifficultyChange={(difficulty) =>
-        dispatch({ type: "setFilter", payload: difficulty })
-      }
-    />
-  );
 
   const content = state.loadingInitial ? (
     <ChallengesLoadingState />
@@ -271,7 +259,6 @@ export default function ChallengesPageClient({
         <ChallengesDesktopShell
           userElo={state.userElo}
           searchQuery={state.searchQuery}
-          sidebar={sidebar}
           onSearchChange={(query) =>
             dispatch({ type: "setSearch", payload: query })
           }

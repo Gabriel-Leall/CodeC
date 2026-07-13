@@ -10,3 +10,4 @@ Esta é a documentação central do Kodan para contribuidores.
 
 - **Docs** reúne produto, design, arquitetura e guias editoriais.
 - **API Reference** renderiza a especificação OpenAPI gerada a partir dos contratos Zod usados pelos Route Handlers.
+- Comece por [Primeiros passos](./contributing/getting-started) para preparar o ambiente e entender como contribuir.
