@@ -1,134 +1,151 @@
 # Kodan
 
-Kodan e uma plataforma de treino para leitura de codigo, diagnostico e explicacao tecnica em TypeScript e React.
-O repositorio ainda nasceu sobre [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), mas ja tem fluxo proprio de conteudo, banco de desafios e question bank editorial.
+Kodan é uma plataforma de treino para leitura, diagnóstico e explicação de código em TypeScript e React. A pessoa escolhe um desafio, analisa o snippet, envia o diagnóstico e acompanha o feedback e a evolução de ELO.
 
-## Features
+O repositório é um monorepo Bun com duas aplicações locais: o produto web e a documentação Docusaurus.
 
-- **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Prisma** - TypeScript-first ORM
-- **Neon Postgres** - Serverless PostgreSQL database
-- **Authentication** - Better-Auth
-- **Question bank editorial** - Seeds curadas para futuras perguntas e desafios do Kodan
+## Início rápido
 
-## Getting Started
+### 1. Pré-requisitos
 
-First, install the dependencies:
+- [Bun](https://bun.sh/) 1.3 ou superior;
+- acesso a um PostgreSQL para os fluxos com dados;
+- Git.
+
+### 2. Instale as dependências
 
 ```bash
 bun install
 ```
 
-## Database Setup
+### 3. Configure o ambiente
 
-This project uses Neon Postgres with Prisma.
-
-1. Update `apps/web/.env` with your Neon connection strings:
+Crie seu arquivo local a partir do exemplo seguro:
 
 ```bash
-DATABASE_URL=...   # app/runtime connection
-DIRECT_URL=...     # Prisma CLI connection
+cp apps/web/.env.example apps/web/.env
 ```
 
-2. Apply the schema to Neon:
+No PowerShell:
+
+```powershell
+Copy-Item apps/web/.env.example apps/web/.env
+```
+
+Preencha ao menos `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` e `CORS_ORIGIN`. Não envie `apps/web/.env` para o Git.
+
+### 4. Prepare o banco
 
 ```bash
 bun run db:push
 ```
 
-3. If you're migrating the old local SQLite data, run:
+### 5. Inicie as aplicações
+
+Use terminais separados durante o desenvolvimento:
 
 ```bash
-bun run db:migrate:sqlite-to-neon
+# Aplicação Kodan
+bun run dev:web
 ```
 
-Then, run the development server:
+Abra [http://localhost:3001](http://localhost:3001).
 
 ```bash
-bun run dev
+# Documentação e referência de API
+bun run docs:dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the fullstack application.
+Abra [http://localhost:3002](http://localhost:3002).
 
-## UI Customization
+`bun run docs:dev` gera a especificação OpenAPI antes de iniciar o Docusaurus. Para trabalhar apenas na interface da documentação, sem regenerar a API, use `bun run --filter docs dev`.
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+> Se uma porta já estiver em uso, finalize o processo que está usando `3001` ou `3002`, ou reutilize o servidor que já está em execução. Evite iniciar `bun run dev` duas vezes.
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+## Onde começar
 
-### Add more shared components
+| Quero... | Leia / rode |
+| --- | --- |
+| Entender as telas e rotas | [Aplicação e rotas](apps/docs/docs/application.md) |
+| Preparar o ambiente com mais detalhes | [Primeiros passos](apps/docs/docs/contributing/getting-started.md) |
+| Entender a separação entre apps, packages e conteúdo | [Mapa de arquitetura](apps/docs/docs/contributing/architecture.md) |
+| Abrir um PR | [Fluxo de contribuição](apps/docs/docs/contributing/pull-requests.md) e [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Criar ou revisar material editorial | [Guia do banco de perguntas](apps/docs/docs/question-bank/authoring-guide.md) |
 
-Run this from the project root to add more primitives to the shared UI package:
+## Aplicações locais
+
+| Aplicação | Comando | URL | Papel |
+| --- | --- | --- | --- |
+| Web | `bun run dev:web` | `http://localhost:3001` | Catálogo, arena de treino, perfil e API Next.js. |
+| Docs | `bun run docs:dev` | `http://localhost:3002` | Docusaurus, guias para contribuidores e referência OpenAPI. |
+
+## Estrutura do projeto
+
+```text
+apps/
+  web/                  # Next.js: interface e Route Handlers HTTP
+  docs/                 # Docusaurus e referência OpenAPI
+packages/
+  ui/                   # Primitives shadcn/ui, estilos e tokens
+  db/                   # Prisma, schema e acesso a PostgreSQL
+  auth/                 # Better Auth
+  env/                  # Validação tipada de variáveis de ambiente
+content/
+  challenges/           # Desafios já disponíveis para treino
+  question-bank/        # Seeds editoriais para curadoria
+scripts/                # Geração OpenAPI e rotinas editoriais
+```
+
+Regra prática: mantenha código específico da aplicação em `apps/web`; extraia para `packages/ui` apenas o que for realmente reutilizável; use `content/challenges` para desafios jogáveis e `content/question-bank` para material editorial ainda não promovido.
+
+## Variáveis de ambiente
+
+| Variável | Necessária | Finalidade |
+| --- | --- | --- |
+| `DATABASE_URL` | Sim | Conexão usada pela aplicação. |
+| `DIRECT_URL` | Para Prisma | Conexão direta para schema e migrações. |
+| `BETTER_AUTH_SECRET` | Sim | Segredo com pelo menos 32 caracteres. |
+| `BETTER_AUTH_URL` | Sim | URL da aplicação, normalmente `http://localhost:3001`. |
+| `CORS_ORIGIN` | Sim | Origem autorizada, normalmente a mesma URL local. |
+| `OPENROUTER_API_KEY` | Não | Habilita feedback por IA; sem ela há fallback local. |
+| `OPENROUTER_MODEL` | Não | Modelo de IA, com padrão `openai/gpt-4o-mini`. |
+| `LEGACY_SQLITE_URL` | Não | Caminho do banco legado para migração. |
+
+## Comandos úteis
+
+| Comando | O que faz |
+| --- | --- |
+| `bun run dev:web` | Inicia somente o Next.js na porta 3001. |
+| `bun run docs:dev` | Gera OpenAPI e inicia o Docusaurus na porta 3002. |
+| `bun run dev` | Inicia todos os workspaces. Use quando as portas estiverem livres. |
+| `bun run docs:build` | Gera OpenAPI e cria a documentação estática. |
+| `bun run check-types` | Verifica os tipos dos workspaces. |
+| `bun test` | Executa os testes Bun. |
+| `bun run doctor` | Executa o React Doctor. |
+| `bun run db:push` | Aplica o schema Prisma no banco configurado. |
+| `bun run db:studio` | Abre o Prisma Studio. |
+| `bun run question-bank:generate` | Regenera os artefatos editoriais. |
+| `bun run question-bank:validate` | Valida estrutura e consistência do banco de perguntas. |
+
+## Antes de abrir um PR
+
+Para mudanças de código:
 
 ```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
+bun run check-types
+bun test
 ```
 
-Import shared components like this:
-
-```tsx
-import { Button } from "@kodan/ui/components/button";
-```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
-
-## Question Bank Workflow
-
-O Kodan separa duas camadas de conteudo:
-
-- `content/question-bank/`: seeds editoriais, pensadas para curadoria, revisao em PR e futura promocao.
-- `content/challenges/`: desafios jogaveis usados pelo runtime.
-
-Fonte de verdade do question bank:
-
-- `scripts/question-bank/bank-data.ts`
-
-Comandos:
+Para alterações em Docs, contratos HTTP ou OpenAPI:
 
 ```bash
-bun run question-bank:generate
-bun run question-bank:validate
+bun run docs:build
 ```
 
-Documentacao de autoria:
+Para alterações React, rode também:
 
-- `docs/question-bank/authoring-guide.md`
-- `docs/question-bank/seed-template.md`
-
-## Project Structure
-
-```
-Kodan/
-├── apps/
-│   └── web/         # Fullstack application (Next.js)
-├── content/
-│   ├── challenges/  # Desafios jogaveis do runtime
-│   └── question-bank/ # Seeds editoriais geradas
-├── docs/
-│   └── question-bank/ # Guias de autoria e auditoria do banco de perguntas
-├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+```bash
+bun run doctor
 ```
 
-## Available Scripts
-
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run db:push`: Push schema changes to database
-- `bun run db:generate`: Generate database client/types
-- `bun run db:migrate`: Run database migrations
-- `bun run db:studio`: Open database studio UI
-- `bun run db:migrate:sqlite-to-neon`: Copy data from the legacy SQLite file into Neon
-- `bun run question-bank:generate`: Regenerate the editorial question bank and its docs
-- `bun run question-bank:validate`: Validate question-bank counts, shape, and generated files
+Veja o [guia de contribuição](CONTRIBUTING.md) para os fluxos de interface, API, dados e conteúdo.

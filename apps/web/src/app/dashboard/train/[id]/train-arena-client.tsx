@@ -20,14 +20,12 @@ import {
   EyeOff,
   FileCode,
   HelpCircle,
-  Hourglass,
   Info,
   Lightbulb,
   Loader2,
-  Menu,
   PanelRightOpen,
-  Search,
   SendHorizontal,
+  X,
 } from "lucide-react";
 
 import { Button } from "@kodan/ui/components/button";
@@ -317,19 +315,6 @@ function getPossibleElo(difficulty: string) {
   }
 }
 
-function getRankLabel(elo: number) {
-  if (elo >= 2200) {
-    return "SENSEI";
-  }
-  if (elo >= 1800) {
-    return "SAMURAI";
-  }
-  if (elo >= 1100) {
-    return "RONIN";
-  }
-  return "CADETE";
-}
-
 function getTags(tags: string) {
   return tags.split(",").flatMap((tag) => {
     const trimmed = tag.trim();
@@ -359,23 +344,6 @@ function inferChallengeType(tags: string[]) {
   return "Diagnostics";
 }
 
-function getChallengeSubtitle(type: string) {
-  switch (type) {
-    case "Effects":
-      return "Domine efeitos colaterais e o ciclo de vida dos componentes.";
-    case "Async UI":
-      return "Treine leitura de corridas, cancelamento e respostas fora de ordem.";
-    case "State":
-      return "Pratique transições de estado, imutabilidade e atualizações derivadas.";
-    case "Rendering":
-      return "Analise renderizações, memoização e contratos entre componentes.";
-    case "Types":
-      return "Fortaleça inferência, narrowing e contratos de tipos em TypeScript.";
-    default:
-      return "Leia o código, isole o bug e proponha uma correção defensável.";
-  }
-}
-
 function getChallengeNumber(challenge: Challenge) {
   const matches = `${challenge.id} ${challenge.title}`.match(/\d+/g);
   if (matches && matches.length > 0) {
@@ -389,29 +357,6 @@ function getChallengeNumber(challenge: Challenge) {
     ) + 1;
 
   return String(hash).padStart(3, "0");
-}
-
-function getLevelCompatibility(recommendedElo: number, userElo: number) {
-  const delta = recommendedElo - userElo;
-
-  if (delta <= 150) {
-    return {
-      label: "Nível compatível",
-      className: "challengers-status-resolved",
-    };
-  }
-
-  if (delta > 200) {
-    return {
-      label: "Acima do seu ELO",
-      className: "challengers-status-in-progress",
-    };
-  }
-
-  return {
-    label: "Boa progressão",
-    className: "challengers-status-not-started",
-  };
 }
 
 interface TrainArenaClientProps {
@@ -460,33 +405,29 @@ export default function TrainArenaClient({
     return (
       <main
         data-challengers-screen="true"
-        className="h-full min-h-0 bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
+        className="min-h-svh bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
       >
-        <div className="h-full min-h-0 lg:grid lg:grid-cols-[64px_minmax(0,1fr)]">
-          <ArenaSidebar />
-          <section className="flex h-full min-h-0 flex-col overflow-hidden">
-            <ArenaTopbar userElo={initialUserElo} />
-            <div className="flex flex-1 items-center justify-center px-4">
-              <div className="challengers-panel max-w-md rounded-[10px] border px-8 py-9 text-center">
-                <h1 className="font-serif text-xl font-bold text-[var(--challengers-ink)]">
-                  Desafio não encontrado
-                </h1>
-                <p className="mt-3 text-sm leading-6 text-[var(--challengers-muted)]">
-                  O item solicitado não está disponível no catálogo atual.
-                </p>
-                <Link href="/challenges" className="mt-6 inline-flex">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
-                  >
-                    <ChevronLeft className="size-3.5" />
-                    Voltar aos desafios
-                  </Button>
-                </Link>
-              </div>
+        <div className="flex min-h-svh min-w-0 flex-col">
+          <div className="flex flex-1 items-center justify-center px-4">
+            <div className="challengers-panel max-w-md rounded-[10px] border px-8 py-9 text-center">
+              <h1 className="font-serif text-xl font-bold text-[var(--challengers-ink)]">
+                Desafio não encontrado
+              </h1>
+              <p className="mt-3 text-sm leading-6 text-[var(--challengers-muted)]">
+                O item solicitado não está disponível no catálogo atual.
+              </p>
+              <Link href="/challenges" className="mt-6 inline-flex">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+                >
+                  <ChevronLeft className="size-3.5" />
+                  Voltar aos desafios
+                </Button>
+              </Link>
             </div>
-          </section>
+          </div>
         </div>
       </main>
     );
@@ -503,13 +444,8 @@ export default function TrainArenaClient({
     userAnswer.trim().length === 0
       ? 0
       : userAnswer.trim().split(/\s+/).length;
-  const attemptCount = challenge.attempts?.length ?? 0;
   const canSubmit =
     !submitting && !answerLocked && answerLength >= MIN_ANSWER_LENGTH;
-  const compatibility = getLevelCompatibility(
-    challenge.recommendedElo,
-    initialUserElo,
-  );
   const hasStartedAnalysis =
     answerLength > 0 || notes.trim().length > 0 || hintRevealed || submitting;
 
@@ -584,29 +520,25 @@ export default function TrainArenaClient({
   return (
     <main
       data-challengers-screen="true"
-      className="h-full min-h-0 bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
+      className="min-h-svh bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
     >
-      <div className="h-full min-h-0 lg:grid lg:grid-cols-[64px_minmax(0,1fr)]">
-        <ArenaSidebar />
-        <section className="flex h-full min-h-0 flex-col overflow-hidden">
-          <ArenaTopbar userElo={userElo} />
+      <div className="flex min-h-svh min-w-0 flex-col">
+        <ChallengeHeader
+          challenge={challenge}
+          challengeNumber={getChallengeNumber(challenge)}
+          challengeType={challengeType}
+          userElo={userElo}
+        />
 
-          <div className="min-h-0 flex-1 overflow-auto">
-            <div className="mx-auto flex min-h-full max-w-[1500px] flex-col gap-4 px-4 py-4 lg:px-5 xl:px-6">
-              <ChallengeOverview
-                challenge={challenge}
-                challengeNumber={getChallengeNumber(challenge)}
-                challengeType={challengeType}
-                attemptCount={attemptCount}
-                compatibility={compatibility}
-              />
-
+        <div className="min-h-0 flex-1 overflow-auto">
+          <div className="mx-auto flex min-h-full max-w-[1500px] flex-col px-4 lg:px-5 xl:px-6">
               <ChallengeSteps
+                className="h-9 shrink-0"
                 hasStartedAnalysis={hasStartedAnalysis}
                 hasResult={Boolean(result)}
               />
 
-              <div className="grid flex-1 gap-5 xl:min-h-[640px] xl:grid-cols-[minmax(0,1.08fr)_minmax(390px,0.92fr)]">
+              <div className="grid flex-1 gap-4 py-3 xl:min-h-[640px] xl:grid-cols-[minmax(0,1.08fr)_minmax(390px,0.92fr)]">
                 <CodePanel
                   code={challenge.code}
                   lineCount={lines.length}
@@ -665,9 +597,8 @@ export default function TrainArenaClient({
                   )}
                 </div>
               </div>
-            </div>
           </div>
-        </section>
+        </div>
       </div>
 
       <div className="fixed bottom-4 right-4 z-[80]">
@@ -679,178 +610,64 @@ export default function TrainArenaClient({
   );
 }
 
-function ArenaSidebar() {
+function ChallengeHeader({
+  challenge,
+  challengeNumber,
+  challengeType,
+  userElo,
+}: {
+  challenge: Challenge;
+  challengeNumber: string;
+  challengeType: string;
+  userElo: number;
+}) {
   return (
-    <aside className="hidden h-full min-h-0 flex-col items-center justify-between border-r border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] py-5 lg:flex">
-      <div className="flex flex-col items-center gap-5">
-        <Link
-          href="/challenges"
-          aria-label="Abrir catálogo de desafios"
-          className="challengers-icon-button inline-flex size-9 items-center justify-center rounded-[9px] border"
-        >
-          <Menu className="size-4" />
-        </Link>
-      </div>
-
+    <header className="flex h-12 shrink-0 items-center gap-3 bg-[var(--challengers-surface)] px-4 lg:px-5 xl:px-6">
       <Link
         href="/challenges"
         aria-label="Voltar ao catálogo de desafios"
-        className="inline-flex size-8 items-center justify-center rounded-[7px] border border-[color:var(--challengers-blue-border)] bg-[var(--challengers-blue-soft)] font-mono text-base font-semibold text-[var(--challengers-blue)]"
+        className="inline-flex size-7 shrink-0 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]"
       >
-        K
+        <ChevronLeft className="size-4" />
       </Link>
-    </aside>
-  );
-}
 
-function ArenaTopbar({ userElo }: { userElo: number }) {
-  return (
-    <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] px-4 py-3 lg:flex lg:h-[72px] lg:flex-row lg:items-center lg:justify-between lg:gap-5 lg:px-6">
-      <div className="min-w-0">
-        <Link
-          href="/challenges"
-          className="inline-flex min-w-0 items-center gap-3 text-[var(--challengers-ink)]"
-        >
-          <span className="inline-flex size-10 items-center justify-center rounded-[8px] border border-[color:var(--challengers-blue-border)] bg-[var(--challengers-blue-soft)] font-mono text-xl font-semibold text-[var(--challengers-blue)]">
-            K
-          </span>
-          <span className="truncate font-serif text-2xl font-bold tracking-[0.04em]">
-            KODAN
-          </span>
-        </Link>
+      <div className="flex min-w-0 items-center gap-2">
+        <h1 className="truncate font-serif text-sm font-bold text-[var(--challengers-ink)] sm:text-base">
+          {challengeNumber} - {challenge.title}
+        </h1>
+        <span className={cn("hidden rounded-[5px] border px-1.5 py-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.06em] sm:inline-flex", getDifficultyClassName(challenge.difficulty))}>
+          {getDifficultyLabel(challenge.difficulty)}
+        </span>
       </div>
 
-      <Link
-        href="/challenges"
-        className="challengers-control relative col-span-2 row-start-2 flex h-11 min-w-0 flex-1 items-center rounded-[9px] border px-4 text-sm text-[var(--challengers-muted)] lg:col-span-1 lg:row-auto lg:max-w-[520px]"
-      >
-        <Search className="mr-3 size-4 shrink-0" />
-        <span className="truncate">Buscar desafios, tópicos, conceitos...</span>
-        <span className="ml-auto hidden size-6 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--challengers-border)] text-[0.72rem] sm:inline-flex">
-          /
+      <div className="ml-auto hidden items-center gap-3 whitespace-nowrap text-[0.7rem] text-[var(--challengers-muted)] lg:flex">
+        <span>{challengeType}</span>
+        <span>{getEstimatedTime(challenge.difficulty)}</span>
+        <span>{getPossibleElo(challenge.difficulty)}</span>
+      </div>
+
+      <div className="ml-auto flex shrink-0 items-center gap-3 lg:ml-2">
+        <span className="text-[0.72rem] font-semibold tabular-nums text-[var(--challengers-blue)]">
+          {userElo} ELO
         </span>
-      </Link>
-
-      <div className="col-start-2 row-start-1 flex shrink-0 items-center justify-end gap-2 lg:col-auto lg:row-auto lg:gap-4">
-        <div className="hidden items-center gap-4 sm:flex">
-          <span className="inline-flex size-10 items-center justify-center rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] font-serif text-lg font-bold text-[var(--challengers-ink)]">
-            圭
-          </span>
-          <div className="border-r border-[color:var(--challengers-border)] pr-5">
-            <p className="text-[0.66rem] uppercase tracking-[0.16em] text-[var(--challengers-muted)]">
-              Rank
-            </p>
-            <p className="font-serif text-base font-bold leading-tight">
-              {getRankLabel(userElo)}
-            </p>
-          </div>
-          <div>
-            <p className="text-[0.66rem] uppercase tracking-[0.16em] text-[var(--challengers-muted)]">
-              Elo
-            </p>
-            <p className="text-base font-semibold leading-tight text-[var(--challengers-blue)]">
-              {userElo}
-            </p>
-          </div>
-        </div>
-
         <Link
           href="/challenges"
-          className="challengers-icon-button inline-flex size-9 items-center justify-center rounded-[9px] border lg:hidden"
-          aria-label="Abrir catálogo"
+          aria-label="Fechar arena e voltar ao catálogo"
+          className="inline-flex size-7 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]"
         >
-          <Menu className="size-4" />
-        </Link>
-
-        <Link
-          href="/profile"
-          className="challengers-icon-button inline-flex h-9 items-center gap-2 rounded-[999px] border px-2.5"
-        >
-          <span className="inline-flex size-7 items-center justify-center rounded-full bg-[var(--challengers-ink)] text-[0.78rem] font-semibold text-[oklch(99%_0.003_248)]">
-            N
-          </span>
-          <ChevronDown className="size-3.5 text-[var(--challengers-muted)]" />
+          <X className="size-3.5" />
         </Link>
       </div>
     </header>
   );
 }
 
-function ChallengeOverview({
-  challenge,
-  challengeNumber,
-  challengeType,
-  attemptCount,
-  compatibility,
-}: {
-  challenge: Challenge;
-  challengeNumber: string;
-  challengeType: string;
-  attemptCount: number;
-  compatibility: { label: string; className: string };
-}) {
-  return (
-    <section className="grid gap-4 border-b border-[color:var(--challengers-border)] pb-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
-      <div className="flex min-w-0 items-start gap-4">
-        <span className="mt-1 hidden text-[var(--challengers-muted)] sm:inline-flex">
-          <Hourglass className="size-5" />
-        </span>
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="font-mono text-base font-semibold tabular-nums text-[var(--challengers-ink)]">
-              {challengeNumber}
-            </span>
-            <h1 className="min-w-0 font-serif text-xl font-bold leading-tight text-[var(--challengers-ink)] sm:text-2xl">
-              {challenge.title}
-            </h1>
-            <span
-              className={cn(
-                "inline-flex rounded-[6px] border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.06em]",
-                getDifficultyClassName(challenge.difficulty),
-              )}
-            >
-              {getDifficultyLabel(challenge.difficulty)}
-            </span>
-            <span
-              className={cn(
-                "inline-flex rounded-[6px] border px-2 py-0.5 text-[0.68rem] font-medium",
-                compatibility.className,
-              )}
-            >
-              {compatibility.label}
-            </span>
-          </div>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--challengers-muted)]">
-            {getChallengeSubtitle(challengeType)}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 overflow-hidden rounded-[10px] border border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] sm:grid-cols-4 xl:min-w-[600px]">
-        <ChallengeMetric label="Tipo" value={challengeType} />
-        <ChallengeMetric label="Tempo" value={getEstimatedTime(challenge.difficulty)} />
-        <ChallengeMetric label="Tentativas" value={String(attemptCount)} />
-        <ChallengeMetric label="ELO" value={getPossibleElo(challenge.difficulty)} />
-      </div>
-    </section>
-  );
-}
-
-function ChallengeMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-r border-t border-[color:var(--challengers-border)] px-4 py-3 first:border-t-0 even:border-r-0 sm:border-t-0 sm:even:border-r sm:last:border-r-0">
-      <p className="text-[0.72rem] text-[var(--challengers-muted)]">{label}</p>
-      <p className="mt-1 font-serif text-base font-semibold leading-tight text-[var(--challengers-ink)]">
-        {value}
-      </p>
-    </div>
-  );
-}
-
 function ChallengeSteps({
+  className,
   hasStartedAnalysis,
   hasResult,
 }: {
+  className?: string;
   hasStartedAnalysis: boolean;
   hasResult: boolean;
 }) {
@@ -872,10 +689,13 @@ function ChallengeSteps({
   return (
     <nav
       aria-label="Progresso do desafio"
-      className="flex flex-wrap items-center gap-x-4 gap-y-3 px-0.5 text-[0.78rem] text-[var(--challengers-muted)]"
+      className={cn(
+        "flex items-center gap-x-3 overflow-x-auto px-0.5 text-[0.7rem] text-[var(--challengers-muted)]",
+        className,
+      )}
     >
       {steps.map((step, index) => (
-        <div key={step.label} className="flex min-w-0 items-center gap-3">
+        <div key={step.label} className="flex shrink-0 items-center gap-2">
           <span
             className={cn(
               "inline-flex size-4 items-center justify-center rounded-full border",
@@ -902,7 +722,7 @@ function ChallengeSteps({
             {step.label}
           </span>
           {index < steps.length - 1 ? (
-            <span className="hidden h-px w-20 bg-[var(--challengers-border-strong)] sm:block" />
+            <span className="hidden h-px w-12 bg-[var(--challengers-border-strong)] sm:block" />
           ) : null}
         </div>
       ))}

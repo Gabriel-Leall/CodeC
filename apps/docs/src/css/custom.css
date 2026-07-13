@@ -30,13 +30,14 @@
 }
 
 [data-theme="dark"] {
-  --kodan-page: #181916;
-  --kodan-surface: #20221e;
-  --kodan-surface-muted: #2b2d28;
-  --kodan-ink: #f5f2eb;
-  --kodan-muted: #b9b3a8;
-  --kodan-border: #3a3c36;
-  --kodan-code: #282d40;
+  --kodan-page: #111111;
+  --kodan-sidebar: #0d0d0d;
+  --kodan-surface: #161616;
+  --kodan-surface-muted: #222222;
+  --kodan-ink: #f6f3ed;
+  --kodan-muted: #8c8a85;
+  --kodan-border: #242424;
+  --kodan-code: #1e1e1e;
 
   --ifm-background-color: var(--kodan-page);
   --ifm-background-surface-color: var(--kodan-surface);
@@ -46,8 +47,8 @@
   --ifm-heading-color: var(--kodan-ink);
   --ifm-toc-border-color: var(--kodan-border);
   --ifm-menu-color-background-active: var(--kodan-surface-muted);
-  --ifm-color-primary: #77a887;
-  --ifm-code-background: #303126;
+  --ifm-color-primary: #5a8dbf;
+  --ifm-code-background: #1e1e1e;
   --prism-background-color: var(--kodan-code);
 }
 
@@ -70,7 +71,10 @@ body,
   color: var(--kodan-ink);
 }
 
-.theme-doc-sidebar-container,
+.theme-doc-sidebar-container {
+  background: var(--kodan-sidebar, var(--kodan-page));
+}
+
 [class*="tableOfContents"] {
   background: var(--kodan-page);
 }
