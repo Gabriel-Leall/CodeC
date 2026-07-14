@@ -11,6 +11,7 @@ const sidebars: SidebarsConfig = {
       label: "Contribuir",
       items: [
         "contributing/getting-started",
+        "contributing/mock-mode",
         "contributing/architecture",
         "contributing/pull-requests",
       ],

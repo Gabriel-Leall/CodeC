@@ -11,7 +11,7 @@ Este guia prepara uma contribuição local para o Kodan. O repositório usa **Bu
 
 - Bun 1.3 ou superior;
 - Node.js compatível com o Bun usado no projeto;
-- uma instância PostgreSQL (Neon ou local) para os fluxos que acessam dados.
+- PostgreSQL (Neon ou local) apenas para os fluxos integrados que acessam dados e autenticação.
 
 ## Instalação
 
@@ -33,11 +33,15 @@ No PowerShell, use:
 Copy-Item apps/web/.env.example apps/web/.env
 ```
 
-Preencha as variáveis de banco e autenticação. Os valores nunca devem ser enviados em commits.
+O arquivo mantém `USE_MOCK_DATA="false"`, o modo integrado. Para contribuições de interface, você pode alterar conscientemente para `USE_MOCK_DATA="true"`: a aplicação passa a usar desafios, usuário e tentativas em memória, sem PostgreSQL nem Better Auth. Os dados são reiniciados ao parar o servidor.
+
+Para trabalhar com Prisma, banco ou autenticação, mude para `USE_MOCK_DATA="false"` e preencha as variáveis de banco e autenticação. Os valores nunca devem ser enviados em commits.
+
+Veja as limitações e os dados disponíveis no [modo mock local](./mock-mode) antes de usar esse caminho para validar uma contribuição.
 
 ## Banco de dados
 
-Depois de configurar `DATABASE_URL` e `DIRECT_URL`, aplique o schema:
+No modo integrado, depois de configurar `DATABASE_URL` e `DIRECT_URL`, aplique o schema:
 
 ```bash
 bun run db:push
@@ -67,11 +71,12 @@ Ela abre em [http://localhost:3002](http://localhost:3002). Esse comando também
 
 | Variável | Obrigatória | Uso |
 | --- | --- | --- |
-| `DATABASE_URL` | Sim | Conexão usada pela aplicação. |
+| `USE_MOCK_DATA` | Não | `true` inicia a interface sem banco; `false` ativa a integração real. |
+| `DATABASE_URL` | No modo integrado | Conexão usada pela aplicação. |
 | `DIRECT_URL` | Para comandos Prisma | Conexão direta para CLI/migrações. |
-| `BETTER_AUTH_SECRET` | Sim | Segredo de autenticação, com ao menos 32 caracteres. |
-| `BETTER_AUTH_URL` | Sim | URL pública/local da aplicação, por exemplo `http://localhost:3001`. |
-| `CORS_ORIGIN` | Sim | Origem autorizada, normalmente a mesma URL local da aplicação. |
+| `BETTER_AUTH_SECRET` | No modo integrado | Segredo de autenticação, com ao menos 32 caracteres. |
+| `BETTER_AUTH_URL` | No modo integrado | URL pública/local da aplicação, por exemplo `http://localhost:3001`. |
+| `CORS_ORIGIN` | No modo integrado | Origem autorizada, normalmente a mesma URL local da aplicação. |
 | `OPENROUTER_API_KEY` | Não | Habilita feedback por IA; sem ela o projeto usa feedback local de fallback. |
 | `OPENROUTER_MODEL` | Não | Modelo do OpenRouter; o padrão atual é `openai/gpt-4o-mini`. |
 | `LEGACY_SQLITE_URL` | Não | Caminho do banco SQLite legado, somente para migração. |

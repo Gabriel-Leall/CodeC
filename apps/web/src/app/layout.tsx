@@ -4,7 +4,7 @@ import { JetBrains_Mono, Courier_Prime } from "next/font/google";
 import "../index.css";
 import { AppShell } from "../components/app-shell";
 import Providers from "../components/providers";
-import { ensureDefaultLocalUser } from "../lib/local-user";
+import { ensureRuntimeUser } from "../lib/runtime-data";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -28,7 +28,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   try {
-    await ensureDefaultLocalUser();
+    await ensureRuntimeUser();
   } catch {
     // Em build/prerender sem schema aplicado, não bloqueia renderização inicial.
   }

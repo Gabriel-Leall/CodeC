@@ -1,8 +1,8 @@
-import { auth } from "@kodan/auth";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { getRuntimeSession } from "@/lib/runtime-data";
 import EntryGate from "./entry-gate";
 
 export const metadata: Metadata = {
@@ -16,9 +16,7 @@ export default async function HomePage() {
   let hasSession = false;
 
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getRuntimeSession(await headers());
     hasSession = Boolean(session);
   } catch {
     // Falha de sessão não bloqueia a tela inicial.

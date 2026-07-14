@@ -9,7 +9,7 @@ O repositório é um monorepo Bun com duas aplicações locais: o produto web e 
 ### 1. Pré-requisitos
 
 - [Bun](https://bun.sh/) 1.3 ou superior;
-- acesso a um PostgreSQL para os fluxos com dados;
+- PostgreSQL apenas para os fluxos integrados com dados e autenticação;
 - Git.
 
 ### 2. Instale as dependências
@@ -32,9 +32,13 @@ No PowerShell:
 Copy-Item apps/web/.env.example apps/web/.env
 ```
 
-Preencha ao menos `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` e `CORS_ORIGIN`. Não envie `apps/web/.env` para o Git.
+O exemplo mantém `USE_MOCK_DATA="false"`, o modo integrado. Para desenvolver apenas a interface sem PostgreSQL nem Better Auth, altere conscientemente a variável para `true`; nesse caso, os dados vivem apenas na memória. Não envie `apps/web/.env` para o Git.
 
-### 4. Prepare o banco
+As limitações e a troca para a integração real estão documentadas em [Modo mock local](apps/docs/docs/contributing/mock-mode.md).
+
+Para trabalhar com banco, autenticação ou Prisma, mude para `USE_MOCK_DATA="false"` e preencha `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` e `CORS_ORIGIN`.
+
+### 4. Prepare o banco (somente modo integrado)
 
 ```bash
 bun run db:push
@@ -102,11 +106,12 @@ Regra prática: mantenha código específico da aplicação em `apps/web`; extra
 
 | Variável | Necessária | Finalidade |
 | --- | --- | --- |
-| `DATABASE_URL` | Sim | Conexão usada pela aplicação. |
+| `USE_MOCK_DATA` | Não | Use `true` para desenvolver telas sem banco; use `false` para o modo integrado. |
+| `DATABASE_URL` | No modo integrado | Conexão usada pela aplicação. |
 | `DIRECT_URL` | Para Prisma | Conexão direta para schema e migrações. |
-| `BETTER_AUTH_SECRET` | Sim | Segredo com pelo menos 32 caracteres. |
-| `BETTER_AUTH_URL` | Sim | URL da aplicação, normalmente `http://localhost:3001`. |
-| `CORS_ORIGIN` | Sim | Origem autorizada, normalmente a mesma URL local. |
+| `BETTER_AUTH_SECRET` | No modo integrado | Segredo com pelo menos 32 caracteres. |
+| `BETTER_AUTH_URL` | No modo integrado | URL da aplicação, normalmente `http://localhost:3001`. |
+| `CORS_ORIGIN` | No modo integrado | Origem autorizada, normalmente a mesma URL local. |
 | `OPENROUTER_API_KEY` | Não | Habilita feedback por IA; sem ela há fallback local. |
 | `OPENROUTER_MODEL` | Não | Modelo de IA, com padrão `openai/gpt-4o-mini`. |
 | `LEGACY_SQLITE_URL` | Não | Caminho do banco legado para migração. |

@@ -1,12 +1,10 @@
 import "server-only";
 
-import { auth } from "@kodan/auth";
-import prisma from "@kodan/db";
-import { env } from "@kodan/env/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
-import { ensureDefaultLocalUser } from "@/lib/local-user";
+import { isMockMode } from "@/lib/mock-mode";
+import { mockTrainingStore } from "./mock-store";
 import { updateCurrentUserSchema, type submitAttemptSchema } from "./schemas";
 import type { z } from "zod";
 
@@ -29,6 +27,14 @@ type ChallengeRecord = {
 type SubmitAttemptInput = z.infer<typeof submitAttemptSchema>;
 
 async function ensureSessionOrLocalUser() {
+  if (isMockMode()) {
+    return mockTrainingStore.getCurrentUser();
+  }
+
+  const [{ auth }, { ensureDefaultLocalUser }] = await Promise.all([
+    import("@kodan/auth"),
+    import("@/lib/local-user"),
+  ]);
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -38,6 +44,11 @@ async function ensureSessionOrLocalUser() {
   }
 
   return ensureDefaultLocalUser();
+}
+
+async function getPrisma() {
+  const { default: prisma } = await import("@kodan/db");
+  return prisma;
 }
 
 function cleanJsonResponse(raw: string): string {
@@ -96,6 +107,11 @@ async function getFeedbackFromOpenRouter(
   userAnswer: string,
 ): Promise<FeedbackPayload> {
   const fallback = getMockFeedback(challenge.solution);
+  if (isMockMode()) {
+    return fallback;
+  }
+
+  const { env } = await import("@kodan/env/server");
 
   if (!env.OPENROUTER_API_KEY) {
     return fallback;
@@ -174,7 +190,6 @@ export async function updateCurrentUserProfile(
 ) {
   try {
     const parsedParams = updateCurrentUserSchema.parse(params);
-    const user = await ensureSessionOrLocalUser();
     const name = parsedParams.name.trim().slice(0, 60);
     const bio =
       typeof parsedParams.bio === "string" ? parsedParams.bio.trim().slice(0, 180) : undefined;
@@ -191,6 +206,18 @@ export async function updateCurrentUserProfile(
       }
       image = parsedParams.image;
     }
+
+    if (isMockMode()) {
+      const updatedUser = mockTrainingStore.updateUser({ name, bio, image });
+      revalidatePath("/", "layout");
+      revalidatePath("/profile");
+      revalidatePath("/dashboard");
+      revalidatePath("/challenges");
+      return { success: true, data: updatedUser };
+    }
+
+    const user = await ensureSessionOrLocalUser();
+    const prisma = await getPrisma();
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -215,9 +242,27 @@ export async function updateCurrentUserProfile(
 
 export async function listChallenges(params?: { limit?: number; offset?: number }) {
   try {
-    const user = await ensureSessionOrLocalUser();
     const limit = Math.min(50, Math.max(1, params?.limit ?? 15));
     const offset = Math.max(0, params?.offset ?? 0);
+
+    if (isMockMode()) {
+      const result = mockTrainingStore.listChallenges({ limit, offset });
+      const nextOffset = offset + result.items.length;
+      return {
+        success: true,
+        data: {
+          items: result.items,
+          total: result.total,
+          offset,
+          nextOffset,
+          hasMore: nextOffset < result.total,
+          userElo: mockTrainingStore.getCurrentUser().elo,
+        },
+      };
+    }
+
+    const user = await ensureSessionOrLocalUser();
+    const prisma = await getPrisma();
     const total = await prisma.challenge.count();
 
     const challenges = await prisma.challenge.findMany({
@@ -259,7 +304,15 @@ export async function listChallenges(params?: { limit?: number; offset?: number 
 
 export async function getChallengeById(id: string) {
   try {
+    if (isMockMode()) {
+      const challenge = mockTrainingStore.getChallengeById(id);
+      return challenge
+        ? { success: true, data: challenge }
+        : { success: false, error: "Desafio não encontrado" };
+    }
+
     const user = await ensureSessionOrLocalUser();
+    const prisma = await getPrisma();
 
     const challenge = await prisma.challenge.findUnique({
       where: { id },
@@ -288,7 +341,17 @@ export async function getChallengeById(id: string) {
 
 export async function submitChallengeAttempt(challengeId: string, input: SubmitAttemptInput) {
   try {
+    if (isMockMode()) {
+      const result = mockTrainingStore.submitAttempt(challengeId, input);
+      revalidatePath("/profile");
+      revalidatePath("/challenges");
+      revalidatePath("/dashboard");
+      revalidatePath("/dashboard/challenges");
+      return { success: true, data: result };
+    }
+
     const user = await ensureSessionOrLocalUser();
+    const prisma = await getPrisma();
     const challenge = await prisma.challenge.findUnique({
       where: { id: challengeId },
     });
@@ -377,7 +440,12 @@ export async function submitChallengeAttempt(challengeId: string, input: SubmitA
 
 export async function listCurrentUserAttempts() {
   try {
+    if (isMockMode()) {
+      return { success: true, data: mockTrainingStore.listAttempts() };
+    }
+
     const user = await ensureSessionOrLocalUser();
+    const prisma = await getPrisma();
 
     const attempts = await prisma.attempt.findMany({
       where: {
