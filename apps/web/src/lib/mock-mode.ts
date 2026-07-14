@@ -1,9 +1,11 @@
 /**
  * Permite executar a interface localmente sem inicializar PostgreSQL ou Better Auth.
- * Nunca é ativado por padrão: use USE_MOCK_DATA=true apenas no ambiente local.
+ * Altere este valor apenas para uma sessão local de desenvolvimento e não o envie como true.
  */
-export function isMockModeEnabled(value = process.env.USE_MOCK_DATA) {
-  return value === "true";
+const MOCK_MODE_ENABLED = false;
+
+export function isMockModeEnabled() {
+  return MOCK_MODE_ENABLED;
 }
 
 export function isMockMode() {

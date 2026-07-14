@@ -9,10 +9,10 @@ O modo mock permite desenvolver a interface do Kodan sem iniciar PostgreSQL, Pri
 
 ## Como ativar
 
-Crie `apps/web/.env` a partir do exemplo e altere explicitamente:
+Abra `apps/web/src/lib/mock-mode.ts` e altere temporariamente a constante:
 
-```env
-USE_MOCK_DATA="true"
+```ts
+const MOCK_MODE_ENABLED = true;
 ```
 
 Depois inicie apenas a aplicação web:
@@ -46,10 +46,15 @@ Ao acessar `/api/auth/*` nesse modo, a aplicação responde `404` informando que
 
 ## Quando usar o modo integrado
 
-O arquivo de exemplo já começa no modo integrado. Use ou volte a esse modo ao alterar autenticação, schema Prisma, Route Handlers com dados reais ou qualquer regra que dependa de persistência:
+O modo integrado é o padrão. Use ou volte a esse modo ao alterar autenticação, schema Prisma, Route Handlers com dados reais ou qualquer regra que dependa de persistência:
+
+```ts
+const MOCK_MODE_ENABLED = false;
+```
+
+Então configure o ambiente integrado:
 
 ```env
-USE_MOCK_DATA="false"
 DATABASE_URL="postgresql://..."
 DIRECT_URL="postgresql://..."
 BETTER_AUTH_SECRET="um-segredo-com-pelo-menos-32-caracteres"

@@ -33,9 +33,9 @@ No PowerShell, use:
 Copy-Item apps/web/.env.example apps/web/.env
 ```
 
-O arquivo mantém `USE_MOCK_DATA="false"`, o modo integrado. Para contribuições de interface, você pode alterar conscientemente para `USE_MOCK_DATA="true"`: a aplicação passa a usar desafios, usuário e tentativas em memória, sem PostgreSQL nem Better Auth. Os dados são reiniciados ao parar o servidor.
+O modo integrado é o padrão. Para contribuições de interface, ative temporariamente o mock em `apps/web/src/lib/mock-mode.ts`: a aplicação passa a usar desafios, usuário e tentativas em memória, sem PostgreSQL nem Better Auth. Os dados são reiniciados ao parar o servidor. Não envie essa alteração como `true` em um commit.
 
-Para trabalhar com Prisma, banco ou autenticação, mude para `USE_MOCK_DATA="false"` e preencha as variáveis de banco e autenticação. Os valores nunca devem ser enviados em commits.
+Para trabalhar com Prisma, banco ou autenticação, mantenha o mock desativado e preencha as variáveis de banco e autenticação. Os valores nunca devem ser enviados em commits.
 
 Veja as limitações e os dados disponíveis no [modo mock local](./mock-mode) antes de usar esse caminho para validar uma contribuição.
 
@@ -71,7 +71,6 @@ Ela abre em [http://localhost:3002](http://localhost:3002). Esse comando também
 
 | Variável | Obrigatória | Uso |
 | --- | --- | --- |
-| `USE_MOCK_DATA` | Não | `true` inicia a interface sem banco; `false` ativa a integração real. |
 | `DATABASE_URL` | No modo integrado | Conexão usada pela aplicação. |
 | `DIRECT_URL` | Para comandos Prisma | Conexão direta para CLI/migrações. |
 | `BETTER_AUTH_SECRET` | No modo integrado | Segredo de autenticação, com ao menos 32 caracteres. |

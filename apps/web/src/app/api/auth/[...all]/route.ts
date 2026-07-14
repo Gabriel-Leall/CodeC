@@ -5,7 +5,7 @@ function mockModeResponse() {
   return Response.json(
     {
       success: false,
-      error: "Autenticação não está disponível com USE_MOCK_DATA=true.",
+      error: "Autenticação não está disponível enquanto o modo mock estiver ativo.",
     },
     { status: 404 },
   );

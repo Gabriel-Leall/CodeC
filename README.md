@@ -32,11 +32,11 @@ No PowerShell:
 Copy-Item apps/web/.env.example apps/web/.env
 ```
 
-O exemplo mantém `USE_MOCK_DATA="false"`, o modo integrado. Para desenvolver apenas a interface sem PostgreSQL nem Better Auth, altere conscientemente a variável para `true`; nesse caso, os dados vivem apenas na memória. Não envie `apps/web/.env` para o Git.
+Para desenvolver apenas a interface sem PostgreSQL nem Better Auth, ative temporariamente o mock em `apps/web/src/lib/mock-mode.ts`; nesse caso, os dados vivem apenas na memória. Não envie `apps/web/.env` para o Git.
 
 As limitações e a troca para a integração real estão documentadas em [Modo mock local](apps/docs/docs/contributing/mock-mode.md).
 
-Para trabalhar com banco, autenticação ou Prisma, mude para `USE_MOCK_DATA="false"` e preencha `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` e `CORS_ORIGIN`.
+Para trabalhar com banco, autenticação ou Prisma, mantenha o mock desativado e preencha `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` e `CORS_ORIGIN`.
 
 ### 4. Prepare o banco (somente modo integrado)
 
@@ -106,7 +106,6 @@ Regra prática: mantenha código específico da aplicação em `apps/web`; extra
 
 | Variável | Necessária | Finalidade |
 | --- | --- | --- |
-| `USE_MOCK_DATA` | Não | Use `true` para desenvolver telas sem banco; use `false` para o modo integrado. |
 | `DATABASE_URL` | No modo integrado | Conexão usada pela aplicação. |
 | `DIRECT_URL` | Para Prisma | Conexão direta para schema e migrações. |
 | `BETTER_AUTH_SECRET` | No modo integrado | Segredo com pelo menos 32 caracteres. |
