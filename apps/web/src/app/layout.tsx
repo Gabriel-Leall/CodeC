@@ -5,6 +5,7 @@ import "../index.css";
 import { AppShell } from "../components/app-shell";
 import Providers from "../components/providers";
 import { ensureRuntimeUser } from "../lib/runtime-data";
+import { getCurrentUser } from "../server/api/service";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -27,8 +28,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let sidebarUser: { name: string; image: string | null } | null = null;
+
   try {
     await ensureRuntimeUser();
+    const userResult = await getCurrentUser();
+    if (userResult.success && userResult.data) {
+      sidebarUser = {
+        name: userResult.data.name,
+        image: userResult.data.image,
+      };
+    }
   } catch {
     // Em build/prerender sem schema aplicado, não bloqueia renderização inicial.
   }
@@ -37,7 +47,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${jetbrainsMono.variable} ${courierPrime.variable} antialiased`}>
         <Providers>
-          <AppShell>{children}</AppShell>
+          <AppShell user={sidebarUser}>{children}</AppShell>
         </Providers>
       </body>
     </html>

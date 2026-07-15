@@ -11,7 +11,9 @@ import {
 import Link from "next/link";
 import {
   ArrowDownRight,
+  ArrowLeft,
   ArrowUpRight,
+  Bell,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
@@ -25,7 +27,6 @@ import {
   Loader2,
   PanelRightOpen,
   SendHorizontal,
-  X,
 } from "lucide-react";
 
 import { Button } from "@kodan/ui/components/button";
@@ -293,57 +294,6 @@ function getDifficultyClassName(difficulty: string) {
   }
 }
 
-function getEstimatedTime(difficulty: string) {
-  switch (difficulty) {
-    case "EASY":
-      return "10-15 min";
-    case "HARD":
-      return "25-35 min";
-    default:
-      return "15-20 min";
-  }
-}
-
-function getPossibleElo(difficulty: string) {
-  switch (difficulty) {
-    case "EASY":
-      return "+12 possível";
-    case "HARD":
-      return "+30 possível";
-    default:
-      return "+20 possível";
-  }
-}
-
-function getTags(tags: string) {
-  return tags.split(",").flatMap((tag) => {
-    const trimmed = tag.trim();
-    return trimmed ? [trimmed] : [];
-  });
-}
-
-function inferChallengeType(tags: string[]) {
-  const joined = tags.join(" ").toLowerCase();
-
-  if (joined.includes("effect") || joined.includes("lifecycle")) {
-    return "Effects";
-  }
-  if (joined.includes("async") || joined.includes("race")) {
-    return "Async UI";
-  }
-  if (joined.includes("state")) {
-    return "State";
-  }
-  if (joined.includes("render") || joined.includes("memo")) {
-    return "Rendering";
-  }
-  if (joined.includes("typescript") || joined.includes("types")) {
-    return "Types";
-  }
-
-  return "Diagnostics";
-}
-
 function getChallengeNumber(challenge: Challenge) {
   const matches = `${challenge.id} ${challenge.title}`.match(/\d+/g);
   if (matches && matches.length > 0) {
@@ -362,7 +312,6 @@ function getChallengeNumber(challenge: Challenge) {
 interface TrainArenaClientProps {
   id: string;
   initialChallenge: Challenge | null;
-  initialUserElo: number;
 }
 
 // react-doctor-disable-next-line react-doctor/prefer-useReducer
@@ -370,7 +319,6 @@ interface TrainArenaClientProps {
 export default function TrainArenaClient({
   id,
   initialChallenge,
-  initialUserElo,
 }: TrainArenaClientProps) {
   const [userAnswer, setUserAnswer] = useState("");
   const [notes, setNotes] = useState("");
@@ -434,9 +382,6 @@ export default function TrainArenaClient({
   }
 
   const challenge = initialChallenge;
-  const userElo = result?.newElo ?? initialUserElo;
-  const tags = getTags(challenge.tags);
-  const challengeType = inferChallengeType(tags);
   const parsedQuestion = parseQuestion(challenge.question);
   const lines = challenge.code.split("\n");
   const answerLength = userAnswer.trim().length;
@@ -520,14 +465,12 @@ export default function TrainArenaClient({
   return (
     <main
       data-challengers-screen="true"
-      className="min-h-svh bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
+      className="h-svh overflow-hidden bg-[var(--challengers-page)] text-[var(--challengers-ink)]"
     >
-      <div className="flex min-h-svh min-w-0 flex-col">
+      <div className="flex h-full min-w-0 flex-col">
         <ChallengeHeader
           challenge={challenge}
           challengeNumber={getChallengeNumber(challenge)}
-          challengeType={challengeType}
-          userElo={userElo}
         />
 
         <div className="min-h-0 flex-1 overflow-auto">
@@ -613,51 +556,32 @@ export default function TrainArenaClient({
 function ChallengeHeader({
   challenge,
   challengeNumber,
-  challengeType,
-  userElo,
 }: {
   challenge: Challenge;
   challengeNumber: string;
-  challengeType: string;
-  userElo: number;
 }) {
   return (
-    <header className="flex h-12 shrink-0 items-center gap-3 bg-[var(--challengers-surface)] px-4 lg:px-5 xl:px-6">
+    <header className="flex h-[76px] shrink-0 items-center gap-4 bg-[var(--challengers-surface)] px-5 lg:px-8 xl:px-9">
       <Link
         href="/challenges"
         aria-label="Voltar ao catálogo de desafios"
-        className="inline-flex size-7 shrink-0 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]"
+        className="inline-flex size-8 shrink-0 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]"
       >
-        <ChevronLeft className="size-4" />
+        <ArrowLeft className="size-5" />
       </Link>
 
-      <div className="flex min-w-0 items-center gap-2">
-        <h1 className="truncate font-serif text-sm font-bold text-[var(--challengers-ink)] sm:text-base">
+      <div className="flex min-w-0 items-center gap-3">
+        <h1 className="truncate font-sans text-lg font-semibold tracking-tight text-[var(--challengers-ink)] sm:text-xl">
           {challengeNumber} - {challenge.title}
         </h1>
-        <span className={cn("hidden rounded-[5px] border px-1.5 py-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.06em] sm:inline-flex", getDifficultyClassName(challenge.difficulty))}>
+        <span className={cn("challengers-header-difficulty hidden rounded-sm border px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-[0.06em] sm:inline-flex", getDifficultyClassName(challenge.difficulty))}>
           {getDifficultyLabel(challenge.difficulty)}
         </span>
       </div>
 
-      <div className="ml-auto hidden items-center gap-3 whitespace-nowrap text-[0.7rem] text-[var(--challengers-muted)] lg:flex">
-        <span>{challengeType}</span>
-        <span>{getEstimatedTime(challenge.difficulty)}</span>
-        <span>{getPossibleElo(challenge.difficulty)}</span>
-      </div>
-
-      <div className="ml-auto flex shrink-0 items-center gap-3 lg:ml-2">
-        <span className="text-[0.72rem] font-semibold tabular-nums text-[var(--challengers-blue)]">
-          {userElo} ELO
-        </span>
-        <Link
-          href="/challenges"
-          aria-label="Fechar arena e voltar ao catálogo"
-          className="inline-flex size-7 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]"
-        >
-          <X className="size-3.5" />
-        </Link>
-      </div>
+      <button type="button" aria-label="Notificações" className="ml-auto inline-flex size-9 shrink-0 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]">
+        <Bell className="size-[18px]" />
+      </button>
     </header>
   );
 }

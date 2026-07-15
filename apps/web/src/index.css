@@ -1,5 +1,15 @@
 @import "@kodan/ui/globals.css";
 
+:root {
+  --app-sidebar-active-surface: oklch(22% 0.008 255 / 0.05);
+  --app-sidebar-active-accent: oklch(60% 0.09 250);
+}
+
+.dark {
+  --app-sidebar-active-surface: rgb(255 255 255 / 0.05);
+  --app-sidebar-active-accent: #5a8dbf;
+}
+
 body:has([data-entry-gate="true"]) header[data-app-header="true"] {
   display: none;
 }
@@ -154,6 +164,12 @@ body:has([data-profile-screen="true"]) header[data-app-header="true"] {
 [data-challengers-screen="true"] .challengers-status-resolved {
   border-color: var(--challengers-success-border);
   background: var(--challengers-success-soft);
+  color: var(--challengers-success);
+}
+
+[data-challengers-screen="true"] .challengers-header-difficulty.challengers-difficulty-easy {
+  border-color: color-mix(in srgb, var(--challengers-success) 20%, transparent);
+  background: color-mix(in srgb, var(--challengers-success) 10%, transparent);
   color: var(--challengers-success);
 }
 
