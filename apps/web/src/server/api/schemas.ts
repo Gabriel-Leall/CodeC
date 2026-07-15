@@ -10,13 +10,13 @@ export const difficultySchema = z.enum(["EASY", "MEDIUM", "HARD"]);
 export const userSchema = z.object({
   id: z.string(),
   name: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   emailVerified: z.boolean(),
   bio: z.string().nullable(),
   image: z.string().nullable(),
   elo: z.number().int(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const updateCurrentUserSchema = z.object({
@@ -34,7 +34,7 @@ export const challengeAttemptSummarySchema = z.object({
   id: z.string(),
   score: z.number(),
   eloChange: z.number().int().optional(),
-  createdAt: z.string().datetime().optional(),
+  createdAt: z.iso.datetime().optional(),
 });
 
 export const challengeSummarySchema = z.object({
@@ -43,8 +43,8 @@ export const challengeSummarySchema = z.object({
   difficulty: difficultySchema,
   recommendedElo: z.number().int(),
   tags: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
   attempts: z.array(challengeAttemptSummarySchema),
 });
 
@@ -75,7 +75,7 @@ export const attemptSchema = z.object({
   feedbackJson: z.string(),
   score: z.number(),
   eloChange: z.number().int(),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
   challenge: challengeSummarySchema.omit({ attempts: true }).optional(),
 });
 
