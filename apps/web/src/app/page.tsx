@@ -23,11 +23,11 @@ export default async function HomePage() {
   }
 
   if (hasSession) {
-    redirect("/challenges");
+    redirect("/dashboard");
   }
 
   if (hasSeenGate) {
-    redirect("/challenges");
+    redirect("/dashboard");
   }
 
   return <EntryGate />;

@@ -39,6 +39,19 @@ describe("challenges-list-state", () => {
     expect(state.initialError).toBeNull();
   });
 
+  it("aplica o filtro inicial recebido pela rota", () => {
+    const state = createInitialChallengesState({
+      challenges: [makeChallenge()],
+      hasMore: false,
+      totalCount: 1,
+      userElo: 1200,
+      initialError: null,
+      initialStatus: "in_progress",
+    });
+
+    expect(state.statusFilter).toBe("in_progress");
+  });
+
   it("faz match por texto e por dificuldade", () => {
     const challenge = makeChallenge();
 

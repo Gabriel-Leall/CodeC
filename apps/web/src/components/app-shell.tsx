@@ -1,71 +1,141 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, PanelLeftClose, PanelLeftOpen, Settings, Target, User } from "lucide-react";
+import {
+  ChevronDown,
+  CircleHelp,
+  Home,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Settings,
+  Swords,
+  X,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { cn } from "@kodan/ui/lib/utils";
 
-const NAVIGATION = [
-  { href: "/", label: "Início", icon: Home },
-  { href: "/challenges", label: "Desafios", icon: Target },
-  { href: "/profile", label: "Perfil", icon: User },
-  { href: "/profile#historico", label: "Histórico", icon: BookOpen },
-  { href: "/profile#configuracoes", label: "Configurações", icon: Settings },
+import sidebarBackground from "@/assets/sidebar_background.png";
+import { eloToDanRank } from "@/lib/rating";
+
+const APP_ROUTE_PREFIXES = [
+  "/dashboard",
+  "/challenges",
+  "/train",
+  "/profile",
+  "/reviews",
+  "/simulator",
+  "/help",
+  "/settings",
 ] as const;
 
-const USER_STATUS_LABEL = "Disponível";
+const CHALLENGE_LINKS = [
+  { href: "/challenges", label: "Todos os Desafios", dot: "bg-[#1c56b5]" },
+  { href: "/challenges?status=in_progress", label: "Em andamento", dot: "bg-[#6d83a0]" },
+  { href: "/reviews", label: "Revisões", dot: "bg-[#b27a96]" },
+  { href: "/simulator", label: "Simulados", dot: "bg-[#d38a55]" },
+] as const;
 
 type SidebarUser = {
   name: string;
   image: string | null;
+  elo: number;
 };
 
-export function AppShell({
-  children,
+function formatRank(elo: number) {
+  const rank = eloToDanRank(elo).kyuDan;
+  return rank.replace(/(\d+)(?:st|nd|rd|th)\s(Kyu|Dan)/, "$1º $2");
+}
+
+function KodanMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={cn("flex items-center", compact ? "justify-center" : "gap-4")}>
+      <span className="grid size-10 shrink-0 place-items-center text-3xl text-[#1d2938]" aria-hidden="true">⛩</span>
+      <span className={cn("font-serif text-xl font-semibold tracking-[0.22em] text-[#1d2938]", compact && "sr-only")}>KODAN</span>
+    </div>
+  );
+}
+
+function DojoSidebar({
+  collapsed,
+  mobileOpen,
+  pathname,
   user,
+  onCloseMobile,
+  onToggle,
 }: {
-  children: ReactNode;
+  collapsed: boolean;
+  mobileOpen: boolean;
+  pathname: string;
   user: SidebarUser | null;
+  onCloseMobile: () => void;
+  onToggle: () => void;
 }) {
+  const challengeSectionActive = pathname.startsWith("/challenges") || pathname.startsWith("/train") || pathname === "/reviews" || pathname === "/simulator";
+  const [challengesOpen, setChallengesOpen] = useState(challengeSectionActive);
+  const compact = collapsed && !mobileOpen;
+  const displayName = user?.name ?? "Kodan";
+  const initials = displayName
+    .split(" ")
+    .flatMap((part) => (part[0] ? [part[0]] : []))
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  const rank = formatRank(user?.elo ?? 1200);
+
+  return (
+    <aside className={cn("relative flex h-svh min-h-0 shrink-0 flex-col overflow-hidden border-r border-[#e3ded4] bg-[#f8f6f1] transition-[width] duration-300", compact ? "w-[84px]" : "w-[256px]")}>
+      <Image src={sidebarBackground} alt="" width={433} height={577} priority className={cn("pointer-events-none absolute bottom-0 z-0 max-w-none object-contain object-bottom transition-opacity duration-300", compact ? "-left-36 h-[360px] w-[270px] opacity-0" : "-left-14 h-[520px] w-[390px] opacity-70")} />
+      <div className={cn("relative z-10 flex h-28 shrink-0 items-center", compact ? "justify-center px-3" : "justify-between px-7")}>
+        <Link href="/dashboard" aria-label="Abrir o Dojo" onClick={onCloseMobile}><KodanMark compact={compact} /></Link>
+        <button type="button" onClick={mobileOpen ? onCloseMobile : onToggle} aria-label={mobileOpen ? "Fechar sidebar" : compact ? "Expandir sidebar" : "Recolher sidebar"} className="grid size-8 place-items-center rounded-lg text-[#687282] transition-colors hover:bg-[#e9edf4] hover:text-[#1c56b5]">
+          {mobileOpen ? <X className="size-4" /> : compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+        </button>
+      </div>
+
+      <nav className="relative z-10 min-h-0 flex-1 space-y-7 overflow-y-auto px-4 py-5" aria-label="Navegação principal">
+        <div>
+          <p className={cn("mb-3 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8a8f96]", compact && "sr-only")}>Dojo</p>
+          <Link href="/dashboard" onClick={onCloseMobile} title={compact ? "Visão Geral" : undefined} aria-current={pathname === "/dashboard" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 hover:translate-x-1 hover:bg-[#e9edf4] hover:text-[#1c56b5]", pathname === "/dashboard" ? "bg-[#e9edf4] text-[#1654b2]" : "text-[#293342]")}><Home className="size-5 shrink-0 transition-transform group-hover:scale-110" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Visão Geral</span></Link>
+          <button type="button" onClick={() => setChallengesOpen((value) => !value)} aria-expanded={challengesOpen} title={compact ? "Desafios" : undefined} className={cn("group mt-2 flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left text-sm font-medium transition-all duration-200 hover:translate-x-1 hover:bg-[#e9edf4] hover:text-[#1c56b5]", challengeSectionActive ? "text-[#1654b2]" : "text-[#293342]")}><Swords className="size-5 shrink-0 transition-transform group-hover:scale-110" /><span className={cn("flex-1 whitespace-nowrap", compact && "sr-only")}>Desafios</span><ChevronDown className={cn("size-4 transition-transform duration-200", challengesOpen && "rotate-180", compact && "hidden")} /></button>
+          {challengesOpen && !compact ? <div className="ml-9 mt-1 space-y-1 border-l border-[#d9dfe8] pl-3">{CHALLENGE_LINKS.map((item) => <Link key={item.href} href={item.href as Route} onClick={onCloseMobile} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#4e5968] transition-colors hover:bg-[#edf1f6] hover:text-[#1c56b5]"><span className={cn("size-1.5 rounded-full", item.dot)} />{item.label}</Link>)}</div> : null}
+        </div>
+
+        <div>
+          <p className={cn("mb-3 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8a8f96]", compact && "sr-only")}>Suporte</p>
+          <Link href={"/help" as Route} onClick={onCloseMobile} title={compact ? "Ajuda" : undefined} aria-current={pathname === "/help" ? "page" : undefined} className="group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium text-[#293342] transition-all duration-200 hover:translate-x-1 hover:bg-[#e9edf4] hover:text-[#1c56b5]"><CircleHelp className="size-5 shrink-0 transition-transform group-hover:scale-110" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Ajuda</span></Link>
+          <Link href={"/settings" as Route} onClick={onCloseMobile} title={compact ? "Configurações" : undefined} aria-current={pathname === "/settings" ? "page" : undefined} className="group mt-2 flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium text-[#293342] transition-all duration-200 hover:translate-x-1 hover:bg-[#e9edf4] hover:text-[#1c56b5]"><Settings className="size-5 shrink-0 transition-transform duration-300 group-hover:rotate-45" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Configurações</span></Link>
+        </div>
+      </nav>
+
+      <div className="relative z-10 mt-auto shrink-0 px-4 pb-5 pt-2">
+        <Link href="/profile" onClick={onCloseMobile} title={compact ? `${displayName}, ${rank}` : undefined} className="group flex items-center gap-3 rounded-2xl border border-[#dfe4eb] bg-[#f8f6f1]/90 p-3 transition-colors hover:border-[#b7c9e0] hover:bg-[#edf3fb]">
+          <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#d5d9dd] text-xs font-bold text-[#293342]">{user?.image ? <Image src={user.image} alt="" width={36} height={36} unoptimized className="size-full object-cover" /> : initials}</span>
+          <span className={cn("min-w-0", compact && "sr-only")}><span className="block truncate text-xs font-semibold text-[#293342]">{displayName}</span><span className="mt-0.5 block text-[10px] uppercase tracking-[0.12em] text-[#1c56b5]">{rank} · {user?.elo ?? 1200} ELO</span></span>
+        </Link>
+      </div>
+    </aside>
+  );
+}
+
+export function AppShell({ children, user }: { children: ReactNode; user: SidebarUser | null }) {
   const pathname = usePathname();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const isAppRoute = pathname === "/profile" || pathname.startsWith("/challenges") || pathname.startsWith("/train") || pathname.startsWith("/dashboard");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const isAppRoute = APP_ROUTE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
   if (!isAppRoute) return <>{children}</>;
 
   return (
-    <div className={cn("min-h-svh bg-background text-foreground lg:grid", sidebarCollapsed ? "lg:grid-cols-[72px_minmax(0,1fr)]" : "lg:grid-cols-[244px_minmax(0,1fr)]")}>
-      <aside className={cn("relative hidden flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 lg:flex", sidebarCollapsed ? "w-[72px]" : "w-[244px]") }>
-        <div className={cn("flex h-16 items-center", sidebarCollapsed ? "justify-center px-2" : "justify-between px-5")}>
-          <div className="flex items-center gap-3">
-            <span className="grid size-8 shrink-0 place-items-center border border-sidebar-primary bg-sidebar-primary text-sm font-bold text-sidebar-primary-foreground">K</span>
-            <span className={cn("font-serif text-lg font-bold tracking-[0.16em]", sidebarCollapsed && "sr-only")}>KODAN</span>
-          </div>
-          {!sidebarCollapsed ? <button type="button" onClick={() => setSidebarCollapsed(true)} aria-label="Recolher sidebar" aria-pressed={false} className="inline-flex size-7 items-center justify-center text-sidebar-foreground/70 hover:text-sidebar-accent-foreground"><PanelLeftClose className="size-3.5" /></button> : null}
-        </div>
-        {sidebarCollapsed ? <div className="flex h-11 shrink-0 items-center justify-center"><button type="button" onClick={() => setSidebarCollapsed(false)} aria-label="Expandir sidebar" aria-pressed className="inline-flex size-7 items-center justify-center text-sidebar-foreground/70 hover:text-sidebar-accent-foreground"><PanelLeftOpen className="size-3.5" /></button></div> : null}
-        <nav className="flex-1 space-y-1 p-3" aria-label="Navegação principal">
-          {NAVIGATION.map(({ href, icon: Icon, label }) => {
-            const active = href === "/" ? false : pathname === href || pathname.startsWith(`${href}/`) || (href === "/challenges" && pathname.startsWith("/train"));
-            return <Link key={label} href={href} title={sidebarCollapsed ? label : undefined} aria-label={sidebarCollapsed ? label : undefined} aria-current={active ? "page" : undefined} className={cn("relative flex items-center border border-transparent px-3 py-2.5 text-sm transition-colors", sidebarCollapsed ? "justify-center px-0" : "gap-3", active ? "bg-[color:var(--app-sidebar-active-surface)] text-[color:var(--app-sidebar-active-accent)] before:absolute before:inset-y-0 before:-left-3 before:w-0.5 before:bg-[color:var(--app-sidebar-active-accent)]" : "text-sidebar-foreground/70 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}><Icon className="size-4 shrink-0" /><span className={cn(sidebarCollapsed && "sr-only")}>{label}</span></Link>;
-          })}
-        </nav>
-        <Link href="/profile" title={sidebarCollapsed ? "Perfil" : undefined} aria-label={sidebarCollapsed ? "Perfil" : undefined} className={cn("group flex items-center text-sm text-sidebar-foreground transition-colors hover:text-sidebar-accent-foreground", sidebarCollapsed ? "m-3 justify-center" : "m-5 gap-3")}>
-          <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-foreground">
-            {user?.image ? <Image src={user.image} alt="" width={36} height={36} unoptimized className="size-full object-cover" /> : user?.name.slice(0, 1).toLocaleUpperCase()}
-          </span>
-          <span className={cn("min-w-0", sidebarCollapsed && "sr-only")}>
-            <span className="block truncate font-medium">{user?.name ?? "Kodan"}</span>
-            <span className="mt-0.5 flex items-center gap-1.5 text-xs text-sidebar-foreground/60"><span className="size-1.5 rounded-full bg-[color:var(--app-sidebar-active-accent)]" aria-hidden="true" />{USER_STATUS_LABEL}</span>
-          </span>
-        </Link>
-      </aside>
-      <div className="min-w-0">
-        <main className="min-h-svh">{children}</main>
-      </div>
+    <div className="flex h-svh overflow-hidden bg-[#f8f6f1] text-[#18212c]">
+      <div className={cn("fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:relative lg:translate-x-0", mobileSidebarOpen ? "translate-x-0" : "-translate-x-full")}><DojoSidebar collapsed={sidebarCollapsed} mobileOpen={mobileSidebarOpen} pathname={pathname} user={user} onCloseMobile={() => setMobileSidebarOpen(false)} onToggle={() => setSidebarCollapsed((value) => !value)} /></div>
+      {mobileSidebarOpen ? <button type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Fechar navegação" className="fixed inset-0 z-40 bg-[#18212c]/20 lg:hidden" /> : null}
+      {!mobileSidebarOpen ? <button type="button" onClick={() => setMobileSidebarOpen(true)} aria-label="Abrir navegação" className="fixed left-3 top-3 z-30 grid size-10 place-items-center rounded-xl border border-[#e3ded4] bg-[#f8f6f1]/95 text-[#566171] shadow-sm lg:hidden"><Menu className="size-5" /></button> : null}
+      <main className="h-svh min-w-0 flex-1 overflow-y-auto overscroll-contain">{children}</main>
     </div>
   );
 }

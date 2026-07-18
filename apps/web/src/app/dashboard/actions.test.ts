@@ -14,7 +14,8 @@ mock.module("@/server/api/service", () => serviceCalls);
 const getRuntimeSession = mock(async () => null);
 mock.module("@/lib/runtime-data", () => ({ getRuntimeSession }));
 mock.module("@/lib/mock-mode", () => ({ isMockMode: () => false }));
-mock.module("next/headers", () => ({ headers: async () => new Headers() }));
+let requestHeaders = new Headers();
+mock.module("next/headers", () => ({ headers: async () => requestHeaders }));
 
 const {
   getAttemptsHistory,
@@ -27,8 +28,18 @@ const {
 
 describe("dashboard server actions", () => {
   beforeEach(() => {
+    requestHeaders = new Headers();
     getRuntimeSession.mockClear();
     Object.values(serviceCalls).forEach((serviceCall) => serviceCall.mockClear());
+  });
+
+  test("allows callers that passed through the local Dojo gate", async () => {
+    requestHeaders.set("cookie", "dojo_gate_seen=1");
+
+    const result = await getChallenges();
+
+    expect(result.success).toBe(true);
+    expect(serviceCalls.listChallenges).toHaveBeenCalledTimes(1);
   });
 
   test("reject unauthenticated callers before service work", async () => {

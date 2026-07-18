@@ -16,8 +16,14 @@ import {
 async function requireAuth() {
   if (isMockMode()) return;
 
-  const session = await getRuntimeSession(await headers());
-  if (!session?.user) {
+  const requestHeaders = await headers();
+  const session = await getRuntimeSession(requestHeaders);
+  const passedLocalGate = requestHeaders
+    .get("cookie")
+    ?.split(";")
+    .some((cookie) => cookie.trim() === "dojo_gate_seen=1");
+
+  if (!session?.user && !passedLocalGate) {
     throw new Error("Unauthorized");
   }
 }

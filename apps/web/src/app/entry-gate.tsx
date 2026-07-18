@@ -18,7 +18,7 @@ export default function EntryGate() {
       return;
     }
     document.cookie = "dojo_gate_seen=1; path=/; max-age=31536000; samesite=lax";
-    push("/challenges");
+    push("/dashboard");
   };
 
   return (

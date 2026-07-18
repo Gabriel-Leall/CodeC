@@ -23,6 +23,7 @@ export interface ChallengesInitialData {
   totalCount: number;
   userElo: number;
   initialError: string | null;
+  initialStatus?: StatusFilter;
 }
 
 export interface ChallengesState {
@@ -82,7 +83,7 @@ export function createInitialChallengesState(
     userElo: initialData.userElo || DEFAULT_USER_ELO,
     topicFilter: "effects-lifecycle",
     filterDifficulty: "ALL",
-    statusFilter: "ALL",
+    statusFilter: initialData.initialStatus ?? "ALL",
     typeFilter: "ALL",
     onlyUnsolved: false,
     sortBy: "RECENT",

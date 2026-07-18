@@ -28,7 +28,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let sidebarUser: { name: string; image: string | null } | null = null;
+  let sidebarUser: { name: string; image: string | null; elo: number } | null = null;
 
   try {
     await ensureRuntimeUser();
@@ -37,6 +37,7 @@ export default async function RootLayout({
       sidebarUser = {
         name: userResult.data.name,
         image: userResult.data.image,
+        elo: userResult.data.elo,
       };
     }
   } catch {

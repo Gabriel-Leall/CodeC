@@ -6,7 +6,6 @@ import {
   BarChart3,
   Filter,
   Home,
-  Menu,
   Moon,
   Search,
   Sun,
@@ -79,15 +78,15 @@ export function ChallengesMobileShell({
 }) {
   return (
     <section className="min-h-svh bg-[var(--challengers-surface)] pb-20 lg:hidden">
-      <header className="sticky top-0 z-20 border-b border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] px-4 py-3">
+      <header className="sticky top-0 z-20 border-b border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] px-4 py-3 pl-16">
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
-            aria-label="Abrir navegação"
+            aria-label="Abrir filtros de desafios"
             className="challengers-icon-button inline-flex size-9 items-center justify-center rounded-[9px] border"
             onClick={onOpenNavigation}
           >
-            <Menu className="size-4" />
+            <Filter className="size-4" />
           </button>
           <KodanLogo compact />
           <div className="flex items-center gap-2">
