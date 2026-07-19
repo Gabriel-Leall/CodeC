@@ -22,7 +22,7 @@ export async function POST(
 
   if (!result.success || !result.data) {
     const error = result.error ?? "Erro ao enviar tentativa";
-    const status = error === "Desafio não encontrado" ? 404 : 500;
+    const status = error === "Unauthorized" ? 401 : error === "Desafio não encontrado" ? 404 : 500;
     return jsonFailure(error, status);
   }
 

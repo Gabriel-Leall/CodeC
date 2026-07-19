@@ -4,7 +4,6 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { ZenToast } from "@kodan/ui/components/zen";
-import { getChallenges } from "../actions";
 import { ChallengesNavigationDrawer } from "./challenges-navigation-drawer";
 import { ChallengesExplorerPanel } from "./challenges-explorer-list";
 import {
@@ -30,6 +29,27 @@ import {
   ChallengesStatePanel,
 } from "./challenges-shell";
 import { type Challenge } from "./ema-challenge-card-helpers";
+
+type ChallengesApiResponse =
+  | {
+      success: true;
+      data: {
+        items: Challenge[];
+        hasMore: boolean;
+        total: number;
+        userElo: number;
+      };
+    }
+  | { success: false; error: string };
+
+async function fetchChallenges(params: { limit: number; offset: number }) {
+  const searchParams = new URLSearchParams({
+    limit: String(params.limit),
+    offset: String(params.offset),
+  });
+  const response = await fetch(`/api/challenges?${searchParams.toString()}`);
+  return (await response.json()) as ChallengesApiResponse;
+}
 
 export default function ChallengesPageClient({
   initialData,
@@ -85,11 +105,11 @@ export default function ChallengesPageClient({
     dispatch({ type: "reloadStarted" });
 
     try {
-      const response = await getChallenges({
+      const response = await fetchChallenges({
         limit: CHALLENGES_INITIAL_LOAD_SIZE,
         offset: 0,
       });
-      if (response.success && response.data) {
+      if (response.success) {
         dispatch({
           type: "reloadSucceeded",
           payload: {
@@ -121,12 +141,12 @@ export default function ChallengesPageClient({
     dispatch({ type: "loadingMore", payload: true });
 
     try {
-      const response = await getChallenges({
+      const response = await fetchChallenges({
         limit: CHALLENGES_PAGE_SIZE,
         offset: state.challenges.length,
       });
 
-      if (response.success && response.data) {
+      if (response.success) {
         dispatch({
           type: "appendLoaded",
           payload: {
@@ -165,10 +185,14 @@ export default function ChallengesPageClient({
     paginatedChallenges,
     focusedChallengeId,
   );
-  const activeTopicKey =
-    state.topicFilter === "ALL" ? "effects-lifecycle" : state.topicFilter;
-  const topicLabel = getChallengeTopicLabel(activeTopicKey);
-  const topicDescription = getChallengeTopicDescription(activeTopicKey);
+  const topicLabel =
+    state.topicFilter === "ALL"
+      ? "Todos os desafios"
+      : getChallengeTopicLabel(state.topicFilter);
+  const topicDescription =
+    state.topicFilter === "ALL"
+      ? "Escolha um exercício e continue sua evolução no Dojo."
+      : getChallengeTopicDescription(state.topicFilter);
   const hasActiveFilters =
     state.searchQuery.trim().length > 0 ||
     state.filterDifficulty !== "ALL" ||
@@ -205,9 +229,10 @@ export default function ChallengesPageClient({
         <button
           type="button"
           className="challengers-control h-10 rounded-[8px] border px-4 text-sm"
+          disabled={state.loadingInitial}
           onClick={loadInitialChallenges}
         >
-          Tentar novamente
+          {state.loadingInitial ? "Carregando..." : "Tentar novamente"}
         </button>
       }
     />
@@ -232,6 +257,7 @@ export default function ChallengesPageClient({
       onlyUnsolved={state.onlyUnsolved}
       sortBy={state.sortBy}
       hasActiveFilters={hasActiveFilters}
+      loadingMore={state.loadingMore}
       onFocusChallenge={setFocusedChallengeId}
       onOpenChallenge={openChallenge}
       onFilterChange={(difficulty) =>
@@ -258,6 +284,8 @@ export default function ChallengesPageClient({
       <div className="hidden h-full min-h-0 w-full lg:block">
         <ChallengesDesktopShell
           userElo={state.userElo}
+          title={topicLabel}
+          description={topicDescription}
           searchQuery={state.searchQuery}
           onSearchChange={(query) =>
             dispatch({ type: "setSearch", payload: query })
@@ -270,10 +298,11 @@ export default function ChallengesPageClient({
       <ChallengesMobileShell
         userElo={state.userElo}
         searchQuery={state.searchQuery}
+        filtersOpen={navigationOpen}
         onSearchChange={(query) =>
           dispatch({ type: "setSearch", payload: query })
         }
-        onOpenNavigation={() => setNavigationOpen(true)}
+        onOpenFilters={() => setNavigationOpen(true)}
       >
         {content}
       </ChallengesMobileShell>
@@ -290,7 +319,7 @@ export default function ChallengesPageClient({
         }
       />
 
-      <div className="fixed bottom-4 right-4 z-[80]">
+      <div className="fixed bottom-4 right-4 z-50">
         <ZenToast open={zenToastOpen} tone="error" title="Falha de carregamento">
           {zenToastMessage ?? ""}
         </ZenToast>

@@ -26,24 +26,35 @@ type ChallengeRecord = {
 
 type SubmitAttemptInput = z.infer<typeof submitAttemptSchema>;
 
-async function ensureSessionOrLocalUser() {
+async function getOptionalAuthenticatedUser() {
   if (isMockMode()) {
     return mockTrainingStore.getCurrentUser();
   }
 
-  const [{ auth }, { ensureDefaultLocalUser }] = await Promise.all([
+  const [{ auth }, prisma] = await Promise.all([
     import("@kodan/auth"),
-    import("@/lib/local-user"),
+    getPrisma(),
   ]);
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session) {
-    await ensureDefaultLocalUser();
+  if (!session?.user) {
+    return null;
   }
 
-  return ensureDefaultLocalUser();
+  return prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
+}
+
+async function requireAuthenticatedUser() {
+  const user = await getOptionalAuthenticatedUser();
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  return user;
 }
 
 async function getPrisma() {
@@ -173,7 +184,7 @@ ${userAnswer}`,
 
 export async function getCurrentUser() {
   try {
-    const user = await ensureSessionOrLocalUser();
+    const user = await requireAuthenticatedUser();
     return { success: true, data: user };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erro ao obter usuário local";
@@ -216,7 +227,7 @@ export async function updateCurrentUserProfile(
       return { success: true, data: updatedUser };
     }
 
-    const user = await ensureSessionOrLocalUser();
+    const user = await requireAuthenticatedUser();
     const prisma = await getPrisma();
 
     const updatedUser = await prisma.user.update({
@@ -261,22 +272,26 @@ export async function listChallenges(params?: { limit?: number; offset?: number 
       };
     }
 
-    const user = await ensureSessionOrLocalUser();
     const prisma = await getPrisma();
-    const total = await prisma.challenge.count();
+    const [user, total] = await Promise.all([
+      getOptionalAuthenticatedUser(),
+      prisma.challenge.count(),
+    ]);
 
     const challenges = await prisma.challenge.findMany({
-      include: {
-        attempts: {
-          where: {
-            userId: user.id,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          take: 1,
-        },
-      },
+      include: user
+        ? {
+            attempts: {
+              where: {
+                userId: user.id,
+              },
+              orderBy: {
+                createdAt: "desc",
+              },
+              take: 1,
+            },
+          }
+        : undefined,
       orderBy: {
         recommendedElo: "asc",
       },
@@ -293,7 +308,7 @@ export async function listChallenges(params?: { limit?: number; offset?: number 
         offset,
         nextOffset,
         hasMore: nextOffset < total,
-        userElo: user.elo,
+        userElo: user?.elo ?? 1200,
       },
     };
   } catch (error: unknown) {
@@ -311,21 +326,23 @@ export async function getChallengeById(id: string) {
         : { success: false, error: "Desafio não encontrado" };
     }
 
-    const user = await ensureSessionOrLocalUser();
     const prisma = await getPrisma();
+    const user = await getOptionalAuthenticatedUser();
 
     const challenge = await prisma.challenge.findUnique({
       where: { id },
-      include: {
-        attempts: {
-          where: {
-            userId: user.id,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-      },
+      include: user
+        ? {
+            attempts: {
+              where: {
+                userId: user.id,
+              },
+              orderBy: {
+                createdAt: "desc",
+              },
+            },
+          }
+        : undefined,
     });
 
     if (!challenge) {
@@ -350,7 +367,7 @@ export async function submitChallengeAttempt(challengeId: string, input: SubmitA
       return { success: true, data: result };
     }
 
-    const user = await ensureSessionOrLocalUser();
+    const user = await requireAuthenticatedUser();
     const prisma = await getPrisma();
     const challenge = await prisma.challenge.findUnique({
       where: { id: challengeId },
@@ -444,7 +461,7 @@ export async function listCurrentUserAttempts() {
       return { success: true, data: mockTrainingStore.listAttempts() };
     }
 
-    const user = await ensureSessionOrLocalUser();
+    const user = await requireAuthenticatedUser();
     const prisma = await getPrisma();
 
     const attempts = await prisma.attempt.findMany({

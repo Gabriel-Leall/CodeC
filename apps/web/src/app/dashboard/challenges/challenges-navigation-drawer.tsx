@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import type { DifficultyFilter } from "./challenges-list-state";
 import { ChallengesNavigationTree } from "./challenges-navigation-tree";
@@ -28,31 +29,69 @@ export function ChallengesNavigationDrawer({
   onDifficultyChange: (difficulty: DifficultyFilter) => void;
 }) {
   const sections = buildChallengeTopicSections(challenges);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeAndRestoreFocus = () => {
+    onClose();
+    window.requestAnimationFrame(() => document.getElementById("challenge-filter-trigger")?.focus());
+  };
 
-  if (!open) {
-    return null;
-  }
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const mobileViewport = window.matchMedia("(max-width: 1023px)");
+    const syncDialog = () => {
+      if (open && mobileViewport.matches && !dialog.open) {
+        dialog.showModal();
+        window.requestAnimationFrame(() => {
+          dialog
+            .querySelector<HTMLElement>('nav[aria-label="Árvore de desafios"] button')
+            ?.focus();
+        });
+      }
+      if ((!open || !mobileViewport.matches) && dialog.open) dialog.close();
+    };
+
+    syncDialog();
+    mobileViewport.addEventListener("change", syncDialog);
+
+    return () => {
+      mobileViewport.removeEventListener("change", syncDialog);
+      if (dialog.open) dialog.close();
+    };
+  }, [open]);
+
+  if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40 lg:hidden">
-      <button
-        type="button"
-        aria-label="Fechar navegação"
-        className="challengers-overlay absolute inset-0"
-        onClick={onClose}
-      />
+    <dialog
+      ref={dialogRef}
+      id="challenge-filters-panel"
+      aria-labelledby="challenge-filters-title"
+      className="challengers-filter-dialog fixed inset-0 m-0 h-svh max-h-none w-screen max-w-none bg-transparent p-0 text-[var(--challengers-ink)] lg:hidden"
+      onCancel={(event) => {
+        event.preventDefault();
+        closeAndRestoreFocus();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeAndRestoreFocus();
+        }
+      }}
+    >
+      <button type="button" tabIndex={-1} aria-label="Fechar filtros ao tocar fora" className="absolute inset-0" onClick={closeAndRestoreFocus} />
       <section className="challengers-panel absolute bottom-0 left-3 right-3 max-h-[82svh] overflow-auto rounded-t-[18px] border px-4 pb-5 pt-4">
         <header className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--challengers-muted)]">
-            Navegação
-          </p>
+          <h2 id="challenge-filters-title" className="text-xs font-semibold uppercase tracking-widest text-[var(--challengers-muted)]">
+            Filtros de desafios
+          </h2>
           <button
             type="button"
-            className="challengers-icon-button inline-flex size-8 items-center justify-center rounded-[8px] border"
-            aria-label="Fechar navegação"
-            onClick={onClose}
+            className="challengers-icon-button inline-flex size-11 items-center justify-center rounded-lg border"
+            aria-label="Fechar filtros"
+            onClick={closeAndRestoreFocus}
           >
-            <X className="size-4" />
+            <X className="size-4" aria-hidden="true" />
           </button>
         </header>
         <ChallengesNavigationTree
@@ -62,11 +101,11 @@ export function ChallengesNavigationDrawer({
           density="drawer"
           onTopicChange={(topic) => {
             onTopicChange(topic);
-            onClose();
+            closeAndRestoreFocus();
           }}
           onDifficultyChange={onDifficultyChange}
         />
       </section>
-    </div>
+    </dialog>
   );
 }

@@ -76,7 +76,6 @@ export function serializeChallengeDetail(challenge: ChallengeRecord) {
     ...serializeChallengeSummary(challenge),
     code: challenge.code,
     question: challenge.question,
-    solution: challenge.solution,
   };
 }
 

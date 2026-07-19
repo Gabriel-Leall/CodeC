@@ -5,9 +5,7 @@ import { headers } from "next/headers";
 import { isMockMode } from "@/lib/mock-mode";
 import { getRuntimeSession } from "@/lib/runtime-data";
 import {
-  getChallengeById,
   getCurrentUser,
-  listChallenges,
   listCurrentUserAttempts,
   submitChallengeAttempt,
   updateCurrentUserProfile,
@@ -16,14 +14,8 @@ import {
 async function requireAuth() {
   if (isMockMode()) return;
 
-  const requestHeaders = await headers();
-  const session = await getRuntimeSession(requestHeaders);
-  const passedLocalGate = requestHeaders
-    .get("cookie")
-    ?.split(";")
-    .some((cookie) => cookie.trim() === "dojo_gate_seen=1");
-
-  if (!session?.user && !passedLocalGate) {
+  const session = await getRuntimeSession(await headers());
+  if (!session?.user) {
     throw new Error("Unauthorized");
   }
 }
@@ -40,16 +32,6 @@ export async function updateLocalUserProfile(params: {
 }) {
   await requireAuth();
   return updateCurrentUserProfile(params);
-}
-
-export async function getChallenges(params?: { limit?: number; offset?: number }) {
-  await requireAuth();
-  return listChallenges(params);
-}
-
-export async function getChallenge(id: string) {
-  await requireAuth();
-  return getChallengeById(id);
 }
 
 export async function submitAttempt(challengeId: string, userAnswer: string, usedHint?: boolean) {

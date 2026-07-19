@@ -395,7 +395,10 @@ function getSessionStatus(attempt: ProfileAttemptRecord): ProfileSessionStatus {
   return "in_progress";
 }
 
-function getCurrentStudyStreak(attempts: ProfileAttemptRecord[], now: Date) {
+export function getCurrentStudyStreak(
+  attempts: ReadonlyArray<Pick<ProfileAttemptRecord, "createdAt">>,
+  now: Date,
+) {
   const attemptedDays = new Set(
     attempts.map((attempt) => toDateKey(attempt.createdAt)),
   );

@@ -77,6 +77,7 @@ export function ChallengesExplorerPanel({
   onlyUnsolved,
   sortBy,
   hasActiveFilters,
+  loadingMore,
   onFocusChallenge,
   onOpenChallenge,
   onFilterChange,
@@ -101,6 +102,7 @@ export function ChallengesExplorerPanel({
   onlyUnsolved: boolean;
   sortBy: SortBy;
   hasActiveFilters: boolean;
+  loadingMore: boolean;
   onFocusChallenge: (id: string | null) => void;
   onOpenChallenge: (id: string) => void;
   onFilterChange: (difficulty: DifficultyFilter) => void;
@@ -113,7 +115,7 @@ export function ChallengesExplorerPanel({
 }) {
   return (
     <section className="min-w-0 px-4 py-5 md:px-7 md:py-6">
-      <div className="hidden md:block">
+      <div className="hidden md:block lg:hidden">
         <div className="flex items-center gap-3">
           <h1 className="font-serif text-2xl font-bold text-[var(--challengers-ink)]">
             {topicLabel}
@@ -135,20 +137,22 @@ export function ChallengesExplorerPanel({
         </div>
       </div>
 
-      <ChallengeFilters
-        filterDifficulty={filterDifficulty}
-        statusFilter={statusFilter}
-        typeFilter={typeFilter}
-        onlyUnsolved={onlyUnsolved}
-        sortBy={sortBy}
-        hasActiveFilters={hasActiveFilters}
-        onFilterChange={onFilterChange}
-        onStatusChange={onStatusChange}
-        onTypeChange={onTypeChange}
-        onOnlyUnsolvedChange={onOnlyUnsolvedChange}
-        onSortChange={onSortChange}
-        onClearFilters={onClearFilters}
-      />
+      <div className="lg:-mt-5">
+        <ChallengeFilters
+          filterDifficulty={filterDifficulty}
+          statusFilter={statusFilter}
+          typeFilter={typeFilter}
+          onlyUnsolved={onlyUnsolved}
+          sortBy={sortBy}
+          hasActiveFilters={hasActiveFilters}
+          onFilterChange={onFilterChange}
+          onStatusChange={onStatusChange}
+          onTypeChange={onTypeChange}
+          onOnlyUnsolvedChange={onOnlyUnsolvedChange}
+          onSortChange={onSortChange}
+          onClearFilters={onClearFilters}
+        />
+      </div>
 
       <div className="mt-5">
         <ChallengeList
@@ -166,6 +170,7 @@ export function ChallengesExplorerPanel({
         pageSize={pageSize}
         visibleCount={visibleCount}
         currentPageCount={challenges.length}
+        loading={loadingMore}
         onPageChange={onPageChange}
       />
     </section>
@@ -382,20 +387,13 @@ function ChallengeTableRow({
 
   return (
     <tr
-      tabIndex={0}
       className={cn(
-        "challengers-row cursor-pointer border-t text-[0.82rem] outline-none transition-colors focus-visible:bg-[var(--challengers-panel)]",
+        "challengers-row cursor-pointer border-t text-[0.82rem] transition-colors",
         active && "challengers-row-active",
       )}
       onMouseEnter={() => onFocusChallenge(challenge.id)}
       onFocus={() => onFocusChallenge(challenge.id)}
       onClick={() => onOpenChallenge(challenge.id)}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          onOpenChallenge(challenge.id);
-        }
-      }}
     >
       <td className="px-4 py-5">
         <div className="flex items-center gap-3">
@@ -577,12 +575,14 @@ function ChallengePagination({
   pageSize,
   visibleCount,
   currentPageCount,
+  loading,
   onPageChange,
 }: {
   page: number;
   pageSize: number;
   visibleCount: number;
   currentPageCount: number;
+  loading: boolean;
   onPageChange: (page: number) => void;
 }) {
   const totalPages = Math.max(1, Math.ceil(visibleCount / pageSize));
@@ -602,13 +602,13 @@ function ChallengePagination({
       </div>
 
       <div className="flex items-center gap-5">
-        <span className="tabular-nums text-[var(--challengers-ink)]">
-          {start}-{end} de {visibleCount}
+        <span aria-live="polite" className="tabular-nums text-[var(--challengers-ink)]">
+          {loading ? "Carregando desafios..." : `${start}-${end} de ${visibleCount}`}
         </span>
         <div className="flex items-center gap-2">
           <PaginationButton
             label="Página anterior"
-            disabled={!canGoPrevious}
+            disabled={loading || !canGoPrevious}
             onClick={() => onPageChange(page - 1)}
           >
             <ChevronLeft className="size-4" />
@@ -621,6 +621,7 @@ function ChallengePagination({
                 key={pageNumber}
                 label={`Ir para página ${pageNumber}`}
                 active={page === pageNumber}
+                disabled={loading}
                 onClick={() => onPageChange(pageNumber)}
               >
                 {pageNumber}
@@ -629,7 +630,7 @@ function ChallengePagination({
           })}
           <PaginationButton
             label="Próxima página"
-            disabled={!canGoNext}
+            disabled={loading || !canGoNext}
             onClick={() => onPageChange(page + 1)}
           >
             <ChevronRight className="size-4" />

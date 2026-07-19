@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Courier_Prime } from "next/font/google";
+import { JetBrains_Mono, Lora } from "next/font/google";
 
 import "../index.css";
 import { AppShell } from "../components/app-shell";
 import Providers from "../components/providers";
-import { ensureRuntimeUser } from "../lib/runtime-data";
 import { getCurrentUser } from "../server/api/service";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -12,9 +11,9 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const courierPrime = Courier_Prime({
+const lora = Lora({
   variable: "--font-serif",
-  weight: ["400", "700"],
+  weight: ["400", "600", "700"],
   subsets: ["latin"],
 });
 
@@ -31,7 +30,6 @@ export default async function RootLayout({
   let sidebarUser: { name: string; image: string | null; elo: number } | null = null;
 
   try {
-    await ensureRuntimeUser();
     const userResult = await getCurrentUser();
     if (userResult.success && userResult.data) {
       sidebarUser = {
@@ -46,7 +44,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className={`${jetbrainsMono.variable} ${courierPrime.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${jetbrainsMono.variable} ${lora.variable} antialiased`}>
         <Providers>
           <AppShell user={sidebarUser}>{children}</AppShell>
         </Providers>

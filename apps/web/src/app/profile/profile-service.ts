@@ -3,7 +3,7 @@ import "server-only";
 import { isMockMode } from "@/lib/mock-mode";
 import { mockTrainingStore } from "@/server/api/mock-store";
 
-export async function loadProfileData() {
+export async function loadProfileData(userId?: string) {
   if (isMockMode()) {
     const user = mockTrainingStore.getCurrentUser();
     const attempts = mockTrainingStore.listAttempts();
@@ -15,11 +15,12 @@ export async function loadProfileData() {
     return { user, attempts, recommendations };
   }
 
-  const [{ default: prisma }, { ensureDefaultLocalUser }] = await Promise.all([
-    import("@kodan/db"),
-    import("@/lib/local-user"),
-  ]);
-  const user = await ensureDefaultLocalUser();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const { default: prisma } = await import("@kodan/db");
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
   const attempts = await prisma.attempt.findMany({
     where: { userId: user.id },
     include: { challenge: true },

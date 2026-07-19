@@ -2,6 +2,7 @@
 
 import {
   useReducer,
+  useEffect,
   useRef,
   useState,
   type FormEvent,
@@ -25,13 +26,16 @@ import {
   Info,
   Lightbulb,
   Loader2,
+  LockKeyhole,
   PanelRightOpen,
   SendHorizontal,
+  X,
 } from "lucide-react";
 
 import { Button } from "@kodan/ui/components/button";
 import { ZenToast } from "@kodan/ui/components/zen";
 import { cn } from "@kodan/ui/lib/utils";
+import { getLoginHref } from "@/lib/auth-navigation";
 import { submitAttempt } from "../../actions";
 
 interface AttemptSummary {
@@ -48,7 +52,6 @@ export interface Challenge {
   recommendedElo: number;
   code: string;
   question: string;
-  solution: string;
   tags: string;
   attempts?: AttemptSummary[];
 }
@@ -312,6 +315,7 @@ function getChallengeNumber(challenge: Challenge) {
 interface TrainArenaClientProps {
   id: string;
   initialChallenge: Challenge | null;
+  isAuthenticated: boolean;
 }
 
 // react-doctor-disable-next-line react-doctor/prefer-useReducer
@@ -319,6 +323,7 @@ interface TrainArenaClientProps {
 export default function TrainArenaClient({
   id,
   initialChallenge,
+  isAuthenticated,
 }: TrainArenaClientProps) {
   const [userAnswer, setUserAnswer] = useState("");
   const [notes, setNotes] = useState("");
@@ -329,6 +334,7 @@ export default function TrainArenaClient({
   const [answerLocked, setAnswerLocked] = useState(false);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [showComparison, setShowComparison] = useState(false);
+  const [showAuthenticationDialog, setShowAuthenticationDialog] = useState(false);
   const [zenToast, dispatchZenToast] = useReducer(zenToastReducer, {
     open: false,
     tone: "info",
@@ -409,6 +415,11 @@ export default function TrainArenaClient({
         "Diagnóstico incompleto",
         `Escreva pelo menos ${MIN_ANSWER_LENGTH} caracteres para enviar.`,
       );
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setShowAuthenticationDialog(true);
       return;
     }
 
@@ -544,6 +555,12 @@ export default function TrainArenaClient({
         </div>
       </div>
 
+      <AuthenticationRequiredDialog
+        open={showAuthenticationDialog}
+        callbackURL={`/train/${id}`}
+        onClose={() => setShowAuthenticationDialog(false)}
+      />
+
       <div className="fixed bottom-4 right-4 z-[80]">
         <ZenToast open={zenToast.open} tone={zenToast.tone} title={zenToast.title}>
           {zenToast.message}
@@ -583,6 +600,80 @@ function ChallengeHeader({
         <Bell className="size-[18px]" />
       </button>
     </header>
+  );
+}
+
+function AuthenticationRequiredDialog({
+  open,
+  callbackURL,
+  onClose,
+}: {
+  open: boolean;
+  callbackURL: string;
+  onClose: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const primaryActionRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (open && !dialog.open) {
+      dialog.showModal();
+      primaryActionRef.current?.focus();
+      return;
+    }
+
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="authentication-required-title"
+      aria-describedby="authentication-required-description"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] p-6 text-[var(--challengers-ink)] shadow-2xl backdrop:bg-black/60 sm:p-8"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
+        <button
+          type="button"
+          aria-label="Fechar"
+          className="challengers-icon-button absolute right-4 top-4 grid size-11 place-items-center rounded-lg border"
+          onClick={onClose}
+        >
+          <X className="size-4" aria-hidden="true" />
+        </button>
+
+        <span className="grid size-12 place-items-center rounded-full bg-[var(--challengers-blue-soft)] text-[var(--challengers-blue)]">
+          <LockKeyhole className="size-5" aria-hidden="true" />
+        </span>
+        <h2 id="authentication-required-title" className="mt-5 pr-10 font-serif text-2xl font-bold text-[var(--challengers-ink)]">
+          Crie sua conta para enviar
+        </h2>
+        <p id="authentication-required-description" className="mt-3 text-sm leading-6 text-[var(--challengers-muted)]">
+          Você pode explorar os desafios livremente. Para receber a avaliação, salvar seu progresso e atualizar seu ELO, registre-se no Kodan.
+        </p>
+
+        <div className="mt-7 grid gap-3 sm:grid-cols-2">
+          <Link
+            ref={primaryActionRef}
+            href={getLoginHref(callbackURL, "register")}
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--challengers-blue)] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Criar conta
+          </Link>
+          <Link
+            href={getLoginHref(callbackURL)}
+            className="challengers-control inline-flex min-h-11 items-center justify-center rounded-lg border px-4 text-sm font-semibold text-[var(--challengers-ink)]"
+          >
+            Já tenho conta
+          </Link>
+        </div>
+    </dialog>
   );
 }
 

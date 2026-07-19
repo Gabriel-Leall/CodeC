@@ -81,7 +81,7 @@ export function createInitialChallengesState(
     hasMore: initialData.hasMore,
     totalCount: initialData.totalCount,
     userElo: initialData.userElo || DEFAULT_USER_ELO,
-    topicFilter: "effects-lifecycle",
+    topicFilter: "ALL",
     filterDifficulty: "ALL",
     statusFilter: initialData.initialStatus ?? "ALL",
     typeFilter: "ALL",
@@ -181,7 +181,7 @@ export function challengesReducer(
     case "clearFilters":
       return {
         ...state,
-        topicFilter: "effects-lifecycle",
+        topicFilter: "ALL",
         filterDifficulty: "ALL",
         statusFilter: "ALL",
         typeFilter: "ALL",

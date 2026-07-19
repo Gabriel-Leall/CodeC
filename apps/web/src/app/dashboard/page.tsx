@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { readChallengesFromContent } from "@kodan/db/challenge-content";
 
-import { getCurrentUser } from "@/server/api/service";
+import { getCurrentStudyStreak } from "@/app/profile/profile-data";
+import { getCurrentUser, listCurrentUserAttempts } from "@/server/api/service";
 import DashboardHome from "./dashboard-home";
 
 export const metadata: Metadata = {
@@ -13,9 +14,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [challenges, userResult] = await Promise.all([
+  const [challenges, userResult, attemptsResult] = await Promise.all([
     readChallengesFromContent(),
     getCurrentUser(),
+    listCurrentUserAttempts(),
   ]);
   const featuredChallenge =
     challenges.find((challenge) => challenge.id === "react-hooks-stale-closure-useeffect") ??
@@ -28,6 +30,9 @@ export default async function DashboardPage() {
   const user = userResult.success && userResult.data
     ? userResult.data
     : { name: "Kodan", image: null, elo: 1200 };
+  const streak = attemptsResult.success && attemptsResult.data
+    ? getCurrentStudyStreak(attemptsResult.data, new Date())
+    : 0;
 
   return (
     <DashboardHome
@@ -36,6 +41,7 @@ export default async function DashboardPage() {
       userName={user.name}
       userImage={user.image}
       userElo={user.elo}
+      userStreak={streak}
     />
   );
 }

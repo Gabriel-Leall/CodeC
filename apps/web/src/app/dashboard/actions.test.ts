@@ -1,9 +1,7 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 
 const serviceCalls = {
-  getChallengeById: mock(async () => ({ success: true })),
   getCurrentUser: mock(async () => ({ success: true })),
-  listChallenges: mock(async () => ({ success: true })),
   listCurrentUserAttempts: mock(async () => ({ success: true })),
   submitChallengeAttempt: mock(async () => ({ success: true })),
   updateCurrentUserProfile: mock(async () => ({ success: true })),
@@ -19,8 +17,6 @@ mock.module("next/headers", () => ({ headers: async () => requestHeaders }));
 
 const {
   getAttemptsHistory,
-  getChallenge,
-  getChallenges,
   getLocalUser,
   submitAttempt,
   updateLocalUserProfile,
@@ -33,21 +29,10 @@ describe("dashboard server actions", () => {
     Object.values(serviceCalls).forEach((serviceCall) => serviceCall.mockClear());
   });
 
-  test("allows callers that passed through the local Dojo gate", async () => {
-    requestHeaders.set("cookie", "dojo_gate_seen=1");
-
-    const result = await getChallenges();
-
-    expect(result.success).toBe(true);
-    expect(serviceCalls.listChallenges).toHaveBeenCalledTimes(1);
-  });
-
-  test("reject unauthenticated callers before service work", async () => {
+  test("keeps profile data and submissions protected", async () => {
     const actions = [
       () => getLocalUser(),
       () => updateLocalUserProfile({ name: "Gabriel" }),
-      () => getChallenges(),
-      () => getChallenge("challenge-1"),
       () => submitAttempt("challenge-1", "Uma resposta suficientemente detalhada."),
       () => getAttemptsHistory(),
     ];
@@ -57,8 +42,19 @@ describe("dashboard server actions", () => {
     }
 
     expect(getRuntimeSession).toHaveBeenCalledTimes(actions.length);
-    for (const serviceCall of Object.values(serviceCalls)) {
-      expect(serviceCall).not.toHaveBeenCalled();
-    }
+    expect(serviceCalls.getCurrentUser).not.toHaveBeenCalled();
+    expect(serviceCalls.updateCurrentUserProfile).not.toHaveBeenCalled();
+    expect(serviceCalls.submitChallengeAttempt).not.toHaveBeenCalled();
+    expect(serviceCalls.listCurrentUserAttempts).not.toHaveBeenCalled();
+  });
+
+  test("does not treat the local Dojo gate as an authenticated session", async () => {
+    requestHeaders.set("cookie", "dojo_gate_seen=1");
+
+    await expect(
+      submitAttempt("challenge-1", "Uma resposta suficientemente detalhada."),
+    ).rejects.toThrow("Unauthorized");
+
+    expect(serviceCalls.submitChallengeAttempt).not.toHaveBeenCalled();
   });
 });
