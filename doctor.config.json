@@ -5,7 +5,6 @@
         "files": [
           "src/app/dashboard/challenges/ema-challenge-card-helpers.ts",
           "src/app/dashboard/challenges/ema-challenge-card.tsx",
-          "src/app/dashboard/dashboard.tsx",
           "src/app/dashboard/train/*/train-arena-client.tsx",
           "src/app/entry-gate.tsx",
           "src/components/header.tsx",
