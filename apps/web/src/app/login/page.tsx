@@ -16,7 +16,7 @@ export default async function LoginPage({
   const session = await getRuntimeSession(await headers());
 
   if (session?.user) {
-    redirect(callbackURL);
+    redirect(getSafeCallbackPath(params.callbackURL, "/dashboard"));
   }
 
   return (
