@@ -2,7 +2,7 @@
 
 import type { EChartsOption } from "echarts";
 import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 
 import { SectionCard } from "@kodan/ui/components/profile";
 import type { EloPoint } from "./profile-types";

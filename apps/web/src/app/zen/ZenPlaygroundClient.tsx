@@ -36,7 +36,7 @@ import {
   ZenDivider,
 } from "@kodan/ui/components/zen";
 import { Moon, RotateCcw, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 import { useState } from "react";
 
 type AlertVariant = "success" | "warning" | "error" | "info";

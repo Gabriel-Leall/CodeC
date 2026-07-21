@@ -14,12 +14,10 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-
 import { cn } from "@kodan/ui/lib/utils";
 
-import sidebarBackground from "@/assets/sidebar_background.png";
 import { getLoginHref } from "@/lib/auth-navigation";
-import { eloToDanRank } from "@/lib/rating";
+import { formatRankLabel } from "@/lib/rating";
 
 export const APP_ROUTE_PREFIXES = [
   "/dashboard",
@@ -46,7 +44,7 @@ export type SidebarUser = {
 };
 
 function formatRank(elo: number) {
-  const rank = eloToDanRank(elo).kyuDan;
+  const rank = formatRankLabel(elo);
   return rank.replace(/(\d+)(?:st|nd|rd|th)\s(Kyu|Dan)/, "$1º $2");
 }
 
@@ -103,7 +101,6 @@ export function AppSidebar({
 
   return (
     <aside className={cn("relative flex h-svh min-h-0 shrink-0 flex-col overflow-hidden border-r border-[color:var(--profile-border)] bg-[var(--profile-bg)] transition-[width] duration-200", compact ? "w-20" : "w-64")}>
-      <Image src={sidebarBackground} alt="" width={433} height={577} priority className={cn("pointer-events-none absolute bottom-0 z-0 max-w-none object-contain object-bottom transition-opacity duration-300", compact ? "-left-36 h-[360px] w-[270px] opacity-0" : "-left-14 h-[520px] w-[390px] opacity-70")} />
       <div className={cn("relative z-10 flex h-28 shrink-0 items-center", compact ? "justify-center px-3" : "justify-between px-7")}>
         <Link href="/dashboard" aria-label="Abrir o Dojo" onClick={onCloseMobile}><KodanMark compact={compact} /></Link>
         <button data-sidebar-close={mobileOpen ? "true" : undefined} type="button" onClick={mobileOpen ? onCloseMobile : onToggle} aria-label={mobileOpen ? "Fechar sidebar" : compact ? "Expandir sidebar" : "Recolher sidebar"} className="grid size-11 place-items-center rounded-lg text-[var(--profile-text-muted)] transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]">
@@ -150,10 +147,12 @@ export function AppSidebar({
       </nav>
 
       <div className="relative z-10 mt-auto shrink-0 px-4 pb-5 pt-2">
-        <Link href={profileHref} onClick={onCloseMobile} aria-current={pathname === "/profile" ? "page" : undefined} title={`${displayName}, ${rank}`} className={cn("group flex items-center gap-3 rounded-2xl border border-[color:var(--profile-border)] bg-[var(--profile-surface)]/90 p-3 transition-colors hover:border-[color:var(--profile-border-strong)] hover:bg-[var(--profile-accent-blue-soft)]", pathname === "/profile" && "border-[color:var(--profile-accent-blue)]")}>
-          <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--profile-surface-elevated)] text-xs font-bold text-[var(--profile-text-primary)]">{user?.image ? <Image src={user.image} alt="" width={36} height={36} unoptimized className="size-full object-cover" /> : initials}</span>
-          <span className={cn("min-w-0", compact && "sr-only")}><span className="block truncate text-xs font-semibold text-[var(--profile-text-primary)]">{displayName}</span><span className="mt-0.5 block text-xs uppercase tracking-wide text-[var(--profile-accent-blue)]">{user ? `${rank} · ${user.elo} ELO` : rank}</span></span>
-        </Link>
+        {user ? (
+          <Link href={profileHref} onClick={onCloseMobile} aria-current={pathname === "/profile" ? "page" : undefined} title={`${displayName}, ${rank}`} className={cn("group flex items-center gap-3 rounded-2xl border border-[color:var(--profile-border)] bg-[var(--profile-surface)]/90 p-3 transition-colors hover:border-[color:var(--profile-border-strong)] hover:bg-[var(--profile-accent-blue-soft)]", pathname === "/profile" && "border-[color:var(--profile-accent-blue)]")}>
+            <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--profile-surface-elevated)] text-xs font-bold text-[var(--profile-text-primary)]">{user.image ? <Image src={user.image} alt="" width={36} height={36} unoptimized className="size-full object-cover" /> : initials}</span>
+            <span className={cn("min-w-0", compact && "sr-only")}><span className="block truncate text-xs font-semibold text-[var(--profile-text-primary)]">{displayName}</span><span className="mt-0.5 block text-xs uppercase tracking-wide text-[var(--profile-accent-blue)]">{rank} · {user.elo} ELO</span></span>
+          </Link>
+        ) : null}
       </div>
     </aside>
   );
