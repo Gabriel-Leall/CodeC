@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useReducer, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { ZenToast } from "@kodan/ui/components/zen";
+import { useZenToast } from "@/hooks/use-zen-toast";
 import { ChallengesNavigationDrawer } from "./challenges-navigation-drawer";
 import { ChallengesExplorerPanel } from "./challenges-explorer-list";
 import {
@@ -53,8 +54,10 @@ async function fetchChallenges(params: { limit: number; offset: number }) {
 
 export default function ChallengesPageClient({
   initialData,
+  user,
 }: {
   initialData: ChallengesInitialData;
+  user: { name: string; image: string | null };
 }) {
   const router = useRouter();
   const [state, dispatch] = useReducer(
@@ -66,35 +69,10 @@ export default function ChallengesPageClient({
     null,
   );
   const [navigationOpen, setNavigationOpen] = useState(false);
-  const [zenToastOpen, setZenToastOpen] = useState(false);
-  const [zenToastMessage, setZenToastMessage] = useState<string | undefined>(
-    undefined,
-  );
-  const toastTimeoutsRef = useRef<number[]>([]);
-
-  useEffect(
-    () => () => {
-      toastTimeoutsRef.current.forEach((timeoutId) =>
-        window.clearTimeout(timeoutId),
-      );
-      toastTimeoutsRef.current = [];
-    },
-    [],
-  );
+  const { toast, showToast } = useZenToast();
 
   const showZenErrorToast = (message: string) => {
-    toastTimeoutsRef.current.forEach((timeoutId) =>
-      window.clearTimeout(timeoutId),
-    );
-    toastTimeoutsRef.current = [];
-    setZenToastMessage(message);
-    setZenToastOpen(false);
-    toastTimeoutsRef.current.push(
-      window.setTimeout(() => setZenToastOpen(true), 20),
-    );
-    toastTimeoutsRef.current.push(
-      window.setTimeout(() => setZenToastOpen(false), 3200),
-    );
+    showToast("error", "Falha de carregamento", message);
   };
 
   const loadInitialChallenges = async () => {
@@ -284,6 +262,7 @@ export default function ChallengesPageClient({
       <div className="hidden h-full min-h-0 w-full lg:block">
         <ChallengesDesktopShell
           userElo={state.userElo}
+          user={user}
           title={topicLabel}
           description={topicDescription}
           searchQuery={state.searchQuery}
@@ -297,6 +276,7 @@ export default function ChallengesPageClient({
 
       <ChallengesMobileShell
         userElo={state.userElo}
+        user={user}
         searchQuery={state.searchQuery}
         filtersOpen={navigationOpen}
         onSearchChange={(query) =>
@@ -320,8 +300,8 @@ export default function ChallengesPageClient({
       />
 
       <div className="fixed bottom-4 right-4 z-50">
-        <ZenToast open={zenToastOpen} tone="error" title="Falha de carregamento">
-          {zenToastMessage ?? ""}
+        <ZenToast open={toast.open} tone={toast.tone} title={toast.title}>
+          {toast.message}
         </ZenToast>
       </div>
     </main>

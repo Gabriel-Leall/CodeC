@@ -61,3 +61,10 @@ export function eloToDanRank(elo: number): DanRank {
   }
   return { kyuDan: "9th Dan", kanji: "九段", description: "Ascendido (Ascended)" };
 }
+
+export function formatRankLabel(elo: number) {
+  return eloToDanRank(elo).kyuDan.replace(
+    /(\d+)(?:st|nd|rd|th)\s(Kyu|Dan)/,
+    "$1º $2",
+  );
+}

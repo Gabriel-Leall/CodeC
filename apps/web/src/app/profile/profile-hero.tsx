@@ -16,7 +16,10 @@ import {
   X,
 } from "lucide-react";
 
+import { ZenToast } from "@kodan/ui/components/zen";
+
 import { updateLocalUserProfile } from "../dashboard/actions";
+import { useZenToast } from "@/hooks/use-zen-toast";
 import type { ProfileUserSummary } from "./profile-types";
 
 export function ProfileHero({ user }: { user: ProfileUserSummary }) {
@@ -26,18 +29,16 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio);
   const [image, setImage] = useState(user.image);
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { toast, showToast } = useZenToast();
 
   const cancelEditing = () => {
     setName(user.name);
     setBio(user.bio);
-    setError(null);
     setEditing(false);
   };
 
   const saveProfile = (nextImage = image) => {
-    setError(null);
     startTransition(async () => {
       const result = await updateLocalUserProfile({
         name,
@@ -46,11 +47,12 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
       });
 
       if (!result.success) {
-        setError(result.error ?? "Erro ao atualizar perfil.");
+        showToast("error", "Falha ao atualizar", result.error ?? "Erro ao atualizar perfil.");
         return;
       }
 
       setEditing(false);
+      showToast("success", "Perfil atualizado", "Suas alterações foram salvas com sucesso.");
       router.refresh();
     });
   };
@@ -61,18 +63,22 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
 
   const changeAvatar = async (file: File) => {
     if (!file.type.startsWith("image/")) {
-      setError("Selecione um arquivo de imagem.");
+      showToast("warning", "Arquivo inválido", "Selecione um arquivo de imagem.");
       return;
     }
 
     if (file.size > 1_500_000) {
-      setError("A imagem deve ter no máximo 1.5MB.");
+      showToast("warning", "Arquivo muito grande", "A imagem deve ter no máximo 1.5MB.");
       return;
     }
 
-    const dataUrl = await readFileAsDataUrl(file);
-    setImage(dataUrl);
-    saveProfile(dataUrl);
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      setImage(dataUrl);
+      saveProfile(dataUrl);
+    } catch {
+      showToast("error", "Falha ao carregar", "Não foi possível ler a imagem selecionada.");
+    }
   };
 
   return (
@@ -169,12 +175,6 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
             </p>
           )}
 
-          {error ? (
-            <p className="mt-2 text-xs font-medium text-[var(--profile-danger)]">
-              {error}
-            </p>
-          ) : null}
-
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[var(--profile-text-muted)]">
             <ProfileMetaItem
               icon={<CalendarDays className="size-4" aria-hidden="true" />}
@@ -195,7 +195,7 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
       <div className="flex items-center gap-6 lg:justify-self-end">
         <div className="flex items-center gap-4">
           <span className="font-serif text-3xl font-semibold text-[var(--profile-text-primary)]">
-            龍
+            {user.rankKanji}
           </span>
           <div>
             <p className="text-[0.68rem] uppercase tracking-[0.14em] text-[var(--profile-text-muted)]">
@@ -218,6 +218,11 @@ export function ProfileHero({ user }: { user: ProfileUserSummary }) {
             {user.topPercentLabel}
           </p>
         </div>
+      </div>
+      <div className="fixed bottom-4 right-4 z-[80]">
+        <ZenToast open={toast.open} tone={toast.tone} title={toast.title}>
+          {toast.message}
+        </ZenToast>
       </div>
     </section>
   );

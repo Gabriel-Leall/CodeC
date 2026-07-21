@@ -7,6 +7,7 @@ import type {
   RecommendedChallengeItem,
   TopicMasteryItem,
 } from "./profile-types";
+import { eloToDanRank, formatRankLabel } from "@/lib/rating";
 
 const INITIAL_ELO = 1200;
 const PT_BR_INTEGER = new Intl.NumberFormat("pt-BR");
@@ -100,15 +101,7 @@ export function clampProficiency(value: number) {
 }
 
 export function getProfileRankLabel(elo: number) {
-  if (elo >= 1850) {
-    return "SENSEI";
-  }
-
-  if (elo >= 1550) {
-    return "RONIN";
-  }
-
-  return "KYU";
+  return formatRankLabel(elo);
 }
 
 export function buildProfileViewModel({
@@ -139,6 +132,7 @@ export function buildProfileViewModel({
       countryLabel: "Brasil",
       timezoneLabel: "Fuso horário: BRT",
       rank: getProfileRankLabel(user.elo),
+      rankKanji: eloToDanRank(user.elo).kanji,
       elo: user.elo,
       topPercentLabel: getTopPercentLabel(user.elo),
     },

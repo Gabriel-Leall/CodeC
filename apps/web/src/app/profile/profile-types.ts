@@ -13,6 +13,7 @@ export interface ProfileUserSummary {
   countryLabel: string;
   timezoneLabel: string;
   rank: string;
+  rankKanji: string;
   elo: number;
   topPercentLabel: string;
 }

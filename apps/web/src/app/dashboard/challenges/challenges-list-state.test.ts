@@ -177,7 +177,7 @@ describe("challenges-list-state", () => {
       { type: "clearFilters" },
     );
 
-    expect(filteredState.topicFilter).toBe("effects-lifecycle");
+    expect(filteredState.topicFilter).toBe("ALL");
     expect(filteredState.filterDifficulty).toBe("ALL");
     expect(filteredState.statusFilter).toBe("ALL");
     expect(filteredState.typeFilter).toBe("ALL");

@@ -58,7 +58,8 @@ describe("profile-data", () => {
     });
 
     expect(viewModel.user.name).toBe("Treinador Kodan");
-    expect(viewModel.user.rank).toBe("KYU");
+    expect(viewModel.user.rank).toBe("4º Kyu");
+    expect(viewModel.user.rankKanji).toBe("四級");
     expect(viewModel.user.elo).toBe(1378);
     expect(viewModel.stats).toHaveLength(5);
     expect(viewModel.stats.find((stat) => stat.id === "resolved")?.value).toBe("2");
@@ -82,8 +83,8 @@ describe("profile-data", () => {
   });
 
   it("maps ELO into profile rank labels", () => {
-    expect(getProfileRankLabel(900)).toBe("KYU");
-    expect(getProfileRankLabel(1687)).toBe("RONIN");
-    expect(getProfileRankLabel(1900)).toBe("SENSEI");
+    expect(getProfileRankLabel(900)).toBe("8º Kyu");
+    expect(getProfileRankLabel(1687)).toBe("1º Kyu");
+    expect(getProfileRankLabel(1900)).toBe("3º Dan");
   });
 });

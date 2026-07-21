@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import {
   Filter,
   Moon,
   Search,
   Sun,
-  User,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
+import { eloToDanRank, formatRankLabel } from "@/lib/rating";
 
 import { cn } from "@kodan/ui/lib/utils";
 
 export function ChallengesDesktopShell({
   userElo,
+  user,
   title,
   description,
   searchQuery,
@@ -22,6 +24,7 @@ export function ChallengesDesktopShell({
   onSearchChange,
 }: {
   userElo: number;
+  user: ChallengesUserSummary;
   title: string;
   description: string;
   searchQuery: string;
@@ -50,7 +53,7 @@ export function ChallengesDesktopShell({
           <div className="col-start-2 row-start-1 flex shrink-0 items-center gap-3 xl:col-start-3">
             <RankBadge userElo={userElo} />
             <ThemeToggleButton />
-            <ProfileLink />
+            <ProfileLink user={user} />
           </div>
         </div>
       </header>
@@ -61,6 +64,7 @@ export function ChallengesDesktopShell({
 
 export function ChallengesMobileShell({
   userElo,
+  user,
   searchQuery,
   children,
   filtersOpen,
@@ -68,6 +72,7 @@ export function ChallengesMobileShell({
   onOpenFilters,
 }: {
   userElo: number;
+  user: ChallengesUserSummary;
   searchQuery: string;
   children: ReactNode;
   filtersOpen: boolean;
@@ -82,6 +87,7 @@ export function ChallengesMobileShell({
           <div className="flex items-center gap-2">
             <CompactRankBadge userElo={userElo} />
             <ThemeToggleButton />
+            <ProfileLink user={user} />
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2">
@@ -154,16 +160,39 @@ function ThemeToggleButton() {
   );
 }
 
-function ProfileLink() {
+type ChallengesUserSummary = {
+  name: string;
+  image: string | null;
+};
+
+function ProfileLink({ user }: { user: ChallengesUserSummary }) {
   return (
     <Link
       href="/profile"
       aria-label="Perfil"
-      className="challengers-icon-button inline-flex size-11 items-center justify-center rounded-lg border"
+      className="challengers-icon-button inline-flex size-11 items-center justify-center overflow-hidden rounded-lg border text-xs font-semibold"
     >
-      <User className="size-4" />
+      {user.image ? (
+        <Image
+          src={user.image}
+          alt=""
+          width={44}
+          height={44}
+          unoptimized
+          className="size-full object-cover"
+        />
+      ) : getInitials(user.name)}
     </Link>
   );
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .flatMap((part) => (part.trim()[0] ? [part.trim()[0]!] : []))
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "K";
 }
 
 function ChallengeSearchInput({
@@ -202,15 +231,17 @@ function ChallengeSearchInput({
 }
 
 function RankBadge({ userElo }: { userElo: number }) {
+  const rank = eloToDanRank(userElo);
+
   return (
     <div className="flex shrink-0 items-center gap-4">
-      <RankSeal />
+      <RankSeal kanji={rank.kanji} />
       <div className="border-r border-[color:var(--challengers-border)] pr-5">
         <p className="text-[0.66rem] uppercase tracking-[0.18em] text-[var(--challengers-muted)]">
           Rank
         </p>
         <p className="font-serif text-lg font-bold leading-tight text-[var(--challengers-ink)]">
-          RONIN
+          {formatRankLabel(userElo)}
         </p>
       </div>
       <div>
@@ -226,9 +257,11 @@ function RankBadge({ userElo }: { userElo: number }) {
 }
 
 function CompactRankBadge({ userElo }: { userElo: number }) {
+  const rank = eloToDanRank(userElo);
+
   return (
     <div className="flex items-center gap-2">
-      <RankSeal compact />
+      <RankSeal compact kanji={rank.kanji} />
       <span className="text-[0.76rem] font-semibold text-[var(--challengers-blue)]">
         {userElo}
       </span>
@@ -236,7 +269,7 @@ function CompactRankBadge({ userElo }: { userElo: number }) {
   );
 }
 
-function RankSeal({ compact = false }: { compact?: boolean }) {
+function RankSeal({ kanji, compact = false }: { kanji: string; compact?: boolean }) {
   return (
     <span
       className={cn(
@@ -245,7 +278,7 @@ function RankSeal({ compact = false }: { compact?: boolean }) {
       )}
       aria-hidden="true"
     >
-      徳
+      {kanji}
     </span>
   );
 }
