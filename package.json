@@ -44,7 +44,14 @@
     "question-bank:validate": "bun run ./scripts/question-bank/validate.ts"
   },
   "dependencies": {
-    "@kodan/env": "workspace:*"
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
+    "@kodan/env": "workspace:*",
+    "@radix-ui/react-label": "^2.1.12",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@asteasolutions/zod-to-openapi": "8.5.0",
