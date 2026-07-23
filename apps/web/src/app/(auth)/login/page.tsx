@@ -13,8 +13,56 @@ import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {authClient} from "@/lib/auth-client"
+import { useRouter } from "next/navigation";
+
+const loginSchema = z
+  .object({
+    email: z.email("E-mail inválido"),
+    password: z.string().min(8, "A senha deve ter no mínimo 6 caracteres"),
+  })
+  
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter()
+
+  const {
+  register,
+  handleSubmit,
+  formState: { errors },
+  } = useForm<LoginFormValues>({
+  resolver: zodResolver(loginSchema),
+  });
+
+  async function onSubmit (formData: LoginFormValues) {
+  console.log(formData); 
+
+    await authClient.signIn.email({
+      email: formData.email,
+      password: formData.password,
+      callbackURL: "/dashboard"
+    }, 
+    {
+      onRequest: (ctx)=> {
+
+    }, 
+    onSuccess: (ctx)=> {
+      console.log("Logado:", ctx)
+      router.replace("/dashboard")
+    },
+    onError:(ctx)=>{
+      console.log("ERRO AO LOGAR!!")
+      console.log(ctx)
+    }
+  })
+  };
 
   return (
     <div className="space-y-6">
@@ -58,6 +106,7 @@ export default function LoginPage() {
             id="email"
             type="email"
             placeholder="voce@empresa.com"
+            {...register("email")}
           />
         </div>
 
@@ -78,10 +127,11 @@ export default function LoginPage() {
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
+              {...register("password")}
             />
 
             <button
-              type="button"
+              type="submit"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
@@ -97,6 +147,7 @@ export default function LoginPage() {
         <Button
           type="button"
           className="w-full bg-[#2783c0] hover:bg-violet-700"
+          onClick={handleSubmit(onSubmit)}
         >
           Entrar
         </Button>
