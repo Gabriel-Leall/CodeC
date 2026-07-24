@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { readChallengesFromContent } from "@kodan/db/challenge-content";
 
-import { getCurrentStudyStreak } from "@/app/profile/profile-data";
+import { getCurrentStudyStreak } from "@/app/(protected)/profile/profile-data";
 import { getCurrentUser, listCurrentUserAttempts } from "@/server/api/service";
 import DashboardHome from "./dashboard-home";
 
