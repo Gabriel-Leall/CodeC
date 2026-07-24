@@ -49,7 +49,7 @@ export function DashboardHomeHeader({ userName, userImage, userElo, userStreak }
             <p className="text-xs text-[var(--dojo-muted)]">{streakUnit} de streak</p>
           </div>
         </div>
-        <Link href="/profile" aria-label="Abrir perfil" className="grid size-11 place-items-center overflow-hidden rounded-full bg-[var(--dojo-avatar)] text-xs font-bold text-[var(--dojo-ink)]">
+        <Link href="/perfil" aria-label="Abrir perfil" className="grid size-11 place-items-center overflow-hidden rounded-full bg-[var(--dojo-avatar)] text-xs font-bold text-[var(--dojo-ink)]">
           {userImage ? <Image src={userImage} alt="" width={44} height={44} unoptimized className="size-full object-cover" /> : getInitials(userName)}
         </Link>
       </div>

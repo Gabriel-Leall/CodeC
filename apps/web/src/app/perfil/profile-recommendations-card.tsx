@@ -46,7 +46,7 @@ export function ProfileRecommendationsCard({
       title="Próximos desafios recomendados"
       footer={
         <Link
-          href="/challenges"
+          href="/desafios"
           className="profile-focusable inline-flex items-center gap-2 rounded-[4px] text-sm font-medium text-[var(--profile-accent-blue)]"
         >
           Explorar todos os desafios

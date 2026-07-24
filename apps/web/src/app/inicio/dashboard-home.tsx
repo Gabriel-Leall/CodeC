@@ -1,7 +1,5 @@
 "use client";
 
-import type { ChallengeContentEntry } from "@kodan/db/challenge-content";
-
 import { DashboardHomeHeader } from "./dashboard-home/dashboard-home-header";
 import { DashboardNavigation } from "./dashboard-home/dashboard-navigation";
 import { DojoInitiationCard } from "./dashboard-home/dojo-initiation-card";
@@ -9,15 +7,25 @@ import { RecommendedChallengeCard } from "./dashboard-home/recommended-challenge
 import { useDashboardThemeAssets } from "./dashboard-home/use-dashboard-theme-assets";
 
 type DashboardHomeProps = {
-  challenge: ChallengeContentEntry;
+  challenge: DashboardChallenge;
   challengeCount: number;
+  recommendationReason: "CONTINUE_RECENT" | "PERSONALIZED" | "POPULAR_BEGINNER" | "FALLBACK";
   userName: string;
   userImage: string | null;
   userElo: number;
   userStreak: number;
 };
 
-export default function DashboardHome({ challenge, challengeCount, userName, userImage, userElo, userStreak }: DashboardHomeProps) {
+export type DashboardChallenge = {
+  id: string;
+  title: string;
+  difficulty: string;
+  tags: string[];
+  code: string;
+  question: string;
+};
+
+export default function DashboardHome({ challenge, challengeCount, recommendationReason, userName, userImage, userElo, userStreak }: DashboardHomeProps) {
   const themeAssets = useDashboardThemeAssets();
 
   return (
@@ -30,7 +38,10 @@ export default function DashboardHome({ challenge, challengeCount, userName, use
       />
       <div className="grid gap-5 p-5 sm:p-8 2xl:grid-cols-[minmax(0,1.65fr)_minmax(20rem,0.75fr)]">
         <section className="space-y-5">
-          <RecommendedChallengeCard challenge={challenge} />
+          <RecommendedChallengeCard
+            challenge={challenge}
+            recommendationReason={recommendationReason}
+          />
           <DojoInitiationCard icon={themeAssets.initiation} />
         </section>
         <DashboardNavigation challengeCount={challengeCount} icons={themeAssets} />

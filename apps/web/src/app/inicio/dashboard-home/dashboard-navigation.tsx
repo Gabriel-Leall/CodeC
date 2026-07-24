@@ -41,7 +41,7 @@ function TrainingNavigationCard({ challengeCount, icon }: { challengeCount: numb
       footer={`${challengeCount} desafios disponíveis`}
       footerIcon={UsersRound}
       icon={icon}
-      href="/challenges"
+      href="/desafios"
     />
   );
 }
@@ -54,7 +54,7 @@ function ReviewsNavigationCard({ icon }: { icon: StaticImageData }) {
       footer="Ver seus registros"
       footerIcon={BookOpen}
       icon={icon}
-      href="/reviews"
+      href="/revisoes"
     />
   );
 }
@@ -67,7 +67,7 @@ function SimulatorNavigationCard({ icon }: { icon: StaticImageData }) {
       footer="Explorar desafios"
       footerIcon={UsersRound}
       icon={icon}
-      href="/simulator"
+      href="/simulados"
     />
   );
 }

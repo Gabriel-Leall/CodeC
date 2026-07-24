@@ -118,7 +118,7 @@ export function ChallengesMobileShell({
 function KodanLogo({ compact = false }: { compact?: boolean }) {
   return (
     <Link
-      href="/dashboard"
+      href="/inicio"
       className={cn(
         "inline-flex items-center gap-3 text-[var(--challengers-ink)]",
         compact && "gap-2",
@@ -168,7 +168,7 @@ type ChallengesUserSummary = {
 function ProfileLink({ user }: { user: ChallengesUserSummary }) {
   return (
     <Link
-      href="/profile"
+      href="/perfil"
       aria-label="Perfil"
       className="challengers-icon-button inline-flex size-11 items-center justify-center overflow-hidden rounded-lg border text-xs font-semibold"
     >

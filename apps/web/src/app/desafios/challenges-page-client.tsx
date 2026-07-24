@@ -49,6 +49,14 @@ async function fetchChallenges(params: { limit: number; offset: number }) {
     offset: String(params.offset),
   });
   const response = await fetch(`/api/challenges?${searchParams.toString()}`);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: `Não foi possível carregar os desafios (${response.status}).`,
+    } satisfies ChallengesApiResponse;
+  }
+
   return (await response.json()) as ChallengesApiResponse;
 }
 
@@ -193,7 +201,7 @@ export default function ChallengesPageClient({
   };
 
   const openChallenge = (challengeId: string) => {
-    router.push(`/train/${challengeId}`);
+    router.push(`/treinar/${challengeId}`);
   };
 
 

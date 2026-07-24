@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  CHALLENGE_TOPICS,
   buildChallengeTopicSections,
   getChallengeTopicKey,
   getChallengeTopicTagline,
@@ -46,6 +47,18 @@ describe("challenges-taxonomy", () => {
         }),
       ),
     ).toBe("component-patterns");
+    expect(
+      getChallengeTopicKey(
+        makeChallenge({
+          id: "typescript-generics-inference",
+          title: "Inferência em tipos genéricos",
+          tags: "typescript,generics,type-inference",
+        }),
+      ),
+    ).toBe("type-system");
+    expect(CHALLENGE_TOPICS.find((topic) => topic.key === "type-system")?.label).toBe(
+      "Type System",
+    );
   });
 
   it("gera uma tagline curta para a linha do explorer", () => {

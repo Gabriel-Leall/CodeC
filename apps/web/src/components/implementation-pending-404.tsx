@@ -10,8 +10,8 @@ export function ImplementationPending404({ title, description }: { title: string
         <h1 className="mt-3 font-serif text-4xl font-bold sm:text-5xl">{title}</h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[var(--dojo-muted)]">{description}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/dashboard" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--dojo-accent)] px-5 py-3 text-sm font-semibold text-[var(--dojo-surface)] transition-colors duration-200 hover:bg-[var(--dojo-accent-strong)]"><Home className="size-4" aria-hidden="true" />Voltar ao Dojo</Link>
-          <Link href="/challenges" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[color:var(--dojo-border-strong)] px-5 py-3 text-sm font-semibold transition-colors duration-200 hover:bg-[var(--dojo-accent-soft)]"><Swords className="size-4" aria-hidden="true" />Ver desafios</Link>
+          <Link href="/inicio" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--dojo-accent)] px-5 py-3 text-sm font-semibold text-[var(--dojo-surface)] transition-colors duration-200 hover:bg-[var(--dojo-accent-strong)]"><Home className="size-4" aria-hidden="true" />Voltar ao Dojo</Link>
+          <Link href="/desafios" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[color:var(--dojo-border-strong)] px-5 py-3 text-sm font-semibold transition-colors duration-200 hover:bg-[var(--dojo-accent-soft)]"><Swords className="size-4" aria-hidden="true" />Ver desafios</Link>
         </div>
       </section>
     </main>

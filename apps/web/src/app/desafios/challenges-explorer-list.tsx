@@ -59,7 +59,7 @@ const SORT_OPTIONS: ReadonlyArray<{ value: SortBy; label: string }> = [
 ] as const;
 
 function getChallengeRoute(challengeId: string): Route {
-  return `/train/${challengeId}` as Route;
+  return `/treinar/${challengeId}` as Route;
 }
 
 export function ChallengesExplorerPanel({

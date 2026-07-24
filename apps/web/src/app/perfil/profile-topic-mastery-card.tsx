@@ -14,7 +14,7 @@ export function ProfileTopicMasteryCard({
       title="Domínio por tópico"
       footer={
         <Link
-          href="/challenges"
+          href="/desafios"
           className="profile-focusable inline-flex items-center gap-2 rounded-[4px] text-sm font-medium text-[var(--profile-accent-blue)]"
         >
           Ver todos os tópicos

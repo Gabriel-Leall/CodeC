@@ -4,7 +4,7 @@ import UserMenu from "./user-menu";
 import { NavLink } from "./nav-link";
 
 const HEADER_LINKS = [
-  { href: "/challenges", label: "Desafios" },
+  { href: "/desafios", label: "Desafios" },
 ] as const;
 
 export default function Header() {

@@ -25,8 +25,9 @@ Abra [http://localhost:3001](http://localhost:3001). Não é necessário rodar `
 
 ## O que funciona sem banco
 
-- catálogo em `/challenges`, com desafios locais;
-- arena em `/train/[id]`;
+- início em `/inicio`, com destaque contextual;
+- catálogo em `/desafios`, com desafios locais;
+- arena em `/treinar/[id]`;
 - envio de tentativa, feedback local e atualização de ELO;
 - perfil, histórico de tentativas e edição de perfil;
 - Route Handlers de jogador e desafios sob `/api/me` e `/api/challenges`.

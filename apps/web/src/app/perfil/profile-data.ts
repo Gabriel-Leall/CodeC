@@ -8,6 +8,13 @@ import type {
   TopicMasteryItem,
 } from "./profile-types";
 import { eloToDanRank, formatRankLabel } from "@/lib/rating";
+import {
+  CHALLENGE_TOPICS,
+  getChallengeTopic,
+  getChallengeTopicKey,
+} from "@/lib/challenge-topics";
+import { buildPractitionerProgress } from "@/lib/practitioner-progress";
+import { PASSING_ATTEMPT_SCORE } from "@/lib/attempt-session-rules";
 
 const INITIAL_ELO = 1200;
 const PT_BR_INTEGER = new Intl.NumberFormat("pt-BR");
@@ -36,33 +43,11 @@ const PT_BR_MONTHS = [
   "nov",
   "dez",
 ] as const;
-const PROFILE_TOPIC_UNLOCKS = [
-  {
-    topicId: "effects-lifecycle",
-    label: "Effects & Lifecycle",
-    unlockHint: "Faça 1 desafio de Effects para liberar",
-  },
-  {
-    topicId: "state-rendering",
-    label: "State & Rendering",
-    unlockHint: "Faça 1 desafio de State para liberar",
-  },
-  {
-    topicId: "async-races",
-    label: "Async UI & Races",
-    unlockHint: "Faça 1 desafio de Async para liberar",
-  },
-  {
-    topicId: "forms-validation",
-    label: "Forms & Validation",
-    unlockHint: "Faça 1 desafio de Forms para liberar",
-  },
-  {
-    topicId: "component-patterns",
-    label: "Component Patterns",
-    unlockHint: "Faça 1 desafio de Components para liberar",
-  },
-] as const;
+const PROFILE_TOPIC_UNLOCKS = CHALLENGE_TOPICS.map((topic) => ({
+  topicId: topic.key,
+  label: topic.label,
+  unlockHint: `Faça 1 desafio de ${topic.label} para liberar`,
+}));
 
 type ProfileUserRecord = {
   id: string;
@@ -110,15 +95,7 @@ export function buildProfileViewModel({
   recommendations,
   now = new Date(),
 }: ProfileViewModelInput): ProfileViewModel {
-  const uniqueResolvedChallengeIds = getResolvedChallengeIds(attempts);
-  const firstAttempts = getFirstAttemptsByChallenge(attempts);
-  const accuracy = attempts.length
-    ? Math.round(
-        (attempts.filter((attempt) => attempt.score >= 5).length /
-          attempts.length) *
-          100,
-      )
-    : 0;
+  const progress = buildPractitionerProgress(attempts, now);
 
   return {
     user: {
@@ -140,31 +117,31 @@ export function buildProfileViewModel({
       {
         id: "resolved",
         label: "Desafios resolvidos",
-        value: PT_BR_INTEGER.format(uniqueResolvedChallengeIds.size),
+        value: PT_BR_INTEGER.format(progress.resolvedCount),
       },
       {
         id: "streak",
         label: "Sequência atual",
-        value: `${getCurrentStudyStreak(attempts, now)} dias`,
+        value: `${progress.streak} dias`,
         accent: "warning",
       },
       {
         id: "accuracy",
         label: "Taxa de acerto",
-        value: `${PT_BR_PERCENT.format(accuracy)}%`,
+        value: `${PT_BR_PERCENT.format(progress.accuracy)}%`,
       },
       {
         id: "study-hours",
         label: "Horas de estudo",
-        value: `${estimateStudyHours(attempts)} h`,
+        value: `${progress.studyHours} h`,
       },
       {
         id: "attempts",
         label: "Tentativas de desafios",
-        value: PT_BR_INTEGER.format(attempts.length),
+        value: PT_BR_INTEGER.format(progress.attemptsCount),
       },
     ],
-    eloSeries: buildEloSeries(firstAttempts, user.elo),
+    eloSeries: buildEloSeries(attempts, user.elo),
     topicMastery: buildTopicMastery(attempts),
     recentSessions: attempts.slice(0, 5).map((attempt) => ({
       id: attempt.id,
@@ -183,55 +160,27 @@ export function buildProfileViewModel({
     })),
     achievements: buildAchievements({
       attempts,
-      resolvedCount: uniqueResolvedChallengeIds.size,
-      streak: getCurrentStudyStreak(attempts, now),
+      resolvedCount: progress.resolvedCount,
+      streak: progress.streak,
     }),
   };
 }
 
-function getFirstAttemptsByChallenge(attempts: ProfileAttemptRecord[]) {
-  const chronological = [...attempts].sort(
-    (left, right) => left.createdAt.getTime() - right.createdAt.getTime(),
-  );
-  const seen = new Set<string>();
-
-  return chronological.filter((attempt) => {
-    if (seen.has(attempt.challenge.id)) {
-      return false;
-    }
-
-    seen.add(attempt.challenge.id);
-    return true;
-  });
-}
-
-function getResolvedChallengeIds(attempts: ProfileAttemptRecord[]) {
-  const ids = new Set<string>();
-
-  for (const attempt of attempts) {
-    if (attempt.score >= 5) {
-      ids.add(attempt.challenge.id);
-    }
-  }
-
-  return ids;
-}
-
-function buildEloSeries(
-  firstAttempts: ProfileAttemptRecord[],
-  currentElo: number,
-): EloPoint[] {
-  if (firstAttempts.length === 0) {
+function buildEloSeries(attempts: ProfileAttemptRecord[], currentElo: number): EloPoint[] {
+  if (attempts.length === 0) {
     return [{ dateLabel: "Hoje", elo: currentElo }];
   }
 
-  const totalDelta = firstAttempts.reduce(
+  const chronologicalAttempts = attempts.toSorted(
+    (left, right) => left.createdAt.getTime() - right.createdAt.getTime(),
+  );
+  const totalDelta = chronologicalAttempts.reduce(
     (sum, attempt) => sum + attempt.eloChange,
     0,
   );
   let runningElo = Math.max(100, currentElo - totalDelta);
 
-  return firstAttempts.slice(-13).map((attempt) => {
+  return chronologicalAttempts.slice(-13).map((attempt) => {
     runningElo = Math.max(100, runningElo + attempt.eloChange);
     return {
       dateLabel: formatShortDate(attempt.createdAt),
@@ -309,7 +258,9 @@ function buildAchievements({
   resolvedCount: number;
   streak: number;
 }): AchievementItem[] {
-  const resolvedAttempts = attempts.filter((attempt) => attempt.score >= 5);
+  const resolvedAttempts = attempts.filter(
+    (attempt) => attempt.score >= PASSING_ATTEMPT_SCORE,
+  );
   const firstResolvedAttempt = getOldestAttempt(resolvedAttempts);
   const firstHardResolvedAttempt = getOldestAttempt(
     resolvedAttempts.filter((attempt) => attempt.challenge.difficulty === "HARD"),
@@ -382,53 +333,11 @@ function getOldestAttempt(attempts: ProfileAttemptRecord[]) {
 }
 
 function getSessionStatus(attempt: ProfileAttemptRecord): ProfileSessionStatus {
-  if (attempt.score >= 5) {
+  if (attempt.score >= PASSING_ATTEMPT_SCORE) {
     return "resolved";
   }
 
   return "in_progress";
-}
-
-export function getCurrentStudyStreak(
-  attempts: ReadonlyArray<Pick<ProfileAttemptRecord, "createdAt">>,
-  now: Date,
-) {
-  const attemptedDays = new Set(
-    attempts.map((attempt) => toDateKey(attempt.createdAt)),
-  );
-  let cursor = startOfDay(now);
-  let streak = 0;
-
-  if (!attemptedDays.has(toDateKey(cursor))) {
-    cursor = addDays(cursor, -1);
-  }
-
-  while (attemptedDays.has(toDateKey(cursor))) {
-    streak += 1;
-    cursor = addDays(cursor, -1);
-  }
-
-  return streak;
-}
-
-function estimateStudyHours(attempts: ProfileAttemptRecord[]) {
-  const minutes = attempts.reduce((total, attempt) => {
-    if (attempt.challenge.difficulty === "HARD") {
-      return total + 18;
-    }
-
-    if (attempt.challenge.difficulty === "MEDIUM") {
-      return total + 12;
-    }
-
-    return total + 8;
-  }, 0);
-
-  if (minutes === 0) {
-    return 0;
-  }
-
-  return Math.max(1, Math.round(minutes / 60));
 }
 
 function getPossibleElo(difficulty: string) {
@@ -456,46 +365,8 @@ function getPrimaryTopicLabel(challenge: ProfileChallengeRecord) {
 }
 
 function getPrimaryTopic(challenge: ProfileChallengeRecord) {
-  const haystack = `${challenge.title},${challenge.tags}`.toLowerCase();
-
-  if (haystack.includes("effect") || haystack.includes("hook")) {
-    return { id: "effects-lifecycle", label: "Effects & Lifecycle" };
-  }
-
-  if (
-    haystack.includes("async") ||
-    haystack.includes("race") ||
-    haystack.includes("fetch") ||
-    haystack.includes("promise")
-  ) {
-    return { id: "async-races", label: "Async UI & Races" };
-  }
-
-  if (
-    haystack.includes("form") ||
-    haystack.includes("valid") ||
-    haystack.includes("input")
-  ) {
-    return { id: "forms-validation", label: "Forms & Validation" };
-  }
-
-  if (
-    haystack.includes("component") ||
-    haystack.includes("composition") ||
-    haystack.includes("children")
-  ) {
-    return { id: "component-patterns", label: "Component Patterns" };
-  }
-
-  if (
-    haystack.includes("type") ||
-    haystack.includes("generic") ||
-    haystack.includes("typescript")
-  ) {
-    return { id: "type-system", label: "Type System" };
-  }
-
-  return { id: "state-rendering", label: "State & Rendering" };
+  const topic = getChallengeTopic(getChallengeTopicKey(challenge));
+  return { id: topic.key, label: topic.label };
 }
 
 function getTopPercentLabel(elo: number) {
@@ -529,18 +400,4 @@ function formatShortDate(date: Date) {
 function formatSessionDate(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
   return `${day} ${PT_BR_MONTHS[date.getMonth()]}`;
-}
-
-function toDateKey(date: Date) {
-  return startOfDay(date).toISOString().slice(0, 10);
-}
-
-function startOfDay(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
 }

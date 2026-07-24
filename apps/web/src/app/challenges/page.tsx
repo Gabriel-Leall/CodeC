@@ -1,1 +1,5 @@
-export { default } from "../dashboard/challenges/page";
+import { redirect } from "next/navigation";
+
+export default function LegacyChallengesPage() {
+  redirect("/desafios");
+}

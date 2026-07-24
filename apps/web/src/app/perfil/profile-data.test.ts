@@ -62,7 +62,7 @@ describe("profile-data", () => {
     expect(viewModel.user.rankKanji).toBe("四級");
     expect(viewModel.user.elo).toBe(1378);
     expect(viewModel.stats).toHaveLength(5);
-    expect(viewModel.stats.find((stat) => stat.id === "resolved")?.value).toBe("2");
+    expect(viewModel.stats.find((stat) => stat.id === "resolved")?.value).toBe("1");
     expect(viewModel.stats.find((stat) => stat.id === "streak")?.value).toBe("2 dias");
     expect(viewModel.topicMastery[0]?.label).toBe("Async UI & Races");
     expect(viewModel.topicMastery.some((topic) => topic.locked)).toBe(true);
@@ -72,8 +72,48 @@ describe("profile-data", () => {
     expect(viewModel.achievements.map((achievement) => achievement.id)).toEqual([
       "first-diagnosis",
       "advanced",
-      "effects",
     ]);
+  });
+
+  it("inclui no histórico de ELO o ganho obtido em uma nova tentativa", () => {
+    const challenge = {
+      id: "challenge-1",
+      title: "Dependências do useEffect",
+      difficulty: "MEDIUM",
+      recommendedElo: 1300,
+      tags: "react,useEffect,hooks",
+    };
+    const viewModel = buildProfileViewModel({
+      now: new Date("2026-07-11T12:00:00.000Z"),
+      user: {
+        id: "user-1",
+        name: "Treinador Kodan",
+        bio: null,
+        image: null,
+        elo: 1206,
+        createdAt: new Date("2026-01-15T12:00:00.000Z"),
+      },
+      attempts: [
+        {
+          id: "attempt-2",
+          score: 8,
+          eloChange: 6,
+          createdAt: new Date("2026-07-11T10:00:00.000Z"),
+          challenge,
+        },
+        {
+          id: "attempt-1",
+          score: 4,
+          eloChange: 0,
+          createdAt: new Date("2026-07-10T10:00:00.000Z"),
+          challenge,
+        },
+      ],
+      recommendations: [],
+    });
+
+    expect(viewModel.eloSeries).toHaveLength(2);
+    expect(viewModel.eloSeries.at(-1)?.elo).toBe(1206);
   });
 
   it("keeps proficiency values inside progress bar bounds", () => {
