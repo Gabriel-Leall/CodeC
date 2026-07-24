@@ -1,4 +1,8 @@
-import type { FeedbackPayload } from "./service";
+import {
+  evaluateAttempt,
+  revealAttemptSolution,
+  type AttemptSessionStatus,
+} from "@/server/training/attempt-execution";
 
 type MockChallenge = {
   id: string;
@@ -21,8 +25,14 @@ type MockAttempt = {
   feedbackJson: string;
   score: number;
   eloChange: number;
+  sessionStatus: AttemptSessionStatus;
+  attemptNumber: number;
   createdAt: Date;
   challenge: MockChallenge;
+};
+
+type MockTrainingStoreOptions = {
+  feedbackForAnswer?: (answer: string) => unknown;
 };
 
 const MOCK_USER_ID = "mock-user";
@@ -87,25 +97,20 @@ function cloneChallenge(challenge: MockChallenge, attempts: MockAttempt[]) {
     attempts: attempts
       .filter((attempt) => attempt.challengeId === challenge.id)
       .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime())
-      .map(({ id, score, eloChange, createdAt }) => ({ id, score, eloChange, createdAt })),
+      .map(({ id, score, eloChange, attemptNumber, sessionStatus, createdAt, userAnswer, feedbackJson }) => ({
+        id,
+        score,
+        eloChange,
+        attemptNumber,
+        sessionStatus,
+        createdAt,
+        userAnswer,
+        feedbackJson,
+      })),
   };
 }
 
-function getFeedback(solution: string): FeedbackPayload {
-  return {
-    score: 8,
-    summary: "Diagnóstico registrado no modo mock. A resposta usa um feedback local previsível para você desenvolver a interface sem banco.",
-    strengths: ["Relacionou o comportamento ao ciclo de renderização.", "Apontou uma correção viável para o componente."],
-    blindspots: ["Compare a solução com dependências e closures antes de enviar.", "No modo integrado, este feedback poderá ser substituído pela IA configurada."],
-    seniorSolution: solution,
-  };
-}
-
-function calculateEloDelta(score: number) {
-  return score >= 8 ? 10 + (score - 8) * 5 : score >= 5 ? 2 + (score - 5) * 1.5 : -15 + score * 2.5;
-}
-
-export function createMockTrainingStore() {
+export function createMockTrainingStore(options: MockTrainingStoreOptions = {}) {
   let user = {
     id: MOCK_USER_ID,
     name: "Treinador local",
@@ -137,17 +142,67 @@ export function createMockTrainingStore() {
     submitAttempt: (challengeId: string, input: { userAnswer: string; usedHint?: boolean }) => {
       const challenge = mockChallenges.find((item) => item.id === challengeId);
       if (!challenge) throw new Error("Desafio não encontrado");
+      const challengeAttempts = attempts.filter((attempt) => attempt.challengeId === challengeId);
+      const latestAttempt = challengeAttempts[0];
+      if (
+        latestAttempt &&
+        latestAttempt.sessionStatus !== "RETRY_AVAILABLE"
+      ) {
+        throw new Error("Tentativa encerrada");
+      }
 
-      const isFirstAttempt = !attempts.some((attempt) => attempt.challengeId === challengeId);
-      const feedback = getFeedback(challenge.solution);
-      const score = feedback.score;
-      let eloChange = isFirstAttempt ? Math.round(calculateEloDelta(score)) : 0;
-      if (input.usedHint && eloChange > 7) eloChange = 7;
-      const newElo = isFirstAttempt ? Math.max(100, user.elo + eloChange) : user.elo;
-      user = { ...user, elo: newElo, updatedAt: new Date() };
-      attempts = [{ id: `mock-attempt-${attempts.length + 1}`, userId: user.id, challengeId, userAnswer: input.userAnswer, feedbackJson: JSON.stringify(feedback), score, eloChange, createdAt: new Date(), challenge }, ...attempts];
+      const evaluation = evaluateAttempt({
+        currentElo: user.elo,
+        previousAttemptsCount: challengeAttempts.length,
+        usedHint: Boolean(input.usedHint),
+        solution: challenge.solution,
+        feedback: options.feedbackForAnswer?.(input.userAnswer),
+      });
+      user = { ...user, elo: evaluation.newElo, updatedAt: new Date() };
+      attempts = [{
+        id: `mock-attempt-${attempts.length + 1}`,
+        userId: user.id,
+        challengeId,
+        userAnswer: input.userAnswer,
+        feedbackJson: JSON.stringify(evaluation.feedback),
+        score: evaluation.score,
+        eloChange: evaluation.eloChange,
+        sessionStatus: evaluation.status,
+        attemptNumber: evaluation.attemptNumber,
+        createdAt: new Date(),
+        challenge,
+      }, ...attempts];
 
-      return { score, eloChange, newElo, isFirstAttempt, feedback };
+      return evaluation;
+    },
+    revealSolution: (challengeId: string) => {
+      const challenge = mockChallenges.find((item) => item.id === challengeId);
+      if (!challenge) throw new Error("Desafio não encontrado");
+      const latestAttempt = attempts.find((attempt) => attempt.challengeId === challengeId);
+      if (
+        !latestAttempt ||
+        latestAttempt.sessionStatus === "SOLVED" ||
+        latestAttempt.sessionStatus === "REVEALED"
+      ) {
+        throw new Error("Tentativa encerrada");
+      }
+
+      const revealed = revealAttemptSolution({
+        currentElo: user.elo,
+        attemptNumber: latestAttempt.attemptNumber,
+        solution: challenge.solution,
+        feedback: JSON.parse(latestAttempt.feedbackJson) as unknown,
+      });
+      attempts = attempts.map((attempt) =>
+        attempt.id === latestAttempt.id
+          ? {
+              ...attempt,
+              feedbackJson: JSON.stringify(revealed.feedback),
+              sessionStatus: revealed.status,
+            }
+          : attempt
+      );
+      return revealed;
     },
   };
 }

@@ -22,22 +22,15 @@ type AttemptRecord = {
   feedbackJson: string;
   score: number;
   eloChange: number;
+  attemptNumber: number;
+  sessionStatus: "RETRY_AVAILABLE" | "SOLVED" | "ELO_EXHAUSTED" | "REVEALED";
   createdAt: Date;
   challenge?: ChallengeRecord;
 };
 
-type ChallengeRecord = DateLikeRecord & {
-  id: string;
-  title: string;
-  difficulty: string;
-  recommendedElo: number;
-  code: string;
-  question: string;
-  solution: string;
-  tags: string;
-  updatedAt: Date;
-  attempts?: Array<Pick<AttemptRecord, "id" | "score" | "eloChange" | "createdAt">>;
-};
+import type { ChallengeRecord } from "./challenge-contract";
+
+export { serializeChallengeDetail, serializeChallengeSummary } from "./challenge-contract";
 
 export function serializeUser(user: UserRecord) {
   return {
@@ -53,32 +46,6 @@ export function serializeUser(user: UserRecord) {
   };
 }
 
-export function serializeChallengeSummary(challenge: ChallengeRecord) {
-  return {
-    id: challenge.id,
-    title: challenge.title,
-    difficulty: challenge.difficulty,
-    recommendedElo: challenge.recommendedElo,
-    tags: challenge.tags,
-    createdAt: challenge.createdAt.toISOString(),
-    updatedAt: challenge.updatedAt.toISOString(),
-    attempts: (challenge.attempts ?? []).map((attempt) => ({
-      id: attempt.id,
-      score: attempt.score,
-      eloChange: attempt.eloChange,
-      createdAt: attempt.createdAt.toISOString(),
-    })),
-  };
-}
-
-export function serializeChallengeDetail(challenge: ChallengeRecord) {
-  return {
-    ...serializeChallengeSummary(challenge),
-    code: challenge.code,
-    question: challenge.question,
-  };
-}
-
 export function serializeAttempt(attempt: AttemptRecord) {
   return {
     id: attempt.id,
@@ -88,6 +55,8 @@ export function serializeAttempt(attempt: AttemptRecord) {
     feedbackJson: attempt.feedbackJson,
     score: attempt.score,
     eloChange: attempt.eloChange,
+    attemptNumber: attempt.attemptNumber,
+    sessionStatus: attempt.sessionStatus,
     createdAt: attempt.createdAt.toISOString(),
     ...(attempt.challenge
       ? {

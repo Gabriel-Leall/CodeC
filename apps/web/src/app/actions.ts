@@ -7,6 +7,7 @@ import { getRuntimeSession } from "@/lib/runtime-data";
 import {
   getCurrentUser,
   listCurrentUserAttempts,
+  revealChallengeSolution,
   submitChallengeAttempt,
   updateCurrentUserProfile,
 } from "@/server/api/service";
@@ -40,6 +41,11 @@ export async function submitAttempt(challengeId: string, userAnswer: string, use
     userAnswer,
     usedHint: Boolean(usedHint),
   });
+}
+
+export async function revealSolution(challengeId: string) {
+  await requireAuth();
+  return revealChallengeSolution(challengeId);
 }
 
 export async function getAttemptsHistory() {

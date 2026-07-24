@@ -36,7 +36,13 @@ import { Button } from "@kodan/ui/components/button";
 import { ZenToast } from "@kodan/ui/components/zen";
 import { cn } from "@kodan/ui/lib/utils";
 import { getLoginHref } from "@/lib/auth-navigation";
-import { submitAttempt } from "../../actions";
+import { revealSolution, submitAttempt } from "../../actions";
+import {
+  attemptSessionReducer,
+  initialAttemptSessionState,
+  type ArenaAttemptResult,
+  type AttemptSessionState,
+} from "./attempt-session-state";
 
 interface AttemptSummary {
   id: string;
@@ -54,22 +60,6 @@ export interface Challenge {
   question: string;
   tags: string;
   attempts?: AttemptSummary[];
-}
-
-interface Feedback {
-  score: number;
-  summary: string;
-  strengths: string[];
-  blindspots: string[];
-  seniorSolution: string;
-}
-
-interface AttemptResult {
-  score: number;
-  eloChange: number;
-  newElo: number;
-  isFirstAttempt: boolean;
-  feedback: Feedback;
 }
 
 const MIN_ANSWER_LENGTH = 30;
@@ -316,6 +306,8 @@ interface TrainArenaClientProps {
   id: string;
   initialChallenge: Challenge | null;
   isAuthenticated: boolean;
+  initialSession?: AttemptSessionState;
+  initialUserAnswer?: string;
 }
 
 // react-doctor-disable-next-line react-doctor/prefer-useReducer
@@ -324,16 +316,18 @@ export default function TrainArenaClient({
   id,
   initialChallenge,
   isAuthenticated,
+  initialSession = initialAttemptSessionState,
+  initialUserAnswer = "",
 }: TrainArenaClientProps) {
-  const [userAnswer, setUserAnswer] = useState("");
+  const [userAnswer, setUserAnswer] = useState(initialUserAnswer);
   const [notes, setNotes] = useState("");
   const [supportTab, setSupportTab] = useState<"statement" | "notes">(
     "statement",
   );
-  const [submitting, setSubmitting] = useState(false);
-  const [answerLocked, setAnswerLocked] = useState(false);
-  const [result, setResult] = useState<AttemptResult | null>(null);
-  const [showComparison, setShowComparison] = useState(false);
+  const [attemptSession, dispatchAttemptSession] = useReducer(
+    attemptSessionReducer,
+    initialSession,
+  );
   const [showAuthenticationDialog, setShowAuthenticationDialog] = useState(false);
   const [zenToast, dispatchZenToast] = useReducer(zenToastReducer, {
     open: false,
@@ -370,7 +364,7 @@ export default function TrainArenaClient({
               <p className="mt-3 text-sm leading-6 text-[var(--challengers-muted)]">
                 O item solicitado não está disponível no catálogo atual.
               </p>
-              <Link href="/challenges" className="mt-6 inline-flex">
+              <Link href="/desafios" className="mt-6 inline-flex">
                 <Button
                   variant="outline"
                   size="sm"
@@ -388,6 +382,11 @@ export default function TrainArenaClient({
   }
 
   const challenge = initialChallenge;
+  const { result, showComparison } = attemptSession;
+  const submitting =
+    attemptSession.phase === "submitting" ||
+    attemptSession.phase === "revealing";
+  const answerLocked = attemptSession.phase !== "answering";
   const parsedQuestion = parseQuestion(challenge.question);
   const lines = challenge.code.split("\n");
   const answerLength = userAnswer.trim().length;
@@ -423,37 +422,71 @@ export default function TrainArenaClient({
       return;
     }
 
-    setAnswerLocked(true);
-    setSubmitting(true);
+    dispatchAttemptSession({ type: "submit_started" });
 
     try {
       const response = await submitAttempt(id, userAnswer, usedHintRef.current);
       if (response.success && response.data) {
-        setResult(response.data as AttemptResult);
+        dispatchAttemptSession({
+          type: "submit_succeeded",
+          result: response.data as ArenaAttemptResult,
+        });
         showZenToast(
           "success",
           "Diagnóstico avaliado",
           "Sua resposta foi processada com sucesso.",
         );
-        setSubmitting(false);
         return;
       }
 
-      setAnswerLocked(false);
+      dispatchAttemptSession({ type: "submit_failed" });
       showZenToast(
         "error",
         "Falha na avaliação",
         response.error || "Erro ao avaliar resposta",
       );
-      setSubmitting(false);
     } catch {
-      setAnswerLocked(false);
+      dispatchAttemptSession({ type: "submit_failed" });
       showZenToast(
         "error",
         "Erro de envio",
         "Erro ao enviar resposta para correção",
       );
-      setSubmitting(false);
+    }
+  };
+
+  const handleRevealSolution = async () => {
+    if (!result?.canRevealSolution || submitting) return;
+
+    dispatchAttemptSession({ type: "reveal_started" });
+    try {
+      const response = await revealSolution(id);
+      if (response.success && response.data) {
+        dispatchAttemptSession({
+          type: "reveal_succeeded",
+          result: response.data as ArenaAttemptResult,
+        });
+        showZenToast(
+          "info",
+          "Solução liberada",
+          "A sessão foi encerrada e a comparação completa está disponível.",
+        );
+        return;
+      }
+
+      dispatchAttemptSession({ type: "reveal_failed" });
+      showZenToast(
+        "error",
+        "Não foi possível revelar",
+        response.error || "Tente novamente em instantes.",
+      );
+    } catch {
+      dispatchAttemptSession({ type: "reveal_failed" });
+      showZenToast(
+        "error",
+        "Não foi possível revelar",
+        "Tente novamente em instantes.",
+      );
     }
   };
 
@@ -539,14 +572,14 @@ export default function TrainArenaClient({
                       userAnswer={userAnswer}
                       showComparison={showComparison}
                       onToggleComparison={() =>
-                        setShowComparison((current) => !current)
+                        dispatchAttemptSession({ type: "comparison_toggled" })
                       }
                       onRetry={() => {
-                        setResult(null);
+                        dispatchAttemptSession({ type: "retry_requested" });
                         setUserAnswer("");
-                        setAnswerLocked(false);
-                        setShowComparison(false);
                       }}
+                      onReveal={() => void handleRevealSolution()}
+                      revealing={attemptSession.phase === "revealing"}
                     />
                   )}
                 </div>
@@ -557,7 +590,7 @@ export default function TrainArenaClient({
 
       <AuthenticationRequiredDialog
         open={showAuthenticationDialog}
-        callbackURL={`/train/${id}`}
+        callbackURL={`/treinar/${id}`}
         onClose={() => setShowAuthenticationDialog(false)}
       />
 
@@ -580,7 +613,7 @@ function ChallengeHeader({
   return (
     <header className="flex h-[76px] shrink-0 items-center gap-4 bg-[var(--challengers-surface)] px-5 lg:px-8 xl:px-9">
       <Link
-        href="/challenges"
+        href="/desafios"
         aria-label="Voltar ao catálogo de desafios"
         className="inline-flex size-8 shrink-0 items-center justify-center text-[var(--challengers-muted)] hover:text-[var(--challengers-ink)]"
       >
@@ -1106,12 +1139,16 @@ function FeedbackPanel({
   showComparison,
   onToggleComparison,
   onRetry,
+  onReveal,
+  revealing,
 }: {
-  result: AttemptResult;
+  result: ArenaAttemptResult;
   userAnswer: string;
   showComparison: boolean;
   onToggleComparison: () => void;
   onRetry: () => void;
+  onReveal: () => void;
+  revealing: boolean;
 }) {
   return (
     <section className="challengers-panel flex min-h-0 flex-col overflow-hidden rounded-[10px] border">
@@ -1162,57 +1199,74 @@ function FeedbackPanel({
             tone="negative"
           />
 
-          <section className="border-t border-[color:var(--challengers-border)] pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex h-9 w-full justify-between rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
-              onClick={onToggleComparison}
-            >
-              <span>
-                {showComparison
-                  ? "Ocultar solução sênior"
-                  : "Comparar com solução sênior"}
-              </span>
-              {showComparison ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </Button>
+          {result.feedback.seniorSolution ? (
+            <section className="border-t border-[color:var(--challengers-border)] pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex h-9 w-full justify-between rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+                onClick={onToggleComparison}
+              >
+                <span>
+                  {showComparison
+                    ? "Ocultar solução sênior"
+                    : "Comparar com solução sênior"}
+                </span>
+                {showComparison ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </Button>
 
-            {showComparison ? (
-              <div className="mt-3 max-h-56 overflow-y-auto rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] p-4 text-sm leading-6">
-                <p className="font-semibold text-[var(--challengers-muted)]">
-                  Sua resposta
-                </p>
-                <p className="mt-1 whitespace-pre-wrap text-[var(--challengers-muted)]">
-                  {userAnswer}
-                </p>
-                <div className="my-4 h-px bg-[var(--challengers-border)]" />
-                <p className="font-semibold text-[var(--challengers-blue)]">
-                  Solução de referência
-                </p>
-                <p className="mt-1 whitespace-pre-wrap text-[var(--challengers-ink)]">
-                  {result.feedback.seniorSolution}
-                </p>
-              </div>
-            ) : null}
-          </section>
+              {showComparison ? (
+                <div className="mt-3 max-h-56 overflow-y-auto rounded-[9px] border border-[color:var(--challengers-border)] bg-[var(--challengers-panel)] p-4 text-sm leading-6">
+                  <p className="font-semibold text-[var(--challengers-muted)]">
+                    Sua resposta
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-[var(--challengers-muted)]">
+                    {userAnswer}
+                  </p>
+                  <div className="my-4 h-px bg-[var(--challengers-border)]" />
+                  <p className="font-semibold text-[var(--challengers-blue)]">
+                    Solução de referência
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-[var(--challengers-ink)]">
+                    {result.feedback.seniorSolution}
+                  </p>
+                </div>
+              ) : null}
+            </section>
+          ) : null}
         </div>
       </div>
 
       <div className="flex shrink-0 gap-2 border-t border-[color:var(--challengers-border)] px-6 py-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 flex-1 rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
-          onClick={onRetry}
-        >
-          Tentar novamente
-        </Button>
-        <Link href="/challenges" className="flex-1">
-          <Button className="h-10 w-full rounded-[8px] border-[color:var(--challengers-blue)] bg-[var(--challengers-blue)] text-[oklch(99%_0.003_248)] hover:bg-[var(--challengers-blue-strong)]">
-            Concluir arena
+        {result.canRetry ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 flex-1 rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+            onClick={onRetry}
+          >
+            Continuar investigando
           </Button>
-        </Link>
+        ) : null}
+        {result.canRevealSolution ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 flex-1 rounded-[8px] border-[color:var(--challengers-border)] bg-[var(--challengers-surface)] text-[var(--challengers-ink)] hover:bg-[var(--challengers-panel)]"
+            disabled={revealing}
+            onClick={onReveal}
+          >
+            {revealing ? <Loader2 className="size-4 animate-spin" /> : <Eye className="size-4" />}
+            Revelar solução e encerrar
+          </Button>
+        ) : (
+          <Link href="/desafios" className="flex-1">
+            <Button className="h-10 w-full rounded-[8px] border-[color:var(--challengers-blue)] bg-[var(--challengers-blue)] text-[oklch(99%_0.003_248)] hover:bg-[var(--challengers-blue-strong)]">
+              Concluir arena
+            </Button>
+          </Link>
+        )}
       </div>
     </section>
   );
