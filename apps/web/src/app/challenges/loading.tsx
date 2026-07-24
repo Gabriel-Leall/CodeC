@@ -1,4 +1,4 @@
-import { ChallengesRouteLoadingState } from "../dashboard/challenges/challenges-shell";
+import { ChallengesRouteLoadingState } from "../desafios/challenges-shell";
 
 export default function Loading() {
   return <ChallengesRouteLoadingState />;

@@ -47,6 +47,17 @@ No modo integrado, depois de configurar `DATABASE_URL` e `DIRECT_URL`, aplique o
 bun run db:push
 ```
 
+Ao aplicar pela primeira vez o modelo de sessões de tentativa em um banco que
+já possui histórico, inspecione e aplique o backfill idempotente:
+
+```bash
+bun run db:backfill:attempts
+bun run db:backfill:attempts:apply
+```
+
+O primeiro comando é somente leitura. O segundo recalcula `attemptNumber` e
+`sessionStatus` por praticante e desafio, preservando respostas, feedback e ELO.
+
 ## Servidores de desenvolvimento
 
 Para trabalhar apenas na aplicação web:

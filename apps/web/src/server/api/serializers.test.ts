@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { serializeChallengeDetail } from "./serializers";
+import { serializeAttempt, serializeChallengeDetail } from "./serializers";
+import { challengeDetailSchema } from "./schemas";
 
 describe("challenge serializers", () => {
   test("does not expose the reference solution in public challenge details", () => {
@@ -20,5 +21,26 @@ describe("challenge serializers", () => {
 
     expect(serialized).not.toHaveProperty("solution");
     expect(serialized.question).toBe("Explique o problema.");
+    expect(() => challengeDetailSchema.parse(serialized)).not.toThrow();
+  });
+
+  test("preserva o estado da sessão ao serializar uma tentativa", () => {
+    const serialized = serializeAttempt({
+      id: "attempt-1",
+      userId: "user-1",
+      challengeId: "challenge-1",
+      userAnswer: "Uma resposta suficientemente detalhada.",
+      feedbackJson: "{}",
+      score: 4,
+      eloChange: 0,
+      attemptNumber: 1,
+      sessionStatus: "RETRY_AVAILABLE",
+      createdAt: new Date("2026-07-24T00:00:00.000Z"),
+    });
+
+    expect(serialized).toMatchObject({
+      attemptNumber: 1,
+      sessionStatus: "RETRY_AVAILABLE",
+    });
   });
 });

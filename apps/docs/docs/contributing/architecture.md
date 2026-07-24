@@ -23,6 +23,7 @@ scripts               geração, validação e OpenAPI
 
 - Mude **`apps/web`** quando a regra ou interface for específica do produto web.
 - Mude **`packages/ui`** quando um componente visual for reutilizável entre aplicações.
+- Mude **`packages/content`** quando os schemas e a leitura do catálogo promovido precisarem mudar.
 - Mude **`packages/db`** quando o contrato persistido, Prisma ou consultas precisarem mudar.
 - Mude **`packages/auth`** quando a configuração de sessão/autorização for alterada.
 - Mude **`content/challenges`** para alterar um desafio que já pode ser treinado.
@@ -31,19 +32,20 @@ scripts               geração, validação e OpenAPI
 ## Fluxo principal de produto
 
 ```text
-Catálogo (/challenges)
-  -> Arena (/train/[id])
+Início (/inicio)
+  -> Catálogo (/desafios)
+  -> Arena (/treinar/[id])
   -> Route Handler / serviço da aplicação
   -> Prisma e PostgreSQL
   -> feedback e atualização de ELO
-  -> Perfil (/profile)
+  -> Perfil (/perfil)
 ```
 
 As páginas de interface e suas rotas canônicas estão detalhadas em [Aplicação e rotas](../application).
 
 ## Compatibilidade de rotas
 
-`/dashboard/challenges` e `/dashboard/train/[id]` ainda existem por compatibilidade. Novas navegações devem usar `/challenges` e `/train/[id]`. `/dashboard` redireciona para `/profile`.
+`/dashboard`, `/challenges`, `/dashboard/challenges`, `/train/[id]`, `/dashboard/train/[id]`, `/profile`, `/reviews` e `/simulator` existem apenas por compatibilidade. Novas navegações devem usar `/inicio`, `/desafios`, `/treinar/[id]`, `/perfil`, `/revisoes` e `/simulados`.
 
 ## Interfaces HTTP
 

@@ -25,26 +25,33 @@ Abra uma rota para ver como ela participa da jornada. As rotas marcadas como **c
 <details>
 <summary><code>/</code> · Entrada</summary>
 
-O gate inicial decide se o jogador já pode entrar no treino e, no fluxo local atual, direciona para o catálogo. Não é uma tela de trabalho persistente: depois da decisão, a jornada continua em **Desafios**.
+A entrada pública direciona para <code>/inicio</code>. A página inicial pode atender visitantes e praticantes autenticados sem transformar o dashboard em um espaço privado.
 
 </details>
 
 <details>
-<summary><code>/challenges</code> · Catálogo canônico</summary>
+<summary><code>/inicio</code> · Início canônico</summary>
 
-É o ponto de partida de treino. Mostra os desafios disponíveis, permite busca textual e concentra os filtros contextuais de dificuldade, status, tipo e ordenação. Ao escolher um item, a aplicação navega para <code>/train/[id]</code>.
-
-</details>
-
-<details>
-<summary><code>/train/[id]</code> · Arena canônica</summary>
-
-Recebe o identificador de um desafio, apresenta o enunciado e o código para diagnóstico. O jogador escreve a análise, pode registrar o uso de dica e envia a tentativa. Ao final, recebe feedback e a atualização de ELO quando a avaliação está disponível.
+Mostra a visão geral e um desafio em destaque com o código ao lado. Para visitantes, prioriza um desafio fácil praticado por mais pessoas. Para praticantes autenticados, pode retomar uma sessão recente ou recomendar um desafio próximo do ELO atual.
 
 </details>
 
 <details>
-<summary><code>/profile</code> · Perfil canônico</summary>
+<summary><code>/desafios</code> · Catálogo canônico</summary>
+
+Mostra os desafios disponíveis, permite busca textual e concentra os filtros contextuais de dificuldade, status, tipo e ordenação. Ao escolher um item, a aplicação navega para <code>/treinar/[id]</code>.
+
+</details>
+
+<details>
+<summary><code>/treinar/[id]</code> · Arena canônica</summary>
+
+Recebe o identificador de um desafio, apresenta o enunciado e o código para diagnóstico. Depois de errar, o praticante pode continuar sem ver a solução e com menor ELO potencial, ou revelar a solução e encerrar a sessão. A sessão aceita no máximo três tentativas avaliadas.
+
+</details>
+
+<details>
+<summary><code>/perfil</code> · Perfil canônico</summary>
 
 Reúne identidade do jogador, ELO, evolução, domínio por tópico, sessões recentes, recomendações e conquistas. A sidebar global também leva a esta rota para itens que ainda são seções do perfil, como histórico e configurações.
 
@@ -53,28 +60,28 @@ Reúne identidade do jogador, ELO, evolução, domínio por tópico, sessões re
 <details>
 <summary><code>/dashboard</code> · Redirecionamento</summary>
 
-É mantida por compatibilidade. Ela não apresenta uma interface própria: redireciona diretamente para <code>/profile</code>.
+É mantida por compatibilidade e redireciona para <code>/inicio</code>.
 
 </details>
 
 <details>
-<summary><code>/dashboard/challenges</code> · Compatibilidade</summary>
+<summary><code>/challenges</code> e <code>/dashboard/challenges</code> · Compatibilidade</summary>
 
-Mantém o caminho antigo para quem já o utiliza. A implementação é reutilizada por <code>/challenges</code>; novos links devem apontar para a rota canônica.
+Mantêm caminhos antigos para quem já os utiliza e redirecionam para <code>/desafios</code>. Novos links devem apontar para a rota canônica.
 
 </details>
 
 <details>
-<summary><code>/dashboard/train/[id]</code> · Compatibilidade</summary>
+<summary><code>/train/[id]</code> e <code>/dashboard/train/[id]</code> · Compatibilidade</summary>
 
-É o caminho antigo da arena. A implementação é a mesma de <code>/train/[id]</code>; novos links devem usar a rota canônica.
+Mantêm caminhos antigos da arena e redirecionam para <code>/treinar/[id]</code>. Novos links devem usar a rota canônica.
 
 </details>
 
 <details>
 <summary><code>/login</code> · Redirecionamento local</summary>
 
-No estado atual, a rota não mostra um formulário de autenticação separado. Ela direciona para <code>/challenges</code>, porque o projeto ainda trabalha com o fluxo local de jogador.
+O login autentica o praticante e preserva o destino local solicitado pela navegação.
 
 </details>
 
@@ -87,10 +94,10 @@ No estado atual, a rota não mostra um formulário de autenticação separado. E
 
 ## Fluxo principal
 
-1. O jogador abre **Desafios**.
+1. O praticante ou visitante abre **Início** e escolhe entrar no catálogo.
 2. Busca por texto e abre **Filtros** para combinar dificuldade, status, tipo e ordenação.
-3. Seleciona um desafio e entra em `/train/[id]`.
-4. Envia a análise e recebe feedback com alteração de ELO quando houver avaliação disponível.
+3. Seleciona um desafio e entra em `/treinar/[id]`.
+4. Envia a análise e decide entre tentar novamente ou revelar a solução quando não resolver o desafio.
 5. Consulta o resultado no **Perfil**.
 
 ## Rotas de API
@@ -103,4 +110,4 @@ As rotas `/api/*` não são páginas. Elas são interfaces HTTP para integraçõ
 - `/api/challenges/{id}/attempts` registra uma tentativa.
 - `/api/auth/*` é fornecida pelo Better Auth.
 
-> A rota de detalhe expõe atualmente a solução de referência. Isso é conhecido como um problema de produto e deve mudar quando o módulo de treino separar a projeção do enunciado do feedback pós-envio.
+> O contrato público de detalhe não expõe a solução de referência. Ela só aparece no resultado quando a sessão é resolvida ou quando o praticante escolhe revelá-la.

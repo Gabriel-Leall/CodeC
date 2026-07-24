@@ -30,8 +30,8 @@ export default async function UserMenu() {
 
   return (
     <Link
-      href="/profile"
-      className="group flex items-center gap-2.5 px-2.5 py-1.5 font-mono text-[13px] text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all select-none border border-transparent hover:border-border/30 rounded-none cursor-pointer"
+      href="/perfil"
+      className="group flex items-center gap-2.5 px-2.5 py-1.5 font-mono text-[13px] text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-colors select-none border border-transparent hover:border-border/30 rounded-none cursor-pointer"
     >
       <span className="font-semibold tracking-wide">{userName}</span>
       {userImage ? (

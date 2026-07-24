@@ -1,4 +1,4 @@
-import { syncChallengesIndexFromContent } from "./challenge-content";
+import { syncChallengesIndexFromContent } from "@kodan/content/promoted-challenge-catalog";
 
 async function run() {
   const result = await syncChallengesIndexFromContent();

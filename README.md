@@ -127,6 +127,8 @@ Regra prática: mantenha código específico da aplicação em `apps/web`; extra
 | `bun test` | Executa os testes Bun. |
 | `bun run doctor` | Executa o React Doctor. |
 | `bun run db:push` | Aplica o schema Prisma no banco configurado. |
+| `bun run db:backfill:attempts` | Mostra quantas tentativas antigas precisam da classificação de sessão. |
+| `bun run db:backfill:attempts:apply` | Recalcula e persiste número/status das tentativas antigas. |
 | `bun run db:studio` | Abre o Prisma Studio. |
 | `bun run question-bank:generate` | Regenera os artefatos editoriais. |
 | `bun run question-bank:validate` | Valida estrutura e consistência do banco de perguntas. |

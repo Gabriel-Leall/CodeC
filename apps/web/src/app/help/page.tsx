@@ -4,9 +4,9 @@ import { BookOpen, CircleHelp, MessageCircleQuestion, Swords } from "lucide-reac
 import { cn } from "@kodan/ui/lib/utils";
 
 const helpTopics = [
-  { title: "Como iniciar um treino?", description: "Abra Todos os Desafios, escolha um exercício e continue para a arena de treino.", icon: Swords, featured: true, href: "/challenges", linkLabel: "Ver todos os desafios" },
+  { title: "Como iniciar um treino?", description: "Abra Todos os Desafios, escolha um exercício e continue para a arena de treino.", icon: Swords, featured: true, href: "/desafios", linkLabel: "Ver todos os desafios" },
   { title: "Como funciona o ELO?", description: "Seu ELO evolui conforme a qualidade das respostas avaliadas nos desafios.", icon: BookOpen },
-  { title: "Precisa de suporte?", description: "Use o perfil para conferir seus dados e o histórico disponível no momento.", icon: MessageCircleQuestion, href: "/profile", linkLabel: "Ir para o perfil" },
+  { title: "Precisa de suporte?", description: "Use o perfil para conferir seus dados e o histórico disponível no momento.", icon: MessageCircleQuestion, href: "/perfil", linkLabel: "Ir para o perfil" },
 ] as const;
 
 export default function HelpPage() {
@@ -40,7 +40,7 @@ export default function HelpPage() {
             );
           })}
         </div>
-        <Link href="/dashboard" className="mt-8 inline-flex min-h-11 items-center rounded-xl bg-[var(--dojo-accent)] px-5 py-3 text-sm font-semibold text-[var(--dojo-surface)] transition-colors duration-200 hover:bg-[var(--dojo-accent-strong)]">Voltar ao Dojo</Link>
+        <Link href="/inicio" className="mt-8 inline-flex min-h-11 items-center rounded-xl bg-[var(--dojo-accent)] px-5 py-3 text-sm font-semibold text-[var(--dojo-surface)] transition-colors duration-200 hover:bg-[var(--dojo-accent-strong)]">Voltar ao Dojo</Link>
       </div>
     </main>
   );

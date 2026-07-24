@@ -1,11 +1,21 @@
 import { z } from "zod";
+import {
+  challengeDetailSchema,
+  challengeSummarySchema,
+  difficultySchema,
+} from "./challenge-contract";
+
+export {
+  challengeAttemptSummarySchema,
+  challengeDetailSchema,
+  challengeSummarySchema,
+  difficultySchema,
+} from "./challenge-contract";
 
 export const apiErrorSchema = z.object({
   success: z.literal(false),
   error: z.string(),
 });
-
-export const difficultySchema = z.enum(["EASY", "MEDIUM", "HARD"]);
 
 export const userSchema = z.object({
   id: z.string(),
@@ -30,30 +40,6 @@ export const listChallengesQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-export const challengeAttemptSummarySchema = z.object({
-  id: z.string(),
-  score: z.number(),
-  eloChange: z.number().int().optional(),
-  createdAt: z.iso.datetime().optional(),
-});
-
-export const challengeSummarySchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  difficulty: difficultySchema,
-  recommendedElo: z.number().int(),
-  tags: z.string(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
-  attempts: z.array(challengeAttemptSummarySchema),
-});
-
-export const challengeDetailSchema = challengeSummarySchema.extend({
-  code: z.string(),
-  question: z.string(),
-  solution: z.string(),
-});
-
 export const feedbackSchema = z.object({
   score: z.number().min(0).max(10),
   summary: z.string(),
@@ -75,6 +61,13 @@ export const attemptSchema = z.object({
   feedbackJson: z.string(),
   score: z.number(),
   eloChange: z.number().int(),
+  attemptNumber: z.number().int().positive(),
+  sessionStatus: z.enum([
+    "RETRY_AVAILABLE",
+    "SOLVED",
+    "ELO_EXHAUSTED",
+    "REVEALED",
+  ]),
   createdAt: z.iso.datetime(),
   challenge: challengeSummarySchema.omit({ attempts: true }).optional(),
 });
@@ -108,6 +101,18 @@ export const submitAttemptResponseSchema = z.object({
     eloChange: z.number().int(),
     newElo: z.number().int(),
     isFirstAttempt: z.boolean(),
+    attemptNumber: z.number().int().positive(),
+    status: z.enum([
+      "RETRY_AVAILABLE",
+      "SOLVED",
+      "ELO_EXHAUSTED",
+      "REVEALED",
+    ]),
+    canRetry: z.boolean(),
+    canRevealSolution: z.boolean(),
+    remainingEvaluatedAttempts: z.number().int().min(0),
+    nextEloPotentialPercent: z.number().int().min(0).max(100),
+    eloFinalized: z.boolean(),
     feedback: feedbackSchema,
   }),
 });

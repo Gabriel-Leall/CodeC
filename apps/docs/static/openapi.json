@@ -242,6 +242,20 @@
           "eloChange": {
             "type": "integer"
           },
+          "attemptNumber": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "sessionStatus": {
+            "type": "string",
+            "enum": [
+              "RETRY_AVAILABLE",
+              "SOLVED",
+              "ELO_EXHAUSTED",
+              "REVEALED"
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -297,6 +311,8 @@
           "feedbackJson",
           "score",
           "eloChange",
+          "attemptNumber",
+          "sessionStatus",
           "createdAt"
         ]
       },
@@ -334,6 +350,20 @@
                 },
                 "eloChange": {
                   "type": "integer"
+                },
+                "attemptNumber": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "exclusiveMinimum": true
+                },
+                "sessionStatus": {
+                  "type": "string",
+                  "enum": [
+                    "RETRY_AVAILABLE",
+                    "SOLVED",
+                    "ELO_EXHAUSTED",
+                    "REVEALED"
+                  ]
                 },
                 "createdAt": {
                   "type": "string",
@@ -390,6 +420,8 @@
                 "feedbackJson",
                 "score",
                 "eloChange",
+                "attemptNumber",
+                "sessionStatus",
                 "createdAt"
               ]
             }
@@ -466,6 +498,20 @@
                     "eloChange": {
                       "type": "integer"
                     },
+                    "attemptNumber": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "sessionStatus": {
+                      "type": "string",
+                      "enum": [
+                        "RETRY_AVAILABLE",
+                        "SOLVED",
+                        "ELO_EXHAUSTED",
+                        "REVEALED"
+                      ]
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -473,7 +519,9 @@
                   },
                   "required": [
                     "id",
-                    "score"
+                    "score",
+                    "attemptNumber",
+                    "sessionStatus"
                   ]
                 }
               },
@@ -481,9 +529,6 @@
                 "type": "string"
               },
               "question": {
-                "type": "string"
-              },
-              "solution": {
                 "type": "string"
               }
             },
@@ -497,8 +542,7 @@
               "updatedAt",
               "attempts",
               "code",
-              "question",
-              "solution"
+              "question"
             ]
           }
         },
@@ -566,6 +610,20 @@
                           "eloChange": {
                             "type": "integer"
                           },
+                          "attemptNumber": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "exclusiveMinimum": true
+                          },
+                          "sessionStatus": {
+                            "type": "string",
+                            "enum": [
+                              "RETRY_AVAILABLE",
+                              "SOLVED",
+                              "ELO_EXHAUSTED",
+                              "REVEALED"
+                            ]
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -573,7 +631,9 @@
                         },
                         "required": [
                           "id",
-                          "score"
+                          "score",
+                          "attemptNumber",
+                          "sessionStatus"
                         ]
                       }
                     }
@@ -726,6 +786,38 @@
               "isFirstAttempt": {
                 "type": "boolean"
               },
+              "attemptNumber": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "RETRY_AVAILABLE",
+                  "SOLVED",
+                  "ELO_EXHAUSTED",
+                  "REVEALED"
+                ]
+              },
+              "canRetry": {
+                "type": "boolean"
+              },
+              "canRevealSolution": {
+                "type": "boolean"
+              },
+              "remainingEvaluatedAttempts": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nextEloPotentialPercent": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "eloFinalized": {
+                "type": "boolean"
+              },
               "feedback": {
                 "type": "object",
                 "properties": {
@@ -767,6 +859,13 @@
               "eloChange",
               "newElo",
               "isFirstAttempt",
+              "attemptNumber",
+              "status",
+              "canRetry",
+              "canRevealSolution",
+              "remainingEvaluatedAttempts",
+              "nextEloPotentialPercent",
+              "eloFinalized",
               "feedback"
             ]
           }

@@ -13,13 +13,13 @@ export function NavLink({ href, children }: NavLinkProps) {
   const pathname = usePathname();
   const hrefString = typeof href === "string" ? href : href?.pathname || "";
 
-  const isChallenges = hrefString === "/challenges";
-  const isProfile = hrefString === "/profile";
+  const isChallenges = hrefString === "/desafios";
+  const isProfile = hrefString === "/perfil";
   const isActive =
     pathname === hrefString ||
     pathname?.startsWith(hrefString + "/") ||
-    (isChallenges && (pathname?.includes("/challenges") || pathname?.includes("/train"))) ||
-    (isProfile && (pathname?.includes("/profile") || pathname === "/dashboard"));
+    (isChallenges && (pathname?.includes("/desafios") || pathname?.includes("/treinar"))) ||
+    (isProfile && (pathname?.includes("/perfil") || pathname === "/inicio"));
 
   return (
     <Link
