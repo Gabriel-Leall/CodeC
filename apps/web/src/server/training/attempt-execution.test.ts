@@ -10,6 +10,18 @@ const validFeedback = {
 };
 
 describe("evaluateAttempt", () => {
+  test("recusa uma quarta avaliação mesmo com status legado incorreto", () => {
+    expect(() =>
+      evaluateAttempt({
+        currentElo: 1200,
+        previousAttemptsCount: 3,
+        usedHint: false,
+        solution: "Solução",
+        feedback: { score: 8 },
+      })
+    ).toThrow("Limite de tentativas atingido");
+  });
+
   test("mantém a sessão aberta e oculta a solução após o primeiro erro", () => {
     const result = evaluateAttempt({
       currentElo: 1200,

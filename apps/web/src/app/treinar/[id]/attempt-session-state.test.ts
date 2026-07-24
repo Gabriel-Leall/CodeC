@@ -129,4 +129,23 @@ describe("attemptSessionReducer", () => {
     });
     expect(restored.state.showComparison).toBe(true);
   });
+
+  test("mantém a comparação de uma sessão resolvida fechada após recarregar", () => {
+    const restored = restoreAttemptSession({
+      score: 8,
+      eloChange: 10,
+      attemptNumber: 1,
+      sessionStatus: "SOLVED",
+      userAnswer: "Minha análise correta.",
+      feedbackJson: JSON.stringify({
+        score: 8,
+        summary: "Problema resolvido.",
+        strengths: ["Boa leitura."],
+        blindspots: [],
+        seniorSolution: "Solução de referência.",
+      }),
+    });
+
+    expect(restored.state.showComparison).toBe(false);
+  });
 });

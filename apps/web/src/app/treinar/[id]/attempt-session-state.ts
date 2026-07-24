@@ -100,7 +100,7 @@ export function restoreAttemptSession(
     state: {
       phase: "feedback",
       result,
-      showComparison: Boolean(feedback.seniorSolution),
+      showComparison: attempt.sessionStatus === "REVEALED",
     },
     userAnswer: attempt.userAnswer ?? "",
   };

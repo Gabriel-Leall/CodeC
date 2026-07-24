@@ -46,6 +46,10 @@ const DEFAULT_BLINDSPOTS = [
 ];
 
 export function evaluateAttempt(input: AttemptEvaluationInput) {
+  if (input.previousAttemptsCount >= MAX_EVALUATED_ATTEMPTS) {
+    throw new Error("Limite de tentativas atingido");
+  }
+
   const normalizedFeedback = normalizeFeedback(input.feedback, input.solution);
   const attemptNumber = input.previousAttemptsCount + 1;
   const isSolved = normalizedFeedback.score >= PASSING_ATTEMPT_SCORE;

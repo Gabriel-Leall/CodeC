@@ -4,9 +4,11 @@ import { headers } from "next/headers";
 
 import {
   evaluateAttempt,
+  MAX_EVALUATED_ATTEMPTS,
   revealAttemptSolution as buildRevealedAttempt,
   type AttemptSessionStatus,
 } from "./attempt-execution";
+import { loadPractitionerCountsForChallenges } from "./challenge-practitioner-counts";
 import type { TrainingAdapter, TrainingChallenge } from "./training-adapter";
 
 async function getPrisma() {
@@ -104,7 +106,7 @@ export const integratedTrainingAdapter: TrainingAdapter = {
   },
   async listChallenges({ limit, offset, userId }) {
     const prisma = await getPrisma();
-    const [user, total, items, practitionerPairs] = await Promise.all([
+    const [user, total, items] = await Promise.all([
       userId ? prisma.user.findUnique({ where: { id: userId } }) : null,
       prisma.challenge.count(),
       prisma.challenge.findMany({
@@ -115,18 +117,12 @@ export const integratedTrainingAdapter: TrainingAdapter = {
         take: limit,
         skip: offset,
       }),
-      prisma.attempt.findMany({
-        select: { challengeId: true, userId: true },
-        distinct: ["challengeId", "userId"],
-      }),
     ]);
-    const uniquePractitionersByChallenge = practitionerPairs.reduce(
-      (counts, pair) => {
-        counts.set(pair.challengeId, (counts.get(pair.challengeId) ?? 0) + 1);
-        return counts;
-      },
-      new Map<string, number>(),
-    );
+    const uniquePractitionersByChallenge =
+      await loadPractitionerCountsForChallenges(
+        prisma.attempt,
+        items.map((challenge) => challenge.id),
+      );
     return {
       items: items.map((challenge) => ({
         ...challenge,
@@ -175,6 +171,9 @@ export const integratedTrainingAdapter: TrainingAdapter = {
           orderBy: { createdAt: "desc" },
           select: { sessionStatus: true },
         });
+        if (previousAttempts.length >= MAX_EVALUATED_ATTEMPTS) {
+          throw new Error("Limite de tentativas atingido");
+        }
         const latestStatus = previousAttempts[0]?.sessionStatus;
         if (latestStatus && latestStatus !== "RETRY_AVAILABLE") {
           throw new Error("Tentativa encerrada");

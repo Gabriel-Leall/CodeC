@@ -12,6 +12,8 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "db:push": "prisma db push",
+    "db:backfill:attempts": "bun run ./src/attempt-session-backfill.ts",
+    "db:backfill:attempts:apply": "bun run ./src/attempt-session-backfill.ts --apply",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:sqlite-to-neon": "bun run ./src/migrate-sqlite-to-neon.ts",
