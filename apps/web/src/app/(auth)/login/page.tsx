@@ -64,6 +64,12 @@ export default function LoginPage() {
   })
   };
 
+  const signInGitHub = async () => {
+    const data = await authClient.signIn.social({
+      provider: "github"
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -182,6 +188,14 @@ export default function LoginPage() {
         type="button"
         variant="outline"
         className="w-full"
+        // onClick={() => {
+        //     console.log("GITHUB!")
+        //     signInGitHub}}
+        onClick={async () =>
+            await authClient.signIn.social({
+              provider: "github",
+            })
+          }
       >
         <FontAwesomeIcon
           icon={faGithub}

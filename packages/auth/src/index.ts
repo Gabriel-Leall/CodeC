@@ -5,6 +5,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI } from "better-auth/plugins";
 
+
 export function createAuth() {
   const prisma = createPrismaClient();
 
@@ -18,6 +19,12 @@ export function createAuth() {
       enabled: true,
       requireEmailVerification: false,
     },
+    socialProviders: { 
+      github: { 
+        clientId: process.env.GITHUB_CLIENT_ID as string, 
+        clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
+      }, 
+    }, 
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     plugins: [nextCookies(), openAPI()],
