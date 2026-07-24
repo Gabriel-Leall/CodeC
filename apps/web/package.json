@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
+    "check-types": "node -e \"require('fs').rmSync('.next/dev/types',{recursive:true,force:true})\" && next typegen && tsc --noEmit",
     "start": "next start"
   },
   "dependencies": {
@@ -42,9 +43,9 @@
       "overrides": [
         {
           "files": [
-            "src/app/dashboard/challenges/ema-challenge-card-helpers.ts",
-            "src/app/dashboard/challenges/ema-challenge-card.tsx",
-            "src/app/dashboard/train/*/train-arena-client.tsx",
+            "src/app/desafios/ema-challenge-card-helpers.ts",
+            "src/app/desafios/ema-challenge-card.tsx",
+            "src/app/treinar/*/train-arena-client.tsx",
             "src/app/entry-gate.tsx",
             "src/components/header.tsx",
             "src/components/mode-toggle.tsx",

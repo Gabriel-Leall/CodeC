@@ -1,22 +1,14 @@
 {
-  "name": "@kodan/auth",
+  "name": "@kodan/content",
   "type": "module",
   "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@kodan/db": "workspace:*",
-    "@kodan/env": "workspace:*",
-    "better-auth": "catalog:",
-    "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

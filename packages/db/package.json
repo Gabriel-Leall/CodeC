@@ -10,6 +10,7 @@
     }
   },
   "scripts": {
+    "check-types": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -21,6 +22,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@kodan/content": "workspace:*",
     "@kodan/env": "workspace:*",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "catalog:",
@@ -29,6 +31,8 @@
   },
   "devDependencies": {
     "@kodan/config": "workspace:*",
+    "@types/bun": "1.3.14",
+    "@types/node": "^22.13.14",
     "prisma": "^7.8.0",
     "typescript": "catalog:"
   }
