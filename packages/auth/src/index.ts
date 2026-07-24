@@ -19,6 +19,9 @@ export function createAuth() {
       enabled: true,
       requireEmailVerification: false,
     },
+    session: {
+    expiresIn: 60 * 60 * 24, // 1 dia (em segundos)
+  },
     socialProviders: { 
       github: { 
         clientId: process.env.GITHUB_CLIENT_ID as string, 
