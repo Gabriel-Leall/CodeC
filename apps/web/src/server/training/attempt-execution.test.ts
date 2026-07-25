@@ -134,6 +134,89 @@ describe("evaluateAttempt", () => {
     expect(result.feedback.blindspots.length).toBeGreaterThan(0);
     expect(result.feedback.seniorSolution).toBe("Solução canônica.");
   });
+
+  test("rejeita respostas aleatórias, vazias ou desconexas sem conceder ELO", () => {
+    const question = "Por que o Handler do clique não remove o listener ao desmontar?";
+    const solution = "O evento addEventListener registrou o handler mas o cleanup não chamou removeEventListener.";
+    const code = "useEffect(() => { window.addEventListener('click', handler); }, []);";
+
+    const resultRandom = evaluateAttempt({
+      currentElo: 1200,
+      previousAttemptsCount: 0,
+      usedHint: false,
+      solution,
+      question,
+      code,
+      userAnswer: "qualquer resposta aleatoria",
+    });
+
+    expect(resultRandom).toMatchObject({
+      score: 0,
+      eloChange: 0,
+      newElo: 1200,
+      status: "RETRY_AVAILABLE",
+      canRetry: true,
+    });
+    expect(resultRandom.feedback.seniorSolution).toBe("");
+    expect(resultRandom.feedback.summary).toContain("não aborda");
+
+    const resultJunk = evaluateAttempt({
+      currentElo: 1200,
+      previousAttemptsCount: 0,
+      usedHint: false,
+      solution,
+      question,
+      code,
+      userAnswer: "asdf",
+    });
+
+    expect(resultJunk.score).toBe(0);
+    expect(resultJunk.eloChange).toBe(0);
+  });
+
+  test("atribui nota baixa (4) e não concede ELO para respostas distantes do diagnóstico correto", () => {
+    const question = "Por que o Handler do clique não remove o listener ao desmontar?";
+    const solution = "O evento addEventListener registrou o handler mas o cleanup não chamou removeEventListener com a mesma referência.";
+    const code = "useEffect(() => { window.addEventListener('click', handler); }, []);";
+
+    const resultPartial = evaluateAttempt({
+      currentElo: 1200,
+      previousAttemptsCount: 0,
+      usedHint: false,
+      solution,
+      question,
+      code,
+      userAnswer: "Tem relação com o evento do window.",
+    });
+
+    expect(resultPartial).toMatchObject({
+      score: 4,
+      eloChange: 0,
+      status: "RETRY_AVAILABLE",
+    });
+    expect(resultPartial.feedback.seniorSolution).toBe("");
+  });
+
+  test("aprova e concede ELO para respostas coerentes com o diagnóstico da questão", () => {
+    const question = "Por que o Handler do clique não remove o listener ao desmontar?";
+    const solution = "O evento addEventListener registrou o handler mas a função de cleanup não executou removeEventListener.";
+    const code = "useEffect(() => { window.addEventListener('click', handler); }, []);";
+
+    const resultCorrect = evaluateAttempt({
+      currentElo: 1200,
+      previousAttemptsCount: 0,
+      usedHint: false,
+      solution,
+      question,
+      code,
+      userAnswer: "O addEventListener registrou o handler no window mas faltou a função de cleanup chamando removeEventListener.",
+    });
+
+    expect(resultCorrect.score).toBeGreaterThanOrEqual(7);
+    expect(resultCorrect.eloChange).toBeGreaterThan(0);
+    expect(resultCorrect.status).toBe("SOLVED");
+    expect(resultCorrect.feedback.seniorSolution).toBe(solution);
+  });
 });
 
 describe("revealAttemptSolution", () => {

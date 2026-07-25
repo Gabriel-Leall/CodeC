@@ -156,6 +156,9 @@ export function createMockTrainingStore(options: MockTrainingStoreOptions = {}) 
         previousAttemptsCount: challengeAttempts.length,
         usedHint: Boolean(input.usedHint),
         solution: challenge.solution,
+        question: challenge.question,
+        code: challenge.code,
+        userAnswer: input.userAnswer,
         feedback: options.feedbackForAnswer?.(input.userAnswer),
       });
       user = { ...user, elo: evaluation.newElo, updatedAt: new Date() };
