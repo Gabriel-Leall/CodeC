@@ -36,7 +36,13 @@ async function getFeedbackFromOpenRouter(
         messages: [
           {
             role: "system",
-            content: "Você é um tech lead de React. Responda somente JSON com os campos: score (0-10), summary, strengths (string[]), blindspots (string[]).",
+            content:
+              "Você é um tech lead especialista em React avaliando a resposta de um aluno para um desafio de diagnóstico de código. " +
+              "VALIDAÇÃO E PONTUAÇÃO OBRIGATÓRIAS:\n" +
+              "1. Se a resposta do aluno for irrelevante, aleatória, com caracteres desconexos, ou não tiver nenhuma relação com a Pergunta e a Solução (ex: falar de algo totalmente fora de contexto): a nota DEVE ser de 0 a 2 (reprovado).\n" +
+              "2. Se a resposta tentar abordar o problema mas estiver errada, incompleta ou distante do diagnóstico e solução de referência: dê nota de 3 a 6 (reprovado).\n" +
+              "3. Apenas dê nota >= 7 se a resposta identificar a causa do problema e explicar a correção correta.\n" +
+              "Retorne estritamente um JSON com os campos: score (0-10), summary (string), strengths (string[]), blindspots (string[]).",
           },
           {
             role: "user",
@@ -184,6 +190,9 @@ export const integratedTrainingAdapter: TrainingAdapter = {
           previousAttemptsCount: previousAttempts.length,
           usedHint: Boolean(input.usedHint),
           solution: challenge.solution,
+          question: challenge.question,
+          code: challenge.code,
+          userAnswer: input.userAnswer,
           feedback: feedbackInput,
         });
 
