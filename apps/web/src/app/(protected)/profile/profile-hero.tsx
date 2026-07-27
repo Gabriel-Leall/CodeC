@@ -18,7 +18,7 @@ import {
 
 import { ZenToast } from "@kodan/ui/components/zen";
 
-import { updateLocalUserProfile } from "../dashboard/actions";
+import { updateLocalUserProfile } from "../../(public)/dashboard/actions";
 import { useZenToast } from "@/hooks/use-zen-toast";
 import type { ProfileUserSummary } from "./profile-types";
 

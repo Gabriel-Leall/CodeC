@@ -73,6 +73,8 @@ function SimulatorNavigationCard({ icon }: { icon: StaticImageData }) {
 }
 
 export function DashboardNavigation({ challengeCount, icons }: { challengeCount: number; icons: DashboardThemeAssets }) {
+  
+  
   return (
     <aside className="grid gap-5 md:grid-cols-3 2xl:block 2xl:space-y-5">
       <TrainingNavigationCard challengeCount={challengeCount} icon={icons.training} />
