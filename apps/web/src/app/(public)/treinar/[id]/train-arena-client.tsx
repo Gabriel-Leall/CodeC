@@ -63,6 +63,7 @@ export interface Challenge {
 }
 
 const MIN_ANSWER_LENGTH = 30;
+const DRAFT_STORAGE_PREFIX = "kodan:train-diagnosis:";
 
 type ZenToastTone = "success" | "error" | "warning" | "info";
 type ZenToastState = {
@@ -340,6 +341,27 @@ export default function TrainArenaClient({
   const [showHintConfirm, setShowHintConfirm] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
 
+  const draftStorageKey = `${DRAFT_STORAGE_PREFIX}${id}`;
+
+  useEffect(() => {
+    if (initialUserAnswer) return;
+
+    try {
+      const savedDraft = window.sessionStorage.getItem(draftStorageKey);
+      if (savedDraft) setUserAnswer(savedDraft);
+    } catch {
+      // O diagnóstico continua disponível na sessão atual se o storage não estiver acessível.
+    }
+  }, [draftStorageKey, initialUserAnswer]);
+
+  const saveDraftBeforeAuthentication = () => {
+    try {
+      window.sessionStorage.setItem(draftStorageKey, userAnswer);
+    } catch {
+      // Não interrompe o redirecionamento para autenticação se o storage estiver indisponível.
+    }
+  };
+
   const showZenToast = (tone: ZenToastTone, title: string, message: string) => {
     dispatchZenToast({ type: "hide" });
     window.setTimeout(
@@ -394,8 +416,9 @@ export default function TrainArenaClient({
     userAnswer.trim().length === 0
       ? 0
       : userAnswer.trim().split(/\s+/).length;
+  // Visitantes também podem acionar o botão: nesse caso exibimos o convite de login.
   const canSubmit =
-    !submitting && !answerLocked && answerLength >= MIN_ANSWER_LENGTH;
+    !submitting && !answerLocked && (!isAuthenticated || answerLength >= MIN_ANSWER_LENGTH);
   const hasStartedAnalysis =
     answerLength > 0 || notes.trim().length > 0 || hintRevealed || submitting;
 
@@ -408,6 +431,11 @@ export default function TrainArenaClient({
       return;
     }
 
+    if (!isAuthenticated) {
+      setShowAuthenticationDialog(true);
+      return;
+    }
+
     if (answerLength < MIN_ANSWER_LENGTH) {
       showZenToast(
         "warning",
@@ -417,16 +445,16 @@ export default function TrainArenaClient({
       return;
     }
 
-    if (!isAuthenticated) {
-      setShowAuthenticationDialog(true);
-      return;
-    }
-
     dispatchAttemptSession({ type: "submit_started" });
 
     try {
       const response = await submitAttempt(id, userAnswer, usedHintRef.current);
       if (response.success && response.data) {
+        try {
+          window.sessionStorage.removeItem(draftStorageKey);
+        } catch {
+          // O resultado foi salvo no servidor; uma falha ao limpar o rascunho não o invalida.
+        }
         dispatchAttemptSession({
           type: "submit_succeeded",
           result: response.data as ArenaAttemptResult,
@@ -592,6 +620,7 @@ export default function TrainArenaClient({
         open={showAuthenticationDialog}
         callbackURL={`/treinar/${id}`}
         onClose={() => setShowAuthenticationDialog(false)}
+        onAuthenticate={saveDraftBeforeAuthentication}
       />
 
       <div className="fixed bottom-4 right-4 z-[80]">
@@ -640,10 +669,12 @@ function AuthenticationRequiredDialog({
   open,
   callbackURL,
   onClose,
+  onAuthenticate,
 }: {
   open: boolean;
   callbackURL: string;
   onClose: () => void;
+  onAuthenticate: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const primaryActionRef = useRef<HTMLAnchorElement>(null);
@@ -684,27 +715,29 @@ function AuthenticationRequiredDialog({
         <span className="grid size-12 place-items-center rounded-full bg-[var(--challengers-blue-soft)] text-[var(--challengers-blue)]">
           <LockKeyhole className="size-5" aria-hidden="true" />
         </span>
-        <h2 id="authentication-required-title" className="mt-5 pr-10 font-serif text-2xl font-bold text-[var(--challengers-ink)]">
-          Crie sua conta para enviar
+        <h2 id="authentication-required-title" className="mt-5 mb-6 pr-10 font-serif text-2xl font-bold text-[var(--challengers-ink)]">
+          É necessário fazer login para enviar seu diagnóstico
         </h2>
         <p id="authentication-required-description" className="mt-3 text-sm leading-6 text-[var(--challengers-muted)]">
-          Você pode explorar os desafios livremente. Para receber a avaliação, salvar seu progresso e atualizar seu ELO, registre-se no Kodan.
+          Você pode ler e escrever seu diagnóstico livremente. Para enviá-lo, receber a avaliação e salvar seu progresso, entre ou crie sua conta no Kodan.
         </p>
 
-        <div className="mt-7 grid gap-3 sm:grid-cols-2">
+        <div className="mt-7">
           <Link
             ref={primaryActionRef}
-            href={getLoginHref(callbackURL, "register")}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--challengers-blue)] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            Criar conta
-          </Link>
-          <Link
             href={getLoginHref(callbackURL)}
-            className="challengers-control inline-flex min-h-11 items-center justify-center rounded-lg border px-4 text-sm font-semibold text-[var(--challengers-ink)]"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-[var(--challengers-blue)] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            onClick={onAuthenticate}
           >
-            Já tenho conta
+            Entrar ou criar conta
           </Link>
+          <button
+            type="button"
+            className="mt-3 w-full text-sm font-medium text-[var(--challengers-muted)] underline-offset-4 hover:text-[var(--challengers-ink)] hover:underline"
+            onClick={onClose}
+          >
+            Agora não, vou entrar depois
+          </button>
         </div>
     </dialog>
   );

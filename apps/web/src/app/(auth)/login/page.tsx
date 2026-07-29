@@ -17,7 +17,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {authClient} from "@/lib/auth-client"
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getRegisterHref, getSafeCallbackPath } from "@/lib/auth-navigation";
 
 const loginSchema = z
   .object({
@@ -31,7 +32,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackURL = getSafeCallbackPath(searchParams.get("callbackURL"), "/inicio");
 
   const {
   register,
@@ -47,7 +50,7 @@ export default function LoginPage() {
     await authClient.signIn.email({
       email: formData.email,
       password: formData.password,
-      callbackURL: "/inicio"
+      callbackURL,
     }, 
     {
       onRequest: (ctx)=> {
@@ -55,7 +58,7 @@ export default function LoginPage() {
     }, 
     onSuccess: (ctx)=> {
       console.log("Logado:", ctx)
-      router.replace("/inicio")
+      router.replace(callbackURL)
     },
     onError:(ctx)=>{
       console.log("ERRO AO LOGAR!!")
@@ -66,7 +69,8 @@ export default function LoginPage() {
 
   const signInGitHub = async () => {
     const data = await authClient.signIn.social({
-      provider: "github"
+      provider: "github",
+      callbackURL,
     })
   }
 
@@ -80,7 +84,7 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-gray-500">
           Não tem conta?{" "}
           <Link
-            href="/cadastro"
+            href={getRegisterHref(callbackURL)}
             className="font-medium text-violet-600 hover:text-violet-500"
           >
             Criar conta
@@ -193,6 +197,7 @@ export default function LoginPage() {
         onClick={async () =>
             await authClient.signIn.social({
               provider: "github",
+              callbackURL,
             })
           }
       >

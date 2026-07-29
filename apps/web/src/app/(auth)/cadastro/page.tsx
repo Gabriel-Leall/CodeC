@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {authClient} from "@/lib/auth-client"
+import { getLoginHref, getSafeCallbackPath } from "@/lib/auth-navigation";
 
 const registerSchema = z
   .object({
@@ -31,6 +32,8 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function CadastroPage() {
   const [showPwd, setShowPwd] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackURL = getSafeCallbackPath(searchParams.get("callbackURL"), "/inicio");
 
   const {
   register,
@@ -45,14 +48,14 @@ export default function CadastroPage() {
     name: formData.name,
     email: formData.email,
     password: formData.password,
-    callbackURL: "/inicio"
+    callbackURL,
   }, 
   {onRequest: (ctx)=> {
 
   }, 
   onSuccess: (ctx)=> {
     console.log("cadastrado", ctx)
-    router.replace("/inicio")
+    router.replace(callbackURL)
   },
   onError:(ctx)=>{
     console.log("ERRO AO CRIAR CONTA")
@@ -70,7 +73,7 @@ export default function CadastroPage() {
         <p className="mt-1 text-sm text-gray-500">
           Já tem conta?{" "}
           <Link
-            href="/login"
+            href={getLoginHref(callbackURL)}
             className="font-medium text-violet-600 hover:text-violet-500"
           >
             Entrar

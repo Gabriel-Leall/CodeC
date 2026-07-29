@@ -64,8 +64,8 @@ export function DashboardHomeHeader({ userName, userImage, userElo, userStreak }
         </>) : 
         (<>
         <div className="flex flex-row gap-3 w-fit">
-          <button className="bg-blue-500 rounded w-auto shadow-2xs px-4 py-2 cursor-pointer font-semibold text-white transition-colors duration-300 ease-in-out hover:bg-white hover:text-blue-500 hover:shadow-md" onClick={() => router.replace('/cadastro')}>Cadastrar</button>
-          <button className="bg-blue-500 rounded w-auto shadow-2xs px-4 py-2 cursor-pointer font-semibold text-white transition-colors duration-300 ease-in-out hover:bg-white hover:text-blue-500 hover:shadow-md" onClick={() => router.replace('/login')}>Entrar</button>
+          <button className="bg-blue-500 rounded w-auto shadow-2xs px-4 py-2 cursor-pointer font-semibold text-white transition-colors duration-300 ease-in-out hover:bg-white hover:text-blue-500 hover:shadow-md" onClick={() => router.push('/cadastro')}>Cadastrar</button>
+          <button className="bg-blue-500 rounded w-auto shadow-2xs px-4 py-2 cursor-pointer font-semibold text-white transition-colors duration-300 ease-in-out hover:bg-white hover:text-blue-500 hover:shadow-md" onClick={() => router.push('/login')}>Entrar</button>
         </div>
         </>)}
         
