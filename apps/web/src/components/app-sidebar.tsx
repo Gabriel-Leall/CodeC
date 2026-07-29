@@ -21,21 +21,21 @@ import { formatRankLabel } from "@/lib/rating";
 import { useSession } from "@/hooks/use-session";
 
 export const APP_ROUTE_PREFIXES = [
-  "/dashboard",
-  "/challenges",
-  "/train",
-  "/profile",
-  "/reviews",
-  "/simulator",
-  "/help",
-  "/settings",
+  "/inicio",
+  "/desafios",
+  "/treinar",
+  "/perfil",
+  "/revisoes",
+  "/simulados",
+  "/ajuda",
+  "/configuracoes",
 ] as const;
 
 const CHALLENGE_LINKS = [
-  { href: "/challenges", label: "Todos os Desafios", dot: "bg-[var(--profile-accent-blue)]" },
-  { href: "/challenges?status=in_progress", label: "Em andamento", dot: "bg-[var(--profile-text-muted)]" },
-  { href: "/reviews", label: "Revisões", dot: "bg-[var(--profile-danger)]" },
-  { href: "/simulator", label: "Simulados", dot: "bg-[var(--profile-warning)]" },
+  { href: "/desafios", label: "Todos os Desafios", dot: "bg-[var(--profile-accent-blue)]" },
+  { href: "/desafios?status=in_progress", label: "Em andamento", dot: "bg-[var(--profile-text-muted)]" },
+  { href: "/revisoes", label: "Revisões", dot: "bg-[var(--profile-danger)]" },
+  { href: "/simulados", label: "Simulados", dot: "bg-[var(--profile-warning)]" },
 ] as const satisfies ReadonlyArray<{ href: Route; label: string; dot: string }>;
 
 export type SidebarUser = {
@@ -59,12 +59,12 @@ function KodanMark({ compact = false }: { compact?: boolean }) {
 }
 
 function isChallengeRoute(pathname: string) {
-  return pathname.startsWith("/challenges") || pathname.startsWith("/train") || pathname.startsWith("/dashboard/challenges") || pathname.startsWith("/dashboard/train") || pathname === "/reviews" || pathname === "/simulator";
+  return pathname.startsWith("/desafios") || pathname.startsWith("/treinar") || pathname === "/revisoes" || pathname === "/simulados";
 }
 
 function isSubrouteActive(pathname: string, href: Route) {
-  if (href === "/reviews" || href === "/simulator") return pathname === href;
-  return href === "/challenges" && pathname.startsWith("/challenges");
+  if (href === "/revisoes" || href === "/simulados") return pathname === href;
+  return href === "/desafios" && pathname.startsWith("/desafios");
 }
 
 export function AppSidebar({
@@ -93,7 +93,7 @@ export function AppSidebar({
     .join("")
     .toUpperCase();
   const rank = user ? formatRank(user.elo) : "Crie sua conta";
-  const profileHref = user ? "/profile" : getLoginHref("/profile");
+  const profileHref = user ? "/perfil" : getLoginHref("/perfil");
 
   const closeMobileAndOpenChallenges = () => {
     setChallengesOpen(true);
@@ -107,7 +107,7 @@ export function AppSidebar({
   return (
     <aside className={cn("relative flex h-svh min-h-0 shrink-0 flex-col overflow-hidden border-r border-[color:var(--profile-border)] bg-[var(--profile-bg)] transition-[width] duration-200", compact ? "w-20" : "w-64")}>
       <div className={cn("relative z-10 flex h-28 shrink-0 items-center", compact ? "justify-center px-3" : "justify-between px-7")}>
-        <Link href="/dashboard" aria-label="Abrir o Dojo" onClick={onCloseMobile}><KodanMark compact={compact} /></Link>
+        <Link href="/inicio" aria-label="Abrir o Dojo" onClick={onCloseMobile}><KodanMark compact={compact} /></Link>
         <button data-sidebar-close={mobileOpen ? "true" : undefined} type="button" onClick={mobileOpen ? onCloseMobile : onToggle} aria-label={mobileOpen ? "Fechar sidebar" : compact ? "Expandir sidebar" : "Recolher sidebar"} className="grid size-11 place-items-center rounded-lg text-[var(--profile-text-muted)] transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]">
           {mobileOpen ? <X className="size-4" /> : compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
         </button>
@@ -116,10 +116,10 @@ export function AppSidebar({
       <nav className="relative z-10 min-h-0 flex-1 space-y-7 overflow-y-auto px-4 py-5" aria-label="Navegação principal">
         <div>
           <p className={cn("mb-3 px-4 text-xs font-semibold uppercase tracking-wider text-[var(--profile-text-secondary)]", compact && "sr-only")}>Dojo</p>
-          <Link href="/dashboard" onClick={onCloseMobile} title={compact ? "Visão Geral" : undefined} aria-current={pathname === "/dashboard" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/dashboard" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><Home className="size-5 shrink-0" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Visão Geral</span></Link>
+          <Link href="/inicio" onClick={onCloseMobile} title={compact ? "Início" : undefined} aria-current={pathname === "/inicio" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/inicio" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><Home className="size-5 shrink-0" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Início</span></Link>
 
           <div className={cn("mt-2 flex items-center rounded-xl transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", challengeSectionActive ? "text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}>
-            <Link href="/challenges" onClick={closeMobileAndOpenChallenges} title={compact ? "Desafios" : undefined} aria-current={challengeSectionActive ? "page" : undefined} className="flex min-h-12 min-w-0 flex-1 items-center gap-4 px-4 text-sm font-medium">
+            <Link href="/desafios" onClick={closeMobileAndOpenChallenges} title={compact ? "Desafios" : undefined} aria-current={challengeSectionActive ? "page" : undefined} className="flex min-h-12 min-w-0 flex-1 items-center gap-4 px-4 text-sm font-medium">
               <Swords className="size-5 shrink-0" />
               <span className={cn("flex-1 whitespace-nowrap", compact && "sr-only")}>Desafios</span>
             </Link>
@@ -146,14 +146,14 @@ export function AppSidebar({
 
         <div>
           <p className={cn("mb-3 px-4 text-xs font-semibold uppercase tracking-wider text-[var(--profile-text-secondary)]", compact && "sr-only")}>Suporte</p>
-          <Link href="/help" onClick={onCloseMobile} title={compact ? "Ajuda" : undefined} aria-current={pathname === "/help" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/help" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><CircleHelp className="size-5 shrink-0" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Ajuda</span></Link>
-          {user && (<Link href="/settings" onClick={onCloseMobile} title={compact ? "Configurações" : undefined} aria-current={pathname === "/settings" ? "page" : undefined} className={cn("group mt-2 flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/settings" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><Settings className="size-5 shrink-0 transition-transform duration-200 motion-safe:group-hover:rotate-45" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Configurações</span></Link>)}
+          <Link href="/ajuda" onClick={onCloseMobile} title={compact ? "Ajuda" : undefined} aria-current={pathname === "/ajuda" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/ajuda" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><CircleHelp className="size-5 shrink-0" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Ajuda</span></Link>
+          {user && (<Link href="/configuracoes" onClick={onCloseMobile} title={compact ? "Configurações" : undefined} aria-current={pathname === "/configuracoes" ? "page" : undefined} className={cn("group mt-2 flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/configuracoes" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><Settings className="size-5 shrink-0 transition-transform duration-200 motion-safe:group-hover:rotate-45" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Configurações</span></Link>)}
         </div>
       </nav>
 
       <div className="relative z-10 mt-auto shrink-0 px-4 pb-5 pt-2">
         {user ? (
-          <Link href={profileHref} onClick={onCloseMobile} aria-current={pathname === "/profile" ? "page" : undefined} title={`${displayName}, ${rank}`} className={cn("group flex items-center gap-3 rounded-2xl border border-[color:var(--profile-border)] bg-[var(--profile-surface)]/90 p-3 transition-colors hover:border-[color:var(--profile-border-strong)] hover:bg-[var(--profile-accent-blue-soft)]", pathname === "/profile" && "border-[color:var(--profile-accent-blue)]")}>
+          <Link href={profileHref} onClick={onCloseMobile} aria-current={pathname === "/perfil" ? "page" : undefined} title={`${displayName}, ${rank}`} className={cn("group flex items-center gap-3 rounded-2xl border border-[color:var(--profile-border)] bg-[var(--profile-surface)]/90 p-3 transition-colors hover:border-[color:var(--profile-border-strong)] hover:bg-[var(--profile-accent-blue-soft)]", pathname === "/perfil" && "border-[color:var(--profile-accent-blue)]")}>
             <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--profile-surface-elevated)] text-xs font-bold text-[var(--profile-text-primary)]">{user.image ? <Image src={user.image} alt="" width={36} height={36} unoptimized className="size-full object-cover" /> : initials}</span>
             <span className={cn("min-w-0", compact && "sr-only")}><span className="block truncate text-xs font-semibold text-[var(--profile-text-primary)]">{displayName}</span><span className="mt-0.5 block text-xs uppercase tracking-wide text-[var(--profile-accent-blue)]">{rank} · {user.elo} ELO</span></span>
           </Link>

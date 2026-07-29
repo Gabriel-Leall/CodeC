@@ -10,7 +10,10 @@
     }
   },
   "scripts": {
+    "check-types": "tsc --noEmit",
     "db:push": "prisma db push",
+    "db:backfill:attempts": "bun run ./src/attempt-session-backfill.ts",
+    "db:backfill:attempts:apply": "bun run ./src/attempt-session-backfill.ts --apply",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:sqlite-to-neon": "bun run ./src/migrate-sqlite-to-neon.ts",
@@ -21,6 +24,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@kodan/content": "workspace:*",
     "@kodan/env": "workspace:*",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "catalog:",
@@ -29,6 +33,8 @@
   },
   "devDependencies": {
     "@kodan/config": "workspace:*",
+    "@types/bun": "1.3.14",
+    "@types/node": "^22.13.14",
     "prisma": "^7.8.0",
     "typescript": "catalog:"
   }

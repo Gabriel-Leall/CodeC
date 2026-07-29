@@ -29,6 +29,8 @@
     "check-types": "bun run --filter '*' check-types",
     "dev:web": "bun run --filter web dev",
     "db:push": "bun run --filter @kodan/db db:push",
+    "db:backfill:attempts": "bun run --filter @kodan/db db:backfill:attempts",
+    "db:backfill:attempts:apply": "bun run --filter @kodan/db db:backfill:attempts:apply",
     "db:studio": "bun run --filter @kodan/db db:studio",
     "db:generate": "bun run --filter @kodan/db db:generate",
     "db:generate:challenges": "bun run --filter @kodan/db db:generate:challenges",

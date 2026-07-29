@@ -47,7 +47,7 @@ export default function LoginPage() {
     await authClient.signIn.email({
       email: formData.email,
       password: formData.password,
-      callbackURL: "/dashboard"
+      callbackURL: "/inicio"
     }, 
     {
       onRequest: (ctx)=> {
@@ -55,7 +55,7 @@ export default function LoginPage() {
     }, 
     onSuccess: (ctx)=> {
       console.log("Logado:", ctx)
-      router.replace("/dashboard")
+      router.replace("/inicio")
     },
     onError:(ctx)=>{
       console.log("ERRO AO LOGAR!!")
@@ -104,7 +104,7 @@ export default function LoginPage() {
         </p>
       </div> */}
 
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-1.5 text-black/80">
           <Label htmlFor="email">E-mail</Label>
 
@@ -137,7 +137,7 @@ export default function LoginPage() {
             />
 
             <button
-              type="submit"
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
@@ -151,9 +151,8 @@ export default function LoginPage() {
         </div>
 
         <Button
-          type="button"
+          type="submit"
           className="w-full bg-[#2783c0] hover:bg-violet-700"
-          onClick={handleSubmit(onSubmit)}
         >
           Entrar
         </Button>

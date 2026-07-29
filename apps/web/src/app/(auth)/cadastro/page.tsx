@@ -30,7 +30,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function CadastroPage() {
   const [showPwd, setShowPwd] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const {
   register,
@@ -41,20 +41,18 @@ export default function CadastroPage() {
   });
 
   async function onSubmit (formData: RegisterForm) {
-  console.log(formData); 
-
-  const {data, error} = await authClient.signUp.email({
+  await authClient.signUp.email({
     name: formData.name,
     email: formData.email,
     password: formData.password,
-    callbackURL: "/dashboard"
+    callbackURL: "/inicio"
   }, 
   {onRequest: (ctx)=> {
 
   }, 
   onSuccess: (ctx)=> {
     console.log("cadastrado", ctx)
-    router.replace("/dashboard")
+    router.replace("/inicio")
   },
   onError:(ctx)=>{
     console.log("ERRO AO CRIAR CONTA")
@@ -80,7 +78,7 @@ export default function CadastroPage() {
         </p>
       </div>
 
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Nome completo</Label>
           <Input
@@ -139,7 +137,6 @@ export default function CadastroPage() {
         <Button
           type="submit"
           className="w-full bg-violet-600 hover:bg-violet-700"
-          onClick={handleSubmit(onSubmit)}
         >
           Criar conta
         </Button>

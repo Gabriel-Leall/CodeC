@@ -1,21 +1,9 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Lora } from "next/font/google";
 
 import "../index.css";
 import { AppShell } from "../components/app-shell";
 import Providers from "../components/providers";
 import { getCurrentUser } from "../server/api/service";
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-});
-
-const lora = Lora({
-  variable: "--font-serif",
-  weight: ["400", "600", "700"],
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Kodan",
@@ -44,7 +32,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className={`${jetbrainsMono.variable} ${lora.variable} antialiased`}>
+      <body suppressHydrationWarning className="antialiased">
         <Providers>
           <AppShell user={sidebarUser}>{children}</AppShell>
         </Providers>

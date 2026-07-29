@@ -7,15 +7,24 @@ import {
   OctagonXIcon,
   Loader2Icon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+import * as React from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
+  const [theme, setTheme] = React.useState<ToasterProps["theme"]>("light");
+
+  React.useEffect(() => {
+    const updateTheme = () => setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    const observer = new MutationObserver(updateTheme);
+
+    updateTheme();
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={theme}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,

@@ -2,7 +2,10 @@ import { access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { readChallengesFromContent, syncChallengesIndexFromContent } from "./challenge-content";
+import {
+  readChallengesFromContent,
+  syncChallengesIndexFromContent,
+} from "@kodan/content/promoted-challenge-catalog";
 
 type Difficulty = "EASY" | "MEDIUM" | "HARD";
 
@@ -455,8 +458,10 @@ async function writeChallenge(root: string, item: ChallengeTemplateData) {
 }
 
 async function run() {
-  const root = await resolveContentRoot();
-  const existing = await readChallengesFromContent();
+  const [root, existing] = await Promise.all([
+    resolveContentRoot(),
+    readChallengesFromContent(),
+  ]);
   const existingIds = new Set(existing.map(ch => ch.id));
   const catalog = buildCatalog().filter(item => !existingIds.has(item.id));
 
@@ -475,14 +480,16 @@ async function run() {
   }
 
   const selected = catalog.slice(0, missing);
-  for (const challenge of selected) {
-    await writeChallenge(root, challenge);
-  }
+  await Promise.all(
+    selected.map((challenge) => writeChallenge(root, challenge)),
+  );
 
-  const finalCount = (await readChallengesFromContent()).length;
-  const synced = await syncChallengesIndexFromContent();
+  const [finalChallenges, synced] = await Promise.all([
+    readChallengesFromContent(),
+    syncChallengesIndexFromContent(),
+  ]);
   console.log(
-    `[generate:challenges] created=${selected.length} previous=${existing.length} final=${finalCount}`,
+    `[generate:challenges] created=${selected.length} previous=${existing.length} final=${finalChallenges.length}`,
   );
   console.log(`[generate:challenges] indexSynced total=${synced.total}`);
 }

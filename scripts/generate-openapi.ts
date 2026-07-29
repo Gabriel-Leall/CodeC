@@ -21,7 +21,7 @@ const {
   submitAttemptResponseSchema,
   submitAttemptSchema,
   updateCurrentUserSchema,
-} = await import("web/server/api/schemas");
+} = await import("../apps/web/src/server/api/schemas");
 
 const outputPath = path.resolve("apps/docs/static/openapi.json");
 
