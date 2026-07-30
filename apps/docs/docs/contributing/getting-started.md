@@ -90,6 +90,9 @@ Ela abre em [http://localhost:3002](http://localhost:3002). Esse comando também
 | `OPENROUTER_API_KEY` | Não | Habilita feedback por IA; sem ela o projeto usa feedback local de fallback. |
 | `OPENROUTER_MODEL` | Não | Modelo do OpenRouter; o padrão atual é `openai/gpt-4o-mini`. |
 | `LEGACY_SQLITE_URL` | Não | Caminho do banco SQLite legado, somente para migração. |
+| `GITHUB_CLIENT_ID` | Não | Client ID da aplicação registrada no GitHub OAuth, utilizado para habilitar o login com GitHub. |
+| `GITHUB_CLIENT_SECRET` | Não | Client Secret da aplicação registrada no GitHub OAuth, utilizado em conjunto com o GITHUB_CLIENT_ID para autenticar usuários via GitHub. |
+
 
 ## Próximo passo
 
