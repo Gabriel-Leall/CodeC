@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {authClient} from "@/lib/auth-client"
 import { getLoginHref, getSafeCallbackPath } from "@/lib/auth-navigation";
+import { useAuthActionFeedback } from "@/components/auth-action-feedback";
 
 const registerSchema = z
   .object({
@@ -34,34 +35,39 @@ export default function CadastroPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackURL = getSafeCallbackPath(searchParams.get("callbackURL"), "/inicio");
+  const { startAuthAction, finishAuthAction, showAuthError } = useAuthActionFeedback();
 
   const {
   register,
   handleSubmit,
-  formState: { errors },
+  formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
   resolver: zodResolver(registerSchema),
   });
 
   async function onSubmit (formData: RegisterForm) {
+  startAuthAction("Criando sua conta...");
   await authClient.signUp.email({
     name: formData.name,
     email: formData.email,
     password: formData.password,
     callbackURL,
   }, 
-  {onRequest: (ctx)=> {
-
-  }, 
+  {
   onSuccess: (ctx)=> {
-    console.log("cadastrado", ctx)
+    finishAuthAction();
     router.replace(callbackURL)
   },
   onError:(ctx)=>{
-    console.log("ERRO AO CRIAR CONTA")
-    console.log(ctx)
+    finishAuthAction();
+    showAuthError(ctx.error.message || "Não foi possível criar sua conta. Tente novamente.");
   }})
 };
+
+  function onInvalid() {
+    const firstError = Object.values(errors)[0]?.message;
+    showAuthError(firstError || "Revise os dados informados e tente novamente.");
+  }
 
   return (
     <div className="space-y-6">
@@ -81,7 +87,7 @@ export default function CadastroPage() {
         </p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit, onInvalid)}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Nome completo</Label>
           <Input
@@ -139,9 +145,10 @@ export default function CadastroPage() {
 
         <Button
           type="submit"
+          disabled={isSubmitting}
           className="w-full bg-violet-600 hover:bg-violet-700"
         >
-          Criar conta
+          {isSubmitting ? <><LoaderCircle className="mr-2 size-4 animate-spin" />Criando conta...</> : "Criar conta"}
         </Button>
       </form>
 

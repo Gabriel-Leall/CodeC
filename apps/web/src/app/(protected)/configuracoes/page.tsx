@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { LogOut, Palette, Settings, UserRound } from "lucide-react";
 
 import { ModeToggle } from "@/components/mode-toggle";
 import {authClient} from "@/lib/auth-client"
 import { Button } from "@/components/button";
 import { useRouter } from "next/navigation";
+import { useAuthActionFeedback } from "@/components/auth-action-feedback";
 
 
 function SettingsRow({ icon, title, description, action }: { icon: ReactNode; title: string; description: string; action: ReactNode }) {
@@ -28,28 +29,30 @@ function SettingsRow({ icon, title, description, action }: { icon: ReactNode; ti
 export default function SettingsPage() {
 
   const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const { startAuthAction, finishAuthAction, showAuthError } = useAuthActionFeedback();
 
   const handleSignOut = async () => {
+    setIsSigningOut(true);
+    startAuthAction("Desconectando sua conta...");
     await authClient.signOut(
       {},
       {
-        onRequest: (ctx) => {
-          console.log("request", ctx);
-        },
         onSuccess: (ctx) => {
-          console.log("DESLOGADO!", ctx);
+          finishAuthAction();
           router.replace("/login");
         },
         onError: (ctx) => {
-          console.log("ERRO AO DESLOGAR DA CONTA");
-          console.log(ctx);
+          setIsSigningOut(false);
+          finishAuthAction();
+          showAuthError(ctx.error.message || "Não foi possível desconectar sua conta. Tente novamente.");
         },
       },
     );
   };
 
   return (
-    <main className="min-h-full bg-[var(--dojo-page)] px-6 py-12 text-[var(--dojo-ink)] sm:px-10">
+    <main className="min-h-full bg-[var(--dojo-page)] px-6 py-12 text-[var(--dojo-ink)] sm:px-10" aria-busy={isSigningOut}>
       <div className="mx-auto max-w-3xl">
         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--dojo-accent)]"><Settings className="size-4" aria-hidden="true" />Preferências</p>
         <h1 className="mt-3 font-serif text-4xl font-bold">Configurações</h1>

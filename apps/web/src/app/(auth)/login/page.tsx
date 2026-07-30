@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGoogle,
@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {authClient} from "@/lib/auth-client"
 import { useRouter, useSearchParams } from "next/navigation";
 import { getRegisterHref, getSafeCallbackPath } from "@/lib/auth-navigation";
+import { useAuthActionFeedback } from "@/components/auth-action-feedback";
 
 const loginSchema = z
   .object({
@@ -35,44 +36,53 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackURL = getSafeCallbackPath(searchParams.get("callbackURL"), "/inicio");
+  const { startAuthAction, finishAuthAction, showAuthError } = useAuthActionFeedback();
 
   const {
   register,
   handleSubmit,
-  formState: { errors },
+  formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
   resolver: zodResolver(loginSchema),
   });
 
   async function onSubmit (formData: LoginFormValues) {
-  console.log(formData); 
-
+    startAuthAction("Entrando na sua conta...");
     await authClient.signIn.email({
       email: formData.email,
       password: formData.password,
       callbackURL,
     }, 
     {
-      onRequest: (ctx)=> {
-
-    }, 
     onSuccess: (ctx)=> {
-      console.log("Logado:", ctx)
+      finishAuthAction();
       router.replace(callbackURL)
     },
     onError:(ctx)=>{
-      console.log("ERRO AO LOGAR!!")
-      console.log(ctx)
+      finishAuthAction();
+      showAuthError(ctx.error.message || "Confira seu e-mail e senha e tente novamente.");
     }
   })
   };
 
-  const signInGitHub = async () => {
-    const data = await authClient.signIn.social({
-      provider: "github",
-      callbackURL,
-    })
+  function onInvalid() {
+    const firstError = Object.values(errors)[0]?.message;
+    showAuthError(firstError || "Revise os dados informados e tente novamente.");
   }
+
+  const signInSocial = async (provider: "google" | "github") => {
+    startAuthAction(`Redirecionando para ${provider === "google" ? "o Google" : "o GitHub"}...`);
+    await authClient.signIn.social(
+      { provider, callbackURL },
+      {
+        onError: (ctx) => {
+          finishAuthAction();
+          showAuthError(ctx.error.message || "Não foi possível iniciar o login social.");
+        },
+      },
+    );
+  };
+
 
   return (
     <div className="space-y-6">
@@ -108,7 +118,7 @@ export default function LoginPage() {
         </p>
       </div> */}
 
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit, onInvalid)}>
         <div className="space-y-1.5 text-black/80">
           <Label htmlFor="email">E-mail</Label>
 
@@ -156,9 +166,10 @@ export default function LoginPage() {
 
         <Button
           type="submit"
+          disabled={isSubmitting}
           className="w-full bg-[#2783c0] hover:bg-violet-700"
         >
-          Entrar
+          {isSubmitting ? <><LoaderCircle className="mr-2 size-4 animate-spin" />Entrando...</> : "Entrar"}
         </Button>
       </form>
 
@@ -174,10 +185,11 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <Button
+      {/* <Button
         type="button"
         variant="outline"
         className="w-full rounded"
+        onClick={() => signInSocial("google")}
       >
         <FontAwesomeIcon
           icon={faGoogle}
@@ -185,21 +197,13 @@ export default function LoginPage() {
         />
 
         <p className="text-black/60">Entrar com Google</p>
-      </Button>
+      </Button> */}
 
       <Button
         type="button"
         variant="outline"
         className="w-full"
-        // onClick={() => {
-        //     console.log("GITHUB!")
-        //     signInGitHub}}
-        onClick={async () =>
-            await authClient.signIn.social({
-              provider: "github",
-              callbackURL,
-            })
-          }
+        onClick={() => signInSocial("github")}
       >
         <FontAwesomeIcon
           icon={faGithub}
