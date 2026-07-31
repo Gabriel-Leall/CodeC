@@ -167,7 +167,7 @@ export default function LoginPage() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#2783c0] hover:bg-violet-700"
+className="w-full bg-[#2783c0] hover:bg-[#1f6da0]"
         >
           {isSubmitting ? <><LoaderCircle className="mr-2 size-4 animate-spin" />Entrando...</> : "Entrar"}
         </Button>
