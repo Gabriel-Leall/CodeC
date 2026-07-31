@@ -17,8 +17,7 @@ import {
 } from "lucide-react";
 
 import { ZenToast } from "@kodan/ui/components/zen";
-
-import { updateLocalUserProfile } from "../actions";
+import { updateLocalUserProfile } from "../../actions";
 import { useZenToast } from "@/hooks/use-zen-toast";
 import type { ProfileUserSummary } from "./profile-types";
 

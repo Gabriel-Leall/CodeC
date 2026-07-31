@@ -1,9 +1,14 @@
 import { ThemeProvider } from "./theme-provider";
+import { Toaster } from "@kodan/ui";
+import { AuthActionFeedbackProvider } from "./auth-action-feedback";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      {children}
+    <ThemeProvider>
+      <AuthActionFeedbackProvider>
+        {children}
+        <Toaster position="bottom-left" closeButton richColors />
+      </AuthActionFeedbackProvider>
     </ThemeProvider>
   );
 }

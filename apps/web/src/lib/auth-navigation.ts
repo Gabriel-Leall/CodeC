@@ -17,3 +17,8 @@ export function getLoginHref(callbackURL: string, mode: AuthMode = "login"): Rou
   const searchParams = new URLSearchParams({ mode, callbackURL });
   return `/login?${searchParams.toString()}` as Route;
 }
+
+export function getRegisterHref(callbackURL: string): Route {
+  const searchParams = new URLSearchParams({ callbackURL });
+  return `/cadastro?${searchParams.toString()}` as Route;
+}

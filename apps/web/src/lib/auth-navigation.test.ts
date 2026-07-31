@@ -4,17 +4,17 @@ import { getLoginHref, getSafeCallbackPath } from "./auth-navigation";
 
 describe("auth navigation", () => {
   test("keeps local callback paths", () => {
-    expect(String(getSafeCallbackPath("/train/react-hooks?step=2", "/dashboard"))).toBe(
+    expect(String(getSafeCallbackPath("/train/react-hooks?step=2", "/inicio"))).toBe(
       "/train/react-hooks?step=2",
     );
   });
 
   test("rejects external and protocol-relative callbacks", () => {
-    expect(getSafeCallbackPath("https://evil.example", "/dashboard")).toBe(
-      "/dashboard",
+    expect(getSafeCallbackPath("https://evil.example", "/inicio")).toBe(
+      "/inicio",
     );
-    expect(getSafeCallbackPath("//evil.example", "/dashboard")).toBe(
-      "/dashboard",
+    expect(getSafeCallbackPath("//evil.example", "/inicio")).toBe(
+      "/inicio",
     );
   });
 

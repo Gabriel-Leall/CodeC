@@ -18,70 +18,116 @@ As telas de treino usam a mesma sidebar global:
 
 O cabeçalho global identifica a área atual e mantém o acesso a notificações. A navegação contextual fica dentro da página: por exemplo, a busca e os filtros pertencem ao catálogo, não à sidebar.
 
-## Rotas de interface
+## Organização das rotas
 
-Abra uma rota para ver como ela participa da jornada. As rotas marcadas como **canônicas** são os endereços que a navegação deve preferir.
+A aplicação utiliza Route Groups do App Router do Next.js para separar as páginas conforme seu comportamento de autenticação.
+
+Essa organização facilita a manutenção do projeto e centraliza as regras de acesso de cada grupo de páginas.
+
+### Estrutura das pastas
+
+A organização das rotas é dividida em três grupos principais:
 
 <details>
-<summary><code>/</code> · Entrada</summary>
+<summary><code>/(auth)</code> · Autenticação</summary>
 
-A entrada pública direciona para <code>/inicio</code>. A página inicial pode atender visitantes e praticantes autenticados sem transformar o dashboard em um espaço privado.
+Agrupa as páginas responsáveis pelo processo de autenticação, como login, cadastro, recuperar senha, redefinir senha e verificação de email.
 
 </details>
 
 <details>
-<summary><code>/inicio</code> · Início canônico</summary>
+<summary><code>/(protected)</code> · Rotas protegidas</summary>
+
+Agrupa as páginas que **exigem uma sessão autenticada** para serem acessadas.
+
+Antes de renderizar qualquer página desse grupo, a aplicação verifica se existe um usuário autenticado. Caso contrário, o acesso é bloqueado e o usuário é redirecionado para a página de login, preservando o destino solicitado para que possa retornar após a autenticação.
+
+Esse grupo normalmente contém páginas relacionadas aos dados pessoais do usuário e funcionalidades que dependem da sua identidade.
+
+</details>
+
+<details>
+<summary><code>/(public)</code> · Rotas públicas</summary>
+
+Agrupa as páginas que podem ser acessadas por qualquer visitante, independentemente de estar autenticado.
+
+Quando existe uma sessão ativa, essas páginas podem exibir informações personalizadas, como o nome do usuário, seu progresso ou recomendações. Entretanto, funcionalidades que alteram dados, como enviar um diagnostico ou registrar progresso, continuam exigindo autenticação.
+
+Se um visitante tentar executar uma ação protegida dentro de uma rota pública, a aplicação solicita o login e, após a autenticação, retorna o usuário para a mesma página para concluir a ação.
+
+</details>
+
+### Layouts
+
+Cada grupo de rotas possui um arquivo **`layout.tsx`**, responsável por compartilhar componentes e definir regras comuns para todas as páginas daquele grupo.
+
+Essa abordagem evita repetição de código e garante que todas as rotas de um mesmo grupo tenham o mesmo comportamento.
+
+<details> 
+<summary><code>/(protected)/layout.tsx</code> · Layout das rotas protegidas</summary>
+
+O layout das rotas protegidas verifica se existe uma sessão autenticada antes de renderizar a página.
+
+Caso o usuário não esteja autenticado, o acesso é bloqueado e ele é redirecionado automaticamente para a página de login.
+
+Todas as páginas dentro de `/(protected)` herdam esse comportamento, não sendo necessário repetir a verificação em cada página individualmente.
+</details>
+  
+<details> 
+<summary><code>/(public)/layout.tsx</code> · Layout das rotas públicas</summary>
+
+O layout das rotas públicas permite que qualquer visitante acesse suas páginas.
+
+Entretanto, ele também verifica se existe uma sessão ativa para disponibilizar informações personalizadas ao usuário autenticado.
+
+Quando uma funcionalidade exige autenticação — por exemplo, enviar um diagnóstico para avaliação — o layout permite que a página seja exibida normalmente, mas a ação protegida solicita o login antes de ser executada. Após a autenticação, o usuário retorna automaticamente para a página em que estava.
+
+Essa estratégia permite que visitantes explorem a plataforma livremente, enquanto funcionalidades que alteram dados permanecem protegidas.
+</details>
+
+### Rotas de interface
+
+Abra uma rota para ver como ela participa da jornada. As rotas marcadas como **canônicas** são os endereços que a navegação deve preferir.
+
+<details>
+<summary><code>/(public)/inicio</code> · Início canônico</summary>
 
 Mostra a visão geral e um desafio em destaque com o código ao lado. Para visitantes, prioriza um desafio fácil praticado por mais pessoas. Para praticantes autenticados, pode retomar uma sessão recente ou recomendar um desafio próximo do ELO atual.
 
 </details>
 
 <details>
-<summary><code>/desafios</code> · Catálogo canônico</summary>
+<summary><code>/(public)/desafios</code> · Catálogo canônico</summary>
 
 Mostra os desafios disponíveis, permite busca textual e concentra os filtros contextuais de dificuldade, status, tipo e ordenação. Ao escolher um item, a aplicação navega para <code>/treinar/[id]</code>.
 
 </details>
 
 <details>
-<summary><code>/treinar/[id]</code> · Arena canônica</summary>
+<summary><code>/(public)/treinar/[id]</code> · Arena canônica</summary>
 
 Recebe o identificador de um desafio, apresenta o enunciado e o código para diagnóstico. Depois de errar, o praticante pode continuar sem ver a solução e com menor ELO potencial, ou revelar a solução e encerrar a sessão. A sessão aceita no máximo três tentativas avaliadas.
 
 </details>
 
 <details>
-<summary><code>/perfil</code> · Perfil canônico</summary>
+<summary><code>/(public)/ajuda</code> · Ajuda </summary>
 
-Reúne identidade do jogador, ELO, evolução, domínio por tópico, sessões recentes, recomendações e conquistas. A sidebar global também leva a esta rota para itens que ainda são seções do perfil, como histórico e configurações.
-
-</details>
-
-<details>
-<summary><code>/dashboard</code> · Redirecionamento</summary>
-
-É mantida por compatibilidade e redireciona para <code>/inicio</code>.
+Página com resposta para dúvidas sobre como o sistema funciona
 
 </details>
 
 <details>
-<summary><code>/challenges</code> e <code>/dashboard/challenges</code> · Compatibilidade</summary>
+<summary><code>/(public)/revisoes</code> · Revisões </summary>
 
-Mantêm caminhos antigos para quem já os utiliza e redirecionam para <code>/desafios</code>. Novos links devem apontar para a rota canônica.
-
-</details>
-
-<details>
-<summary><code>/train/[id]</code> e <code>/dashboard/train/[id]</code> · Compatibilidade</summary>
-
-Mantêm caminhos antigos da arena e redirecionam para <code>/treinar/[id]</code>. Novos links devem usar a rota canônica.
+Página em implementação ainda.
 
 </details>
 
 <details>
-<summary><code>/login</code> · Redirecionamento local</summary>
+<summary><code>/(public)/simulados</code> · Simulados </summary>
 
-O login autentica o praticante e preserva o destino local solicitado pela navegação.
+Página em implementação ainda.
 
 </details>
 
@@ -91,6 +137,34 @@ O login autentica o praticante e preserva o destino local solicitado pela navega
 É um playground visual experimental. Fica fora da navegação principal e não faz parte da jornada de treino, catálogo ou perfil.
 
 </details>
+
+<details>
+<summary><code>/(protected)/perfil</code> · Perfil canônico</summary>
+
+Reúne identidade do jogador, ELO, evolução, domínio por tópico, sessões recentes, recomendações e conquistas. A sidebar global também leva a esta rota para itens que ainda são seções do perfil, como histórico e configurações.
+
+</details>
+
+<details>
+<summary><code>/(protected)/configuracoes</code> · Configurações</summary>
+
+Configurações gerais como aparência do sistema(dark ou light), botão de redirecionamento pro perfil e botão de logOut
+</details>
+
+<details>
+<summary><code>/(auth)/login</code> · Redirecionamento local</summary>
+
+O login autentica o praticante e preserva o destino local solicitado pela navegação.
+
+</details>
+
+<details>
+<summary><code>/(auth)/cadastro</code> · Redirecionamento local</summary>
+
+O cadastro cria um usuário para o praticante no sistemae preserva o destino local solicitado pela navegação.
+
+</details>
+
 
 ## Fluxo principal
 

@@ -17,6 +17,19 @@ export function createAuth() {
     emailAndPassword: {
       enabled: true,
     },
+    session: {
+      expiresIn: 60 * 60 * 24, // 1 dia (em segundos)
+    },
+    socialProviders: {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID as string,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      },
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID as string,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      },
+    },
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     plugins: [nextCookies(), openAPI()],

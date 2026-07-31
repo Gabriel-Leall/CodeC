@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Flame } from "lucide-react";
 
 import { DashboardRankMenu } from "./dashboard-rank-menu";
+import { useSession } from "@/hooks/use-session";
+import { useRouter } from "next/navigation";
 
 type DashboardHomeHeaderProps = {
   userName: string;
@@ -27,6 +29,10 @@ function getInitials(userName: string) {
 export function DashboardHomeHeader({ userName, userImage, userElo, userStreak }: DashboardHomeHeaderProps) {
   const streakUnit = userStreak === 1 ? "dia" : "dias";
 
+  const session = useSession();
+
+  const router = useRouter()
+
   return (
     <header className="sticky top-0 z-20 flex min-h-28 items-center justify-between gap-5 bg-[var(--dojo-page)] px-5 pl-16 sm:px-8 lg:px-12">
       <div className="flex items-center gap-4">
@@ -49,9 +55,20 @@ export function DashboardHomeHeader({ userName, userImage, userElo, userStreak }
             <p className="text-xs text-[var(--dojo-muted)]">{streakUnit} de streak</p>
           </div>
         </div>
-        <Link href="/perfil" aria-label="Abrir perfil" className="grid size-11 place-items-center overflow-hidden rounded-full bg-[var(--dojo-avatar)] text-xs font-bold text-[var(--dojo-ink)]">
+
+        {session ? (
+          <>
+            <Link href="/perfil" aria-label="Abrir perfil" className="grid size-11 place-items-center overflow-hidden rounded-full bg-[var(--dojo-avatar)] text-xs font-bold text-[var(--dojo-ink)]">
           {userImage ? <Image src={userImage} alt="" width={44} height={44} unoptimized className="size-full object-cover" /> : getInitials(userName)}
         </Link>
+        </>) : 
+        (<>
+        <div className="flex flex-row gap-3 w-fit">
+          <button className="bg-blue-500 rounded w-auto shadow-2xs px-4 py-2 cursor-pointer font-semibold text-white transition-colors duration-300 ease-in-out hover:bg-white hover:text-blue-500 hover:shadow-md" onClick={() => router.push('/cadastro')}>Cadastrar</button>
+          <button className="bg-blue-500 rounded w-auto shadow-2xs px-4 py-2 cursor-pointer font-semibold text-white transition-colors duration-300 ease-in-out hover:bg-white hover:text-blue-500 hover:shadow-md" onClick={() => router.push('/login')}>Entrar</button>
+        </div>
+        </>)}
+        
       </div>
     </header>
   );

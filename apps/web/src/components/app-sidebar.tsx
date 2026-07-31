@@ -18,6 +18,7 @@ import { cn } from "@kodan/ui/lib/utils";
 
 import { getLoginHref } from "@/lib/auth-navigation";
 import { formatRankLabel } from "@/lib/rating";
+import { useSession } from "@/hooks/use-session";
 
 export const APP_ROUTE_PREFIXES = [
   "/inicio",
@@ -26,8 +27,8 @@ export const APP_ROUTE_PREFIXES = [
   "/perfil",
   "/revisoes",
   "/simulados",
-  "/help",
-  "/settings",
+  "/ajuda",
+  "/configuracoes",
 ] as const;
 
 const CHALLENGE_LINKS = [
@@ -99,6 +100,10 @@ export function AppSidebar({
     onCloseMobile();
   };
 
+  const session = useSession()
+
+  console.log("session", session)
+
   return (
     <aside className={cn("relative flex h-svh min-h-0 shrink-0 flex-col overflow-hidden border-r border-[color:var(--profile-border)] bg-[var(--profile-bg)] transition-[width] duration-200", compact ? "w-20" : "w-64")}>
       <div className={cn("relative z-10 flex h-28 shrink-0 items-center", compact ? "justify-center px-3" : "justify-between px-7")}>
@@ -141,8 +146,8 @@ export function AppSidebar({
 
         <div>
           <p className={cn("mb-3 px-4 text-xs font-semibold uppercase tracking-wider text-[var(--profile-text-secondary)]", compact && "sr-only")}>Suporte</p>
-          <Link href="/help" onClick={onCloseMobile} title={compact ? "Ajuda" : undefined} aria-current={pathname === "/help" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/help" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><CircleHelp className="size-5 shrink-0" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Ajuda</span></Link>
-          <Link href="/settings" onClick={onCloseMobile} title={compact ? "Configurações" : undefined} aria-current={pathname === "/settings" ? "page" : undefined} className={cn("group mt-2 flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/settings" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><Settings className="size-5 shrink-0 transition-transform duration-200 motion-safe:group-hover:rotate-45" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Configurações</span></Link>
+          <Link href="/ajuda" onClick={onCloseMobile} title={compact ? "Ajuda" : undefined} aria-current={pathname === "/ajuda" ? "page" : undefined} className={cn("group flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/ajuda" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><CircleHelp className="size-5 shrink-0" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Ajuda</span></Link>
+          {user && (<Link href="/configuracoes" onClick={onCloseMobile} title={compact ? "Configurações" : undefined} aria-current={pathname === "/configuracoes" ? "page" : undefined} className={cn("group mt-2 flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors duration-200 hover:bg-[var(--profile-accent-blue-soft)] hover:text-[var(--profile-accent-blue)]", pathname === "/configuracoes" ? "bg-[var(--profile-accent-blue-soft)] text-[var(--profile-accent-blue)]" : "text-[var(--profile-text-primary)]")}><Settings className="size-5 shrink-0 transition-transform duration-200 motion-safe:group-hover:rotate-45" /><span className={cn("whitespace-nowrap", compact && "sr-only")}>Configurações</span></Link>)}
         </div>
       </nav>
 

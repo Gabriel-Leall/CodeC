@@ -38,6 +38,10 @@ export default async function DashboardPage() {
   });
   const featuredChallenge = selection.challenge;
 
+  console.log("Challenges:", challenges);
+console.log("Quantidade:", challenges.length);
+console.log("challengesResult", challengesResult);
+
   if (!featuredChallenge) {
     throw new Error("Nenhum desafio jogável disponível.");
   }

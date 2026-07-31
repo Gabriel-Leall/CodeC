@@ -27,6 +27,7 @@ export { Input } from "./components/input";
 export { Label } from "./components/label";
 export { Skeleton } from "./components/skeleton";
 export { Toaster } from "./components/sonner";
+export { toast } from "sonner";
 export { cn } from "./lib/utils";
 export * from "./components/profile";
 export * from "./components/zen";

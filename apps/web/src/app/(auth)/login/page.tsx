@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGoogle,
@@ -13,8 +13,76 @@ import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {authClient} from "@/lib/auth-client"
+import { useRouter, useSearchParams } from "next/navigation";
+import { getRegisterHref, getSafeCallbackPath } from "@/lib/auth-navigation";
+import { useAuthActionFeedback } from "@/components/auth-action-feedback";
+
+const loginSchema = z
+  .object({
+    email: z.email("E-mail inválido"),
+    password: z.string().min(8, "A senha deve ter no mínimo 6 caracteres"),
+  })
+  
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackURL = getSafeCallbackPath(searchParams.get("callbackURL"), "/inicio");
+  const { startAuthAction, finishAuthAction, showAuthError } = useAuthActionFeedback();
+
+  const {
+  register,
+  handleSubmit,
+  formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+  resolver: zodResolver(loginSchema),
+  });
+
+  async function onSubmit (formData: LoginFormValues) {
+    startAuthAction("Entrando na sua conta...");
+    await authClient.signIn.email({
+      email: formData.email,
+      password: formData.password,
+      callbackURL,
+    }, 
+    {
+    onSuccess: (ctx)=> {
+      finishAuthAction();
+      router.replace(callbackURL)
+    },
+    onError:(ctx)=>{
+      finishAuthAction();
+      showAuthError(ctx.error.message || "Confira seu e-mail e senha e tente novamente.");
+    }
+  })
+  };
+
+  function onInvalid() {
+    const firstError = Object.values(errors)[0]?.message;
+    showAuthError(firstError || "Revise os dados informados e tente novamente.");
+  }
+
+  const signInSocial = async (provider: "google" | "github") => {
+    startAuthAction(`Redirecionando para ${provider === "google" ? "o Google" : "o GitHub"}...`);
+    await authClient.signIn.social(
+      { provider, callbackURL },
+      {
+        onError: (ctx) => {
+          finishAuthAction();
+          showAuthError(ctx.error.message || "Não foi possível iniciar o login social.");
+        },
+      },
+    );
+  };
+
 
   return (
     <div className="space-y-6">
@@ -26,7 +94,7 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-gray-500">
           Não tem conta?{" "}
           <Link
-            href="/cadastro"
+            href={getRegisterHref(callbackURL)}
             className="font-medium text-violet-600 hover:text-violet-500"
           >
             Criar conta
@@ -50,7 +118,7 @@ export default function LoginPage() {
         </p>
       </div> */}
 
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit, onInvalid)}>
         <div className="space-y-1.5 text-black/80">
           <Label htmlFor="email">E-mail</Label>
 
@@ -58,6 +126,7 @@ export default function LoginPage() {
             id="email"
             type="email"
             placeholder="voce@empresa.com"
+            {...register("email")}
           />
         </div>
 
@@ -78,6 +147,7 @@ export default function LoginPage() {
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
+              {...register("password")}
             />
 
             <button
@@ -95,10 +165,11 @@ export default function LoginPage() {
         </div>
 
         <Button
-          type="button"
-          className="w-full bg-[#2783c0] hover:bg-violet-700"
+          type="submit"
+          disabled={isSubmitting}
+className="w-full bg-[#2783c0] hover:bg-[#1f6da0]"
         >
-          Entrar
+          {isSubmitting ? <><LoaderCircle className="mr-2 size-4 animate-spin" />Entrando...</> : "Entrar"}
         </Button>
       </form>
 
@@ -114,10 +185,11 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <Button
+      {/* <Button
         type="button"
         variant="outline"
         className="w-full rounded"
+        onClick={() => signInSocial("google")}
       >
         <FontAwesomeIcon
           icon={faGoogle}
@@ -125,12 +197,13 @@ export default function LoginPage() {
         />
 
         <p className="text-black/60">Entrar com Google</p>
-      </Button>
+      </Button> */}
 
       <Button
         type="button"
         variant="outline"
         className="w-full"
+        onClick={() => signInSocial("github")}
       >
         <FontAwesomeIcon
           icon={faGithub}

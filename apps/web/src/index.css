@@ -1,6 +1,8 @@
 @import "@kodan/ui/globals.css";
 
 :root {
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --font-serif: Lora, Georgia, "Times New Roman", serif;
   --profile-bg: #f8f7f3;
   --profile-surface: #fcfbf8;
   --profile-surface-elevated: #fefefc;
