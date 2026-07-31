@@ -59,7 +59,7 @@ export default function SettingsPage() {
         <div className="mt-10 space-y-4">
           <SettingsRow icon={<Palette className="size-5" />} title="Aparência" description="Alterne o tema usado pela aplicação." action={<ModeToggle />} />
           <SettingsRow icon={<UserRound className="size-5" />} title="Perfil" description="Edite seu nome, foto e consulte sua evolução." action={<Link href="/perfil" className="inline-flex min-h-11 items-center rounded-xl border border-[color:var(--dojo-border-strong)] px-4 py-2.5 text-sm font-semibold transition-colors duration-200 hover:bg-[var(--dojo-accent-soft)]">Abrir perfil</Link>} />
-          <SettingsRow icon={<LogOut className="size-5" />} title="Sair" description="Clique no botão a seguir para deslogar da sua conta." action={<button onClick={handleSignOut} className="inline-flex min-h-11 items-center rounded-xl border border-[color:var(--dojo-border-strong)] px-4 py-2.5 text-sm font-semibold transition-colors duration-200 hover:bg-[var(--dojo-accent-soft)]">Desconectar da conta</button>} />
+<button onClick={handleSignOut} disabled={isSigningOut} className="inline-flex min-h-11 items-center rounded-xl border border-[color:var(--dojo-border-strong)] px-4 py-2.5 text-sm font-semibold transition-colors duration-200 hover:bg-[var(--dojo-accent-soft)] disabled:opacity-60">{isSigningOut ? "Desconectando..." : "Desconectar da conta"}</button>
 
         </div>
       </div>
